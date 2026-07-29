@@ -1,0 +1,7 @@
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "noEmitOnError": true,
+    "sourceMap": true
+  }
+}
