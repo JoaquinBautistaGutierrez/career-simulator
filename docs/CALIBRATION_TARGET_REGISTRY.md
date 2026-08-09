@@ -337,3 +337,44 @@ Estados generales: `PLANNED`, `MEASURABLE`, `EVIDENCE_READY`, `ACCEPTED`,
 - [Contrato matemático y de calibración](MATHEMATICAL_CALIBRATION_CONTRACT.md)
 - Todos los documentos `*_MATH_SPEC.md` de G3C.
 
+## 8. Evidence y product bindings G3D-2
+
+Las 186 rows conservan ID. Los patterns siguientes actualizan sus dependencies
+sin duplicarlas:
+
+| Target patterns | Evidence/data binding | Product decision | Acceptance status G3D-2 |
+|---|---|---|---|
+| `CT-CRE-*`, `CT-DEV-*` | player creation/trait/foot/position/development datasets | `PD-G3D-008` para equivalence | observable mixto; ranges pending |
+| `CT-ROLE-*`, `CT-MIN-*`, `CT-APP-*`, `CT-START-*` | role/minutes + calendar + registration | `PD-G3D-005/006` | evidence pending |
+| `CT-PERF-*`, `CT-ST-*`, `CT-CM-*`, `CT-GK-*`, `CT-PROD-*` | performance/exposure/pressure + club context | tail policy `PD-G3D-013` | evidence pending |
+| `CT-HLT-*`, `CT-INJ-*`, `CT-REC-*`, `CT-REL-*`, `CT-SEQ-*` | injury exposure/recovery + taxonomy/calendar | injury scope validation | evidence pending |
+| `CT-CLUB-*`, `CT-MGR-*`, `CT-TACTIC-*`, `CT-PCOMP-*` | club bundle/history/finance/manager/squad | `PD-G3D-001/002/003` | evidence pending |
+| `CT-CAL-*`, `CT-COMP-*`, `CT-WORLD-*` | competition/calendar/history catalogs | `PD-G3D-003/005/006` | catalog data pending |
+| `CT-MKT-*`, `CT-CONTRACT-*` | transfer/money/contract/external pool | `PD-G3D-003/004/005/006` | evidence pending |
+| `CT-NT-*` | national definitions/history/calendar | `PD-G3D-007` | data pending; policy resolved |
+| `CT-AWD-*` | five AwardDefinitions + award/performance history | award scope freeze | evidence pending |
+| `CT-REP-*`, `CT-SOC-*` | reach/social/reputation/attention datasets | `PD-G3D-010/013` | observable + product ranges |
+| `CT-RET-*`, `CT-CB-*`, `CT-FIN-*` | retirement history + health/market adapters | `PD-G3D-011/012/013` | evidence/product ranges pending |
+| `CT-SCR-*` | scoring catalogs/cohorts | `PD-G3D-009/010/015` | Gate 6 data/product pending |
+| `CT-E2E-*` | all accepted artifacts | all scope/tail decisions | last causal gate |
+
+Evidence tier mínimo es el definido por cada DatasetDefinition. Invariants
+siguen normativos y no se convierten en observacionales. Targets sin verdad
+externa suficiente se etiquetan `SYNTHETIC` o `PRODUCT`, nunca
+`EXTERNAL_OBSERVATION`.
+
+### 8.1 Segmentation freeze
+
+Los segmentos obligatorios del slice son GK/CM/ST, ARG/ESP y los contextos de
+competición/edad/role definidos por cada row. Club segmentation usa `clubId`
+solo para 16 detailed/materialized identities; fields abstractos se agregan por
+region/tier y no aparecen como clubs observados. Season/edition siempre se
+vincula al baseline manifest.
+
+### 8.2 Product-dependent acceptance
+
+`CT-CRE-EQUIV-001`, `CT-SCR-TIER-001`, `CT-SCR-POP-001`,
+`CT-CB-FREQ-001`, `CT-FIN-TIME-001` y tail diagnostics quedan
+`RULE_PENDING` hasta publicar tolerancias/rangos. Su métrica y aggregation ya
+están cerradas por `G3D_PRODUCT_DECISIONS.md`.
+

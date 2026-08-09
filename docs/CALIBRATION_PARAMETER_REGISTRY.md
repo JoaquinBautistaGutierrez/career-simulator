@@ -547,3 +547,42 @@ los catálogos que definen `{key}` estén congelados.
 - [ADR-070](adr/070-mathematical-runtime-and-parameter-sets.md)
 - [ADR-080](adr/080-exact-scoring-mathematics.md)
 
+## 14. Bindings de data y producto G3D-2
+
+Todo template hereda los blockers de su rama. Un valor no avanza de
+`UNASSIGNED` si falta una dependencia P0/P1 o decisión de producto indicada.
+
+| Rama | Dataset/catalog dependencies | Product dependencies | Publication blockers |
+|---|---|---|---|
+| `player.creation` | creation/trait/foot/position datasets; Position mapping | `PD-G3D-008` | baseline cohorts, Quick/Custom tolerances |
+| `development` | development longitudinal, role/minutes, club qualities, injury outputs | — | censoring, environment baselines |
+| `roleMinutes` | role/minutes, calendar, club competition, registration | `PD-G3D-005/006` | phase→Q, opportunity, eligibility bindings |
+| `performance` | performance/exposure, club contexts, calendar/pressure | — | position coverage and context units |
+| `health` | injury exposure/recovery, six InjuryDefinitions, calendar | scope freeze injury rows | taxonomy mapping and denominators |
+| `clubWorld` | 16 detailed club bundle, histories, finance, manager, squad proxy | `PD-G3D-001/002/003` | club portfolio and external identity pool |
+| `competitions` | competition/national/calendar catalogs and history | `PD-G3D-005/006` | editions, stages, Q mapping, registration |
+| `transfers` | transfer/fee/salary/contract/money, external pool | `PD-G3D-003/004/005/006` | ARS/EUR transform, candidate identities |
+| `nationalTeam` | NationalTeam/competition definitions, selection/outcome history | `PD-G3D-007` | Argentina definitions/calendar |
+| `awards` | five AwardDefinitions, award/performance histories | scope freeze award slots | field size, eligibility, timing, ties |
+| `reputationSocial` | club/national reach, social/reputation/attention datasets | `PD-G3D-010/013` | partitions, platform-era mappings |
+| `retirementComeback` | career/retirement history, health/market/external-tier adapters | `PD-G3D-011/012/013` | activity/censoring definitions, target ranges |
+| `scoringConfiguration` | scoring catalog + gameplay definition refs | `PD-G3D-009/010/015` | scoring values, compatibility/product gates |
+| `scoringCalibrationData` | PRI/CC/social cohorts | `PD-G3D-009/010` | frozen cohorts and Gate 6 |
+
+### 14.1 Dimensiones canónicas de expansión
+
+| Placeholder | Catálogo autoritativo V1 |
+|---|---|
+| `{position}` | `GK|CM|ST`, salvo path architecture-only explícito |
+| `{country|context}` | `ARG|ESP` y contexts nacionales/continentales declarados |
+| `{club}` | 16 detailed IDs + materialized real external IDs, nunca field abstracto |
+| `{competition}` | seis club slots + National definitions publicadas |
+| `{injuryFamily}` | seis InjuryDefinitions aprobadas; candidates no expanden un release |
+| `{award|profile}` | cinco AwardDefinitions y profiles referenciados |
+| `{currency}` | ARS/EUR; otra solo por scope/dataVersion publicado |
+| `{market|region}` | partitions no superpuestas de dataVersion |
+
+La cardinalidad escalar se calcula desde hashes de esos catálogos al congelar
+el candidate. Agregar una key después de publicación crea nueva versión/hash;
+no activa un default. Los 275 templates canónicos no cambian en G3D-2.
+

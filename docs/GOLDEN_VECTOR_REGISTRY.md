@@ -305,3 +305,27 @@ Un golden alcanza `PUBLISHED_V1` solo si:
 - [Mathematical Calibration Contract](MATHEMATICAL_CALIBRATION_CONTRACT.md)
 - Todos los documentos `*_MATH_SPEC.md` de G3C.
 
+## 9. Catalog/data blockers G3D-2
+
+Los 139 IDs permanecen `SPECIFIED`. Se añade el siguiente binding heredable:
+
+| Golden group | Required frozen catalogs/data | Puede calcular expected antes de calibración completa | Verification |
+|---|---|---|---|
+| `GV-MATH-*` | algorithm/profile IDs; sin data observada | Sí, al congelar fixture structural | critical: reference implementation/worksheet |
+| `GV-CRE-*`, `GV-DEV-*` | position mapping; candidate parameter values | Solo structural/synthetic fixtures; no publication | standard/critical según row |
+| `GV-ROLE-*`, `GV-MIN-*`, `GV-APP-*`, `GV-AVAIL-UNION-*` | calendar/competition/registration fixtures | Sí con synthetic definitions validadas; official requiere hashes V1 | independent evaluator |
+| `GV-PERF-*`, `GV-ST-*`, `GV-CM-*`, `GV-GK-*`, `GV-FORM-*` | position/performance context catalogs | Sí para sampler arithmetic; outputs balance dependen del candidate | reference sampler + evaluator |
+| `GV-HLT-*`, `GV-INJ-*`, `GV-REC-*`, `GV-RELAPSE-*`, `GV-SEQUELA-*`, `GV-AVAIL-MED-*` | six InjuryDefinitions + calendar | No official expected antes de taxonomy/parameters | independent state evaluator |
+| `GV-CLUB-*`, `GV-MGR-*`, `GV-TACTIC-*`, `GV-PCOMP-*`, `GV-WORLD-*` | 16 club definitions/baselines and profiles | Synthetic structural fixtures sí | second evaluator |
+| `GV-CALENDAR-*`, `GV-CONGEST-*`, `GV-LEAGUE-*`, `GV-KNOCKOUT-*`, `GV-MOBILITY-*`, `GV-CONTRIB-*` | Competition/Calendar/ExternalPool definitions | Calendar official no; ranking sampler synthetic sí | critical where exact ordering |
+| `GV-MKT-*`, `GV-CONTRACT-*`, `GV-MONEY-*` | Market windows, registration, ARS/EUR monetary artifacts, external clubs | Money boundary cases sí; official amounts no | worksheet/reference converter |
+| `GV-NT-*` | Argentina NationalTeam/competition/eligibility definitions | Ineligible structural vector sí; official contexts no | critical zero-RNG + evaluator |
+| `GV-AWD-*` | five AwardDefinitions and field/tie profiles | ordinal/tie algorithms sí con synthetic IDs | critical field/rank verifier |
+| `GV-REP-*`, `GV-SOC-*` | market/reach partitions | Arithmetic/lag synthetic only | independent state evaluator |
+| `GV-RET-*`, `GV-CB-*`, `GV-FIN-*` | activity/retirement definitions and product policies | Structural lifecycle vectors sí | critical lifecycle trace |
+| `GV-SCR-*` | frozen ScoringConfiguration/CalibrationData and gameplay IDs | Arithmetic/rounding sí; category outputs no | exact rational worksheet/reference implementation |
+
+Un fixture synthetic nunca se renombra como V1. `INPUTS_FROZEN` requiere
+`DataArtifactManifest`/ParameterSet/config hashes resolubles. Required catalog
+links y expected-output blockers forman parte del future golden manifest.
+

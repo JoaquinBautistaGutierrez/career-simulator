@@ -394,3 +394,69 @@ A dataset no puede pasar a `VALIDATED` si falta cualquiera de:
 - [ADR-070](adr/070-mathematical-runtime-and-parameter-sets.md)
 - [ADR-080](adr/080-exact-scoring-mathematics.md)
 
+## 12. Binding contractual G3D-2
+
+Las 40 entradas conservan su `datasetId`; no fue necesario dividirlas. Todas
+quedan `CONTRACT_DEFINED + PLANNED`. Los campos de §2 se complementan con los
+schemas y mappings de
+[`VERTICAL_SLICE_DATA_CATALOG_SPEC.md`](VERTICAL_SLICE_DATA_CATALOG_SPEC.md).
+
+Perfiles contractuales:
+
+| Perfil | Campos adicionales obligatorios |
+|---|---|
+| `PLAYER_OBSERVATION` | anonymous/source identity, season/competition, position mapping, exposure, age/context, quality flags |
+| `LONGITUDINAL_OBSERVATION` | ordered periods, transfers/context changes, left/right censoring y cohort bias |
+| `CLUB_EVIDENCE` | club/season/dimension, raw evidence, units, transform, confidence, uncertainty, limitations |
+| `CATALOG_DEFINITION` | stable IDs, aliases, valid period, rule/profile refs, provenance, dataVersion |
+| `MONEY_OBSERVATION` | amount/unit, currency, date, disclosed status, normalization refs y confidence |
+| `EVENT_HISTORY` | definition/edition mapping, occurrence/outcome, timing, eligibility y source completeness |
+| `SCORING_RESOURCE` | scoringVersion, gameplay refs, exact values/transforms, provenance y publication status |
+
+| Dataset ID | Perfil / scope V1 | Tier / research | Dependencias | Publication gate |
+|---|---|---|---|---|
+| `DS-PLAYER-CREATION-REFERENCE` | `PLAYER_OBSERVATION`; GK/CM/ST, ARG/ESP reference cohorts | B/C; P1 | baseline, position mapping | normalized cohorts + bias review |
+| `DS-PLAYER-TRAIT-REFERENCE` | `PLAYER_OBSERVATION`; proxy definitions only | C/D; P1 | product construct policy | uncertainty + no hidden-trait claims |
+| `DS-PLAYER-FOOT-REFERENCE` | `PLAYER_OBSERVATION`; RIGHT/LEFT/BOTH | A/B; P1 | position mapping | source semantics and denominator validated |
+| `DS-POSITION-EVALUATION-REFERENCE` | `PLAYER_OBSERVATION`; task signals GK/CM/ST | B; P1 | performance mapping | position-specific transforms reviewed |
+| `DS-DEVELOPMENT-LONGITUDINAL` | `LONGITUDINAL_OBSERVATION`; age/exposure/performance | B; P1 | player exposure, context mapping | censoring/survivorship report |
+| `DS-POSITION-USAGE-HISTORY` | `LONGITUDINAL_OBSERVATION`; minute-conserving position use | B; P3 | position mapping | ambiguous labels excluded/reviewed |
+| `DS-ROLE-MINUTES-REFERENCE` | `PLAYER_OBSERVATION`; opportunity/minutes/starts/role proxy | A/B; P1 | calendar, memberships | opportunity-aligned exposure validated |
+| `DS-PERFORMANCE-REFERENCE` | `PLAYER_OBSERVATION`; position-specific production/context | A/B; P1 | exposure, club/competition mapping | units/denominators and GK/CM/ST coverage |
+| `DS-PERFORMANCE-LONGITUDINAL` | `LONGITUDINAL_OBSERVATION`; ordered Q/season summaries | B; P1 | calendar, transfers | no same-window leakage |
+| `DS-PRESSURE-PERFORMANCE-REFERENCE` | `EVENT_HISTORY`; phase/stakes/performance | B/C; P3 | pressure profiles/calendar | sample/selection-bias review |
+| `DS-INJURY-EXPOSURE` | `PLAYER_OBSERVATION`; injury incidence with denominator | A/B; P1 | injury mapping, calendar | origin/exposure compatible |
+| `DS-INJURY-RECOVERY` | `LONGITUDINAL_OBSERVATION`; episodes/recovery/relapse/censoring | A/B; P1 | six-family mapping | overlapping/censoring QA |
+| `DS-CLUB-VERTICAL-SLICE` | `CLUB_EVIDENCE`; exactly 8 clubs per ARG/ESP league | A identity, B/C proxy; P0 | baseline, portfolio decision | 16 identities + every required dimension |
+| `DS-CLUB-HISTORICAL-STRENGTH` | `CLUB_EVIDENCE`; multi-edition attack/defense/control | B; P1 | competition history | format/context transformations validated |
+| `DS-CLUB-FINANCIAL-REFERENCE` | `CLUB_EVIDENCE` + `MONEY_OBSERVATION` | B/C; P1 | monetary artifact | date/currency/proxy comparability |
+| `DS-MANAGER-TENURE` | `EVENT_HISTORY`; manager spells/turnover | A/B; P1 | club IDs/calendar | interim/reason policy validated |
+| `DS-SQUAD-COMPETITION-PROXY` | `PLAYER_OBSERVATION`; club-window-position concentration | B/C; P1 | exposure/position mapping | depth proxy limitations documented |
+| `DS-COMPETITION-CATALOG` | `CATALOG_DEFINITION`; six club competition slots | A; P0 | baseline/format sources | IDs, stages, exposure, tie/mobility complete |
+| `DS-NATIONAL-COMPETITION-CATALOG` | `CATALOG_DEFINITION`; ARG senior contexts | A; P0 | ADR-082/calendar | eligibility/timing/format refs complete |
+| `DS-AWARD-DEFINITION-CATALOG` | `CATALOG_DEFINITION`; exactly five V1 slots | A; P0 | baseline/award history | eligibility/window/field/tie complete |
+| `DS-CALENDAR-SLICE` | `CATALOG_DEFINITION`; phase→Q/windows/boundaries | A; P0 | competition catalogs/baseline | no gaps, invalid overlaps or future exposure |
+| `DS-COMPETITION-HISTORY` | `EVENT_HISTORY`; ARG/ESP/continental editions | A; P1 | competition mapping | participant/outcome/format alignment |
+| `DS-TRANSFER-HISTORY` | `EVENT_HISTORY`; permanent/free/loan/renewal | A/B; P1 | club IDs, market windows | operation/timing/context completeness |
+| `DS-TRANSFER-FEES` | `MONEY_OBSERVATION`; nominal fee evidence | A/B; P1 | monetary artifact | disclosed/add-ons and date/currency QA |
+| `DS-MARKET-VALUATION-PROXY` | `MONEY_OBSERVATION`; provider estimates, diagnostic | B/C; P3 | methodology/version | no objective-value claim |
+| `DS-SALARY-REFERENCE` | `MONEY_OBSERVATION`; gross/net/period explicit | B/C; P1 | monetary artifact | comparable units or explicit exclusion |
+| `DS-CONTRACT-REFERENCE` | `EVENT_HISTORY`; terms/duration/renewal | A/B/C; P1 | transaction mapping | option/expectation ambiguity documented |
+| `DS-CURRENCY-INFLATION` | `CATALOG_DEFINITION`; ARS/EUR series/transforms | A; P0 | baseline/base-date policy | formula, revisions, rounding and hashes |
+| `DS-NATIONAL-SELECTION-HISTORY` | `EVENT_HISTORY`; ARG callups/squads/minutes | A/B; P1 | ADR-082, national calendar | no eligibility inference |
+| `DS-NATIONAL-COMPETITION-HISTORY` | `EVENT_HISTORY`; national outcomes | A; P1 | national definitions | format/edition mapping complete |
+| `DS-AWARD-HISTORY` | `EVENT_HISTORY`; five V1 slots and reference fields | A; P1 | AwardDefinitions | nomination/tie/status semantics validated |
+| `DS-REPUTATION-REFERENCE` | `PLAYER_OBSERVATION`; construct/proxy by market | C/D; P3 | reach/region mapping | construct validity review |
+| `DS-SOCIAL-AUDIENCE-REFERENCE` | `PLAYER_OBSERVATION`; platform/date partitions | B/C; P3 | market partitions | duplicate audience/platform-era policy |
+| `DS-SOCIAL-ENGAGEMENT-REFERENCE` | `PLAYER_OBSERVATION`; denominator/content type | B/C; P3 | audience dataset | engagement definition compatible |
+| `DS-PUBLIC-ATTENTION-REFERENCE` | `EVENT_HISTORY`; event windows/regions/baseline | B/C; P3 | public signal mapping | causal-attribution limitations |
+| `DS-CAREER-RETIREMENT-HISTORY` | `LONGITUDINAL_OBSERVATION`; activity/retirement/comeback | A/B; P1 | external-tier activity definition | censoring and comeback rules validated |
+| `DS-SCORING-PRI-COHORTS` | `SCORING_RESOURCE`; GK/CM/ST/context/evidence | A/B; P2 | performance/exposure | frozen samples/CDF/fallback hierarchy |
+| `DS-SCORING-CONTRIBUTION-COHORTS` | `SCORING_RESOURCE`; participation/contribution | A/B + product; P2 | eligibility/competition facts | monotonic transform + provenance |
+| `DS-SCORING-CATALOG` | `SCORING_RESOURCE`; competitions/awards/records/milestones | A/normative; P0/P2 | MASTER_SPEC, gameplay IDs | no missing value inferred; exact hashes |
+| `DS-SCORING-SOCIAL-COHORTS` | `SCORING_RESOURCE`; authorized social/historic metrics | B/C + product; P2 | social datasets/PD-G3D-010 | no sporting double count |
+
+Aliases/deprecations G3D-2: ninguno. `DS-CLUB-VERTICAL-SLICE` conserva tanto
+identidad como evidence por ser un único publication bundle; sus raw sources
+pueden ser múltiples artifacts sin crear otro datasetId.
+
