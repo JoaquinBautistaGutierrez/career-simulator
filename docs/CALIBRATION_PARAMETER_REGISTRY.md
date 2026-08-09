@@ -724,3 +724,29 @@ reclassified:
 
 No path, alias, classification, sensitivity, target consumer or value changed.
 No `EngineParameterSetCandidate` was created.
+
+## 20. P1 player-evidence and identifiability overlay G3D-4A
+
+All 275 templates remain `UNASSIGNED` and value-free. No path, alias,
+classification or sensitivity changes. The following metadata is attached to
+the affected canonical branches:
+
+| Parameter branch/family | Evidence bindings | Identifiability | Observational support | Remaining dependency |
+|---|---|---|---|---|
+| `player.creation.*` age/position location/scale/tails | `DS-PLAYER-CREATION-REFERENCE`; `EV-P1-CRE-*` | `INDIRECTLY_IDENTIFIABLE` | Spain/multileague emergence sensitivity; official Argentina aggregate | define likelihood jointly with exposure/selection; Argentina player panel |
+| `player.creation.*` factor loadings, latent power, capabilities, traits | Creation/Development/Performance evidence | `JOINT_CALIBRATION_REQUIRED` | observable outcomes only | synthetic identification constraints and integrated calibration |
+| `player.creation.*` preferred-foot transforms | none | `NO_DIRECT_EVIDENCE` | none acquired | dedicated position/foot source |
+| `development.*` age-curve centers/widths/amplitudes | `DS-DEVELOPMENT-LONGITUDINAL`; `EV-P1-DEV-*` | `JOINT_CALIBRATION_REQUIRED` | longitudinal outfield findings, cross-sectional and exposure-change summaries | censoring model; GK longitudinal evidence; latent separation |
+| `development.*` player offsets/noise/correlation | `DS-DEVELOPMENT-LONGITUDINAL`; `EV-P1-DEV-004,005,007` | `INDIRECTLY_IDENTIFIABLE` | broad within-player observed variability | remove opportunity/health/club effects jointly |
+| `roleMinutes.*` share location/scale/zero/exposure shapes | `DS-ROLE-MINUTES-REFERENCE`; `EV-P1-ROLE-001..004` | `DIRECTLY_ESTIMABLE` | Spain/multileague position distributions | source-license acceptance; Argentina baseline |
+| `roleMinutes.*` persistence/transition/club context | `EV-P1-ROLE-005..007` | `JOINT_CALIBRATION_REQUIRED` | same-club/change associations and official semantics | latent Role adapter and club/opportunity controls |
+| `performance.st.*` goal/assist count location and dispersion | `DS-PERFORMANCE-REFERENCE`; `EV-P1-PERF-001,004,010` | `DIRECTLY_ESTIMABLE` | Spain count/rate shape plus event opportunity reference | evidence gating; competition/club context; source review |
+| `performance.cm.*` count production | `EV-P1-PERF-002` | `DIRECTLY_ESTIMABLE` | Spain count mean/variance/zero/tails | context segmentation |
+| `performance.cm.*` task factors/weights | `EV-P1-PERF-005,009` | `JOINT_CALIBRATION_REQUIRED` | small event proxy and official Argentina semantics | commercial source/permission; larger direct panels |
+| `performance.gk.*` shot/save/concede/clean-sheet families | `EV-P1-PERF-006,009` | `INDIRECTLY_IDENTIFIABLE` | small event reference and official Argentina semantics | exposure/support separation and commercial source |
+| `performance.form.*`, shared/correlation factors | `EV-P1-PERF-007,008` | `JOINT_CALIBRATION_REQUIRED` | observed adjacent-block associations | separate ability, exposure, opponent and count noise |
+
+`DIRECTLY_ESTIMABLE` means a future estimator can fit an observational component;
+it does not authorize a parameter value, guarantee causal identification or
+advance publication status. Acceptance-critical flags and product-target
+consumers from G3D-3D are unchanged.

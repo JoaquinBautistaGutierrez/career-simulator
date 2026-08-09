@@ -612,3 +612,25 @@ The abbreviated prefix remains
 `@candidate/RSNAP-G3D3B-2026-08-07-C1`. The other 37 datasets retain their
 prior state. No dataset is `FROZEN`; no P1 acquisition, parameter value or raw
 external artifact entered the repository.
+
+## 18. P1 player-evidence overlay G3D-4A
+
+G3D-4A retains all 40 canonical `datasetId` values. Only aggregate derived
+summaries are stored; raw external observations and real-player identifiers are
+outside the repository. `NORMALIZED_WITH_LIMITATIONS` is a candidate-subset
+state, never `FROZEN` or a published `dataVersion`.
+
+| Dataset ID | G3D-4A state | Acquired coverage | Limitation / next gate |
+|---|---|---|---|
+| `DS-PLAYER-CREATION-REFERENCE` | `NORMALIZED_WITH_LIMITATIONS` | strict GK/CM/ST covered-first-tier emergence sensitivity; Spain and multileague summaries; official Argentina debut aggregate | no Argentina age/position panel; source coverage is not professional debut; latent capabilities not observed |
+| `DS-POSITION-EVALUATION-REFERENCE` | `NORMALIZED_WITH_LIMITATIONS` | strict position-task reference for CM/ST/GK from La Liga 2015/16 event data | StatsBomb is noncommercial/reference-only; strict CM N is small; needs permission or alternative source before freeze |
+| `DS-DEVELOPMENT-LONGITUDINAL` | `NORMALIZED_WITH_LIMITATIONS` | peer-reviewed La Liga longitudinal findings plus multileague within-player exposure-change summaries | survivorship/censoring; exposure is not capability; direct GK longitudinal performance missing |
+| `DS-ROLE-MINUTES-REFERENCE` | `NORMALIZED_WITH_LIMITATIONS` | Spain/multileague minute share, zero mass, exposure bands, starts/appearances availability and year-to-year persistence | no Argentina player-season panel; SportingRole remains latent |
+| `DS-PERFORMANCE-REFERENCE` | `NORMALIZED_WITH_LIMITATIONS` | Spain ST/CM counts/rates, strict GK/CM/ST event proxies and distribution shapes | Argentina has only official metric semantics; event subset license/small-N limitations |
+| `DS-PERFORMANCE-LONGITUDINAL` | `NORMALIZED_WITH_LIMITATIONS` | adjacent quarter-like block correlations and repeated-season production/exposure associations | observed persistence does not separately identify latent Form or capability persistence |
+
+The following related datasets do **not** advance: `DS-PLAYER-TRAIT-REFERENCE`,
+`DS-PLAYER-FOOT-REFERENCE`, `DS-POSITION-USAGE-HISTORY` and
+`DS-PRESSURE-PERFORMANCE-REFERENCE`. G3D-4A found no evidence sufficient to
+promote them. Source and transform hashes are in
+[G3D_P1_PLAYER_OBSERVATIONAL_HASH_MANIFEST.md](G3D_P1_PLAYER_OBSERVATIONAL_HASH_MANIFEST.md).

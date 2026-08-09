@@ -5782,3 +5782,21 @@ Impacto en schemaVersion/engineVersion/contentVersion/dataVersion/scoringVersion
 Tests o evidencia requeridos:
 ADR o documento asociado:
 ```
+
+## 15. G3D-4A — Player observational evidence reconciliation
+
+G3D-4A adds 30 P1 EvidenceRecords and aggregate candidate summaries for
+Creation, Development, Role/Minutes and Performance without changing any
+decision family or mathematical contract.
+
+| DR / scope | State after G3D-4A | Evidence advance | Remaining gate |
+|---|---|---|---|
+| `DR-008` integrated calibration | `PARTIAL_CALIBRATION` | player/Development/Role/Performance observational shapes and identifiability mapped | Health/Club/Market/National/Social/Retirement P1, ParameterSet candidates, sensitivity, integrated runs and expected goldens |
+| Creation/Development math | `RESOLVED_MATH / PARTIAL_CALIBRATION` | smooth/position-specific observational constraints and survivorship documented | no latent capability/trait values; GK longitudinal and Argentina panel gaps |
+| Role/Minutes math | `RESOLVED_MATH / PARTIAL_CALIBRATION` | share/zero/persistence evidence acquired | latent Role utilities, context adapters and Argentina baseline require joint calibration/data |
+| Performance/Form math | `RESOLVED_MATH / PARTIAL_CALIBRATION` | ST/CM counts, GK/CM/ST task proxies and temporal diagnostics acquired | Form/factors jointly identified; event licensing and Argentina distributions remain |
+
+DR-021/025/027 and all resolved policies remain unchanged. The 77 product
+targets, tier/scoring rules, Data V1 state and all 275 unassigned parameter
+templates are untouched. Result:
+`GO_FOR_G3D_4B_WITH_PLAYER_EVIDENCE_LIMITATIONS`.

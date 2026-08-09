@@ -439,3 +439,21 @@ expected output was computed. The focused candidates remove these input gaps:
 
 These are readiness changes only. Catalog hashes are candidate provenance, not
 published data/scoring versions, and no golden arithmetic result is asserted.
+
+## 15. Empirical-input readiness G3D-4A
+
+All 139 golden IDs remain `SPECIFIED`. No expected output, draw or parameter
+fixture is computed. The following existing groups gain only a future empirical
+fixture/distribution basis:
+
+| Golden group | G3D-4A readiness improvement | Still missing |
+|---|---|---|
+| `GV-CRE-*` | emergence-age sensitivity and strict position-mapping basis | latent creation parameters, Argentina player panel and frozen fixture |
+| `GV-DEV-*` | longitudinal aging/exposure heterogeneity and bias documentation | Development candidate values, censoring treatment and GK evidence |
+| `GV-ROLE-*`, `GV-MIN-*`, `GV-APP-START-001` | minute-share shapes, zero mass, exposure bands and observed persistence | role/minutes parameters, frozen TeamMinutesOpportunity fixture and Argentina baseline |
+| `GV-ST-*`, `GV-CM-IMPACT-001`, `GV-GK-PROD-001` | count/rate/event-proxy distribution basis by position | candidate parameters; event-source license or alternative; exact draws |
+| `GV-PERF-*` | temporal-block association and task-proxy basis | factor/Form candidate, source-cleared fixture and independent expected output |
+
+Acceptance uses from G3D-3D are unchanged. These vectors have
+`empiricalFixtureBasis=AVAILABLE_WITH_LIMITATIONS`; none has
+`parameterDependencyCleared=TRUE`, `INPUTS_FROZEN` or a computed result.

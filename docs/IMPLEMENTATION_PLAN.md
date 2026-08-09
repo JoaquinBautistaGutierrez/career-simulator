@@ -2717,3 +2717,28 @@ no cambian; los 139 goldens siguen sin expected outputs.
 4. scoring IJL/catalog/cohorts permanece en su track, sin ampliarlo aquí.
 
 Esta fase no inicia automáticamente ninguno de esos pasos.
+
+### Cierre G3D-4A — P1 Player, Development, Role & Performance evidence
+
+**Resultado:** `GO_FOR_G3D_4B_WITH_PLAYER_EVIDENCE_LIMITATIONS`.
+
+G3D-4A creates a separate `EV-P1-*` namespace, acquires aggregate Spain and
+multileague evidence, records limited official Argentina coverage, and maps
+observational support/identifiability into Dataset, Target, Parameter and Golden
+registries. Raw data, player identity and parameter values stay outside the
+repository. Data V1 remains unpublished.
+
+#### Reconciled P1 sequence
+
+| Phase | Inputs | Authorized output | Gate | Explicit boundary |
+|---|---|---|---|---|
+| `G3D-4B` — Health/Injury evidence | Health math/spec and injury dataset contracts | exposure-compatible incidence/severity/recovery evidence | definition, censoring, privacy and license review | no parameter calibration; not started here |
+| `G3D-4C` — Clubs/Market evidence | club identities, money candidate, market contracts | club baseline and transfer/contract observational evidence | context/money mappings and source legality | no gameplay or coefficients |
+| `G3D-4D` — National Team/Awards evidence | validated candidate definitions | histories/selection/award distributions | eligibility/timing/field mappings | no scoring values |
+| `G3D-4E` — Reputation/Social/Retirement evidence | public/reputation/lifecycle contracts | permitted aggregates and longitudinal histories | platform era, privacy, career-state definitions | no sponsor/scoring/retirement hazard calibration |
+| Initial ParameterSet Calibration | completed P1 evidence, 77 product targets, P0 candidates | explicit partial/full parameter candidates and reports | upstream coverage, license, identifiability and authorization | occurs only in a later explicit phase |
+
+Player-side blockers carried forward: no Argentina player-season panel, direct
+GK aging evidence, freeze-quality event-task licensing, preferred-foot evidence,
+and joint identification of latent Creation/Development/Role/Form variables.
+No later phase starts automatically.

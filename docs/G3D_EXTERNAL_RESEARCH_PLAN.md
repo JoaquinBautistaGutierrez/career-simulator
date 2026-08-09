@@ -279,3 +279,22 @@ Campaign lineage remains `RSNAP-G3D3B-2026-08-07-C1` with immutable
 Result: **`P0_DATA_READY_WITH_NONBLOCKING_LIMITATIONS`**. Award, Calendar and
 Money candidates can enter a future atomic freeze review; Data V1 remains
 unpublished. P1 observational acquisition is ready but was not started.
+
+## 15. G3D-4A P1 player-evidence result
+
+Scope was limited to Creation, Development/Aging, Role/Minutes and
+Performance/Form. It produced 30 atomic `EV-P1-*` records from ten sources,
+without modifying the immutable P0 namespace.
+
+| Research area | Evidence state | Coverage | Residual research gap |
+|---|---|---|---|
+| Creation | `OBSERVATIONAL_SUMMARY_AVAILABLE_WITH_LIMITATIONS` | strict GK/CM/ST emergence sensitivity; Spain/multileague; LPF debut aggregate | Argentina age/position panel; foot; no direct latent capabilities |
+| Development | `OBSERVATIONAL_SUMMARY_AVAILABLE_WITH_LIMITATIONS` | peer-reviewed La Liga longitudinal findings and panel exposure changes | GK longitudinal performance; survivorship/censoring treatment |
+| Role/Minutes | `CALIBRATION_READY_WITH_LIMITATIONS` | Spain/multileague share, zero mass and persistence | Argentina player-season panel; SportingRole remains latent |
+| Performance/Form | `OBSERVATIONAL_SUMMARY_AVAILABLE_WITH_LIMITATIONS` | Spain counts/rates/task proxies and temporal diagnostics | Argentina distributions; event license/CM-GK sample; latent Form separation |
+
+Source hierarchy prioritized official LPF facts, peer-reviewed research and
+reproducible public datasets. Transfermarkt-derived aggregates require upstream
+license review before freeze; StatsBomb/Dendir are reference-only/noncommercial.
+No raw data or player identities entered the repository. Result:
+`GO_FOR_G3D_4B_WITH_PLAYER_EVIDENCE_LIMITATIONS`; G3D-4B was not started.

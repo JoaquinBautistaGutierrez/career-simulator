@@ -580,3 +580,22 @@ retain the exhaustive G3D-3D classification. Only dependency metadata advances:
 
 `DATA_AVAILABLE` never supplies an observed target range. Product numeric
 targets from G3D-3D are immutable in this phase.
+
+## 14. P1 observational-readiness overlay G3D-4A
+
+No target ID, type, product number or acceptance tolerance changes. The 186
+targets and all 77 `PT-*` values remain intact. This overlay adds only the
+allowed P1 evidence state.
+
+| Evidence state | Target IDs | Meaning after G3D-4A |
+|---|---|---|
+| `CALIBRATION_READY` | `CT-MIN-ACTUAL-001`, `CT-MIN-SHARE-001`, `CT-MIN-ZERO-001`, `CT-APP-DIST-001`, `CT-START-DIST-001`, `CT-ST-GOAL-001`, `CT-ST-AST-001`, `CT-CM-COUNT-001` | directly summarized for Spain/multileague; later estimation must preserve context/license and cannot set acceptance from this row alone |
+| `OBSERVATIONAL_SUMMARY_AVAILABLE` | `CT-CRE-DOMPOS-001`, `CT-CRE-POS-001`, `CT-CRE-TAIL-001`, `CT-DEV-CUM-001`, `CT-DEV-DELTA-001`, `CT-DEV-EXPOSURE-001`, `CT-DEV-PEAK-001`, `CT-DEV-TAIL-001`, `CT-ROLE-COMP-001`, `CT-ROLE-FREQ-001`, `CT-ROLE-TRANS-001`, `CT-MIN-CORR-001`, `CT-MIN-POS-001`, `CT-MIN-TAIL-001`, `CT-PERF-CONS-001`, `CT-PERF-CORR-001`, `CT-PERF-DIST-001`, `CT-PERF-EVID-001`, `CT-PERF-FORM-001`, `CT-PERF-SUM-001`, `CT-PERF-TAIL-001`, `CT-PERF-TASK-001`, `CT-ST-CONV-001`, `CT-ST-CORR-001`, `CT-CM-IMPACT-001`, `CT-GK-CS-001`, `CT-GK-SAVE-001`, `CT-GK-SHOTS-001` | empirical proxy/shape/association exists, but latent or task-factor separation remains joint and Argentina/direct-license gaps apply |
+| `OBSERVATIONAL_EVIDENCE_ACQUIRED` | `CT-CRE-CAP-001`, `CT-CRE-CORR-001`, `CT-CRE-POWER-001`, `CT-CRE-SUIT-001`, `CT-CRE-TRAIT-001`, `CT-DEV-CORR-001`, `CT-DEV-FAMILY-001`, `CT-DEV-SIGN-001`, `CT-ROLE-SENS-001`, `CT-MIN-CONTEXT-001`, `CT-MIN-SENS-001`, `CT-PERF-X-001` | evidence constrains the family indirectly; no direct observed target or parameter value is available |
+| `STILL_BLOCKED` | `CT-CRE-FOOT-001`, `CT-DEV-ENV-001`, `CT-DEV-RETRAIN-001`, `CT-PERF-PRESS-001`, `CT-PERF-SURPRISE-001` | no adequate G3D-4A source/summary; state does not imply mathematical incompleteness |
+
+`CT-CRE-EQUIV-001` and `CT-APP-INVARIANT-001` retain their G3D-3D product/
+invariant classifications. P1 evidence may become their fixtures later, but does
+not modify their numeric product contract. Geographic metadata is
+`SPAIN_DIRECT`, `ARGENTINA_DIRECT_LIMITED`, and `MULTI_LEAGUE_REFERENCE`; the
+aggregate must never hide the Argentina gap.
