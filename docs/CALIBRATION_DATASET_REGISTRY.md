@@ -596,3 +596,19 @@ Artifacts canónicos:
 - [Normalization Spec](G3D_P0_NORMALIZATION_SPEC.md);
 - [Candidate Hash Manifest](G3D_P0_CANDIDATE_HASH_MANIFEST.md);
 - [Data V1 Readiness](G3D_3C_DATA_V1_READINESS_REPORT.md).
+
+## 17. Focused P0 gap-closure overlay G3D-3B2
+
+G3D-3B2 preserves all 40 `datasetId` values and the G3D-3C parent candidates.
+Only the three authorized subsets advance:
+
+| Dataset ID | Revised candidate / dataset state | Newly available | Remaining gate |
+|---|---|---|---|
+| `DS-AWARD-DEFINITION-CATALOG` | `.../005-r2`; `VALIDATED_CANDIDATE` | five consumer-complete Definitions; real non-public voting fields classified; Pichichi alias/tie resolved | numeric abstract-field profiles, P1 history and atomic Data V1 freeze |
+| `DS-CALENDAR-SLICE` | `.../003-r2`; `VALIDATED_CANDIDATE` | ordinary Argentina/FIFA windows, selection checkpoints and maximum-opportunity semantics | exact fixtures are deliberately absent; catalog freeze/registration detail later |
+| `DS-CURRENCY-INFLATION` | `.../006-r2`; dataset `ACQUIRED`, binding/transform subset `VALIDATED_CANDIDATE` | four official series routes/units/hashes/terms plus exact rational normalization | normalized retained series artifact, extended periods and atomic freeze |
+
+The abbreviated prefix remains
+`@candidate/RSNAP-G3D3B-2026-08-07-C1`. The other 37 datasets retain their
+prior state. No dataset is `FROZEN`; no P1 acquisition, parameter value or raw
+external artifact entered the repository.

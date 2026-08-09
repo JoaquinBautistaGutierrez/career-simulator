@@ -4,7 +4,7 @@
 
 ```yaml
 artifactId: SOURCE_LICENSE_MANIFEST
-artifactVersion: g3d-3b-candidate-1
+artifactVersion: g3d-3b2-candidate-1
 schemaVersion: G3D_P0_ACQUISITION_SPEC.v1
 researchSnapshotId: RSNAP-G3D3B-2026-08-07-C1
 producerResearchIds:
@@ -17,10 +17,10 @@ producerResearchIds:
   - RS-P0-AWARD-CATALOG
   - RS-P0-MONEY-POLICY-DATA
   - RS-P0-SCORING-NORMATIVE
-state: EVIDENCE_COMPLETE_WITH_LIMITATIONS
+state: EVIDENCE_COMPLETE_WITH_NONBLOCKING_LIMITATIONS
 retrievedAt: 2026-08-09
 rawExternalArtifactsCommitted: false
-artifactHashStatus: PENDING_G3D_3C_CANONICALIZATION
+artifactHashStatus: CANDIDATE_HASHED
 candidateArtifactHashRef: P0_EVIDENCE_INDEX.md#7-candidate-artifact-integrity
 ownerApprovals:
   DATA_OWNER: PROJECT_MAINTAINER_AS_DATA_OWNER
@@ -74,6 +74,7 @@ atomic cited public fact under the governance policy.
 | `SRC-FIFA-WC-FORMAT-2026` | FIFA / organizer announcement | [World Cup 2026 format and final date](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/date-set-for-2026-world-cup-final-canada-mexico-usa) | national | `MANUAL_PUBLIC_FACT`; FIFA terms/copyright | no raw; facts only | dated page | usable P0 reference |
 | `SRC-FIFA-WC-RESULTS-2026` | FIFA / official results | [World Cup 2026 schedule and results](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/match-schedule-fixtures-results-teams-stadiums) | national/calendar | `REFERENCE_ONLY`; FIFA terms/copyright | no raw; selected facts only | dynamic; archive required for freeze | usable with reproducibility limitation |
 | `SRC-FIFA-WC-FINAL-2026` | FIFA / official match report | [Spain-Argentina final report](https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/spain-argentina-final-report-highlights) | national | `MANUAL_PUBLIC_FACT`; FIFA terms/copyright | no raw; facts only | dated page | usable P0 reference |
+| `SRC-FIFA-MENS-IMC-2025-2030` | FIFA / official international match calendar | [Council-approved men's IMC 2025-2030](https://inside.fifa.com/organisation/fifa-council/media-releases/fifa-council-approves-international-match-calendars); [published calendar periods](https://www.fifa.com/en/articles/international-match-calendars) | calendar/national | `MANUAL_PUBLIC_FACT`; FIFA terms/copyright | no raw; atomic dates/maxima only | official calendar rule; 2026 dates verified before cutoff | usable primary ordinary-window evidence |
 | `SRC-FIFA-ELIGIBILITY` | FIFA / official legal explainer | [Eligibility to play for representative teams](https://inside.fifa.com/en/legal/media-releases/fifa-publishes-explainer-on-eligibility-to-play-for-representative-teams) | national eligibility | `MANUAL_PUBLIC_FACT`; FIFA terms/copyright | no raw; governing reference only | timeless definition; current rule text must be bound in G3D-3C | usable reference, not player eligibility inference |
 | `SRC-AFA-OFFICIAL` | AFA / official association site | [AFA official site](https://www.afa.com.ar/) | national identity | `MANUAL_PUBLIC_FACT`; terms not reviewed | no raw; identity only | live page | usable P0 identity |
 
@@ -83,8 +84,13 @@ atomic cited public fact under the governance policy.
 |---|---|---|---|---|---|---|---|
 | `SRC-UEFA-BALLON-WINNERS-2025` | UEFA/Groupe Amaury / co-organizer release | [2025 Ballon d'Or awards](https://www.uefa.com/news-media/news/029d-1ec9af5d0295-419f208aca97-1000--aitana-bonmati-and-ousmane-dembele-win-2025-ballon-d-or-a/) | awards | `MANUAL_PUBLIC_FACT`; copyright | no raw; facts only | primary for edition/existence/winners | usable P0 reference |
 | `SRC-UEFA-BALLON-RULES` | UEFA/Groupe Amaury / co-organizer rules explainer | [How winners are decided](https://www.uefa.com/ballondor/news/0292-1c2705cb8fd5-8f2dcb111a8a-1000--ballon-d-or-how-are-the-winners-decided/) | awards | `MANUAL_PUBLIC_FACT`; copyright | no raw; facts only | published for 2024; 2025 continuity requires validation | usable with limitation |
+| `SRC-UEFA-BALLON-NOMINEES-2025` | UEFA/Groupe Amaury / co-organizer release | [2025 nominees and jury PDF](https://editorial.uefa.com/resources/029c-1e6a605dcdda-850bf4467b58-1000/uefa_pr_ballondor_2025_eng.pdf) | awards | `REFERENCE_ONLY`; copyright | no raw; atomic facts only | stable PDF published 7 Aug 2025; archive/hash recommended | usable primary 2025 field/electorate |
+| `SRC-UEFA-BALLON-VOTING-2025` | UEFA/Groupe Amaury / co-organizer results | [Official 2025 voting rankings](https://www.uefa.com/uefachampionsleague/news/029e-1eeae3a29e5c-64e217276491-1000--2025-ballon-d-or-voting-results-official-rankings/) | awards | `MANUAL_PUBLIC_FACT`; copyright | no raw; facts only | post-edition publication describes pre-cutoff closed award | usable primary 2025 ordinal/ballot evidence |
 | `SRC-LALIGA-AWARDS-2025-26` | LALIGA / organizer release | [2025/26 award winners](https://www.laliga.com/es-US/noticias/laliga-anuncia-los-ganadores-de-los-premios-de-laliga-ea-sports-2025-26) | awards | `MANUAL_PUBLIC_FACT`; copyright | no raw; facts only | page omits field/tie mechanics | usable identity, incomplete definition |
+| `SRC-LALIGA-POTY-2025-26` | LALIGA / organizer winner release | [Lamine Yamal, 2025/26 Player of the Season](https://www.laliga.com/noticias/lamine-yamal-mejor-jugador-de-laliga-ea-sports-2025-2026) | awards | `MANUAL_PUBLIC_FACT`; copyright | no raw; facts only | identity/window/winner; ballot mechanics not published | usable primary; non-public mechanics explicit |
 | `SRC-LALIGA-TOPSCORER-2025-26` | LALIGA / organizer statistics | [LALIGA official site/search](https://www.laliga.com/es-US?btag=479540_l130835) | awards | `REFERENCE_ONLY`; live stats terms not reviewed | no raw; cited leader fact only | dynamic URL; archive/version binding required | usable with reproducibility limitation |
+| `SRC-LALIGA-PICHICHI-BINDING` | LALIGA / organizer editorial | [LALIGA individual categories](https://www.laliga.com/en-US/news/robert-lewandowski-joan-garcia-and-lamine-yamal-stand-out-in-the-laliga-ea-sports-individual-categories) | awards | `MANUAL_PUBLIC_FACT`; copyright | no raw; atomic identity fact | explicitly describes Pichichi as the top-scorer prize | usable primary alias/semantics |
+| `SRC-MARCA-PICHICHI-DEFINITION` | MARCA / award publisher historical explainer | [90 years of LaLiga: Pichichi](https://especiales.marca.com/futbol/90-aniversario-laliga/abecedario.html) | awards | `MANUAL_PUBLIC_FACT`; publisher copyright | no raw; atomic facts only | primary for MARCA's named award | usable for external-award ownership/definition |
 | `SRC-REALMADRID-PICHICHI-2025-26` | Real Madrid CF / winner-club report | [Mbappe wins Pichichi 2025/26](https://www.realmadrid.com/en-US/news/football/first-team/latest-news/mbappe-gana-el-trofeo-pichichi-2025-26-23-05-2026) | awards | `MANUAL_PUBLIC_FACT`; club copyright | no raw; corroboration only | Tier B; cannot supply organizer tie rules | usable corroboration only |
 
 ## 5. Monetary/statistical sources
@@ -94,10 +100,17 @@ atomic cited public fact under the governance policy.
 | `SRC-ISO-4217` | ISO / international standard | [ISO 4217:2015](https://www.iso.org/standard/64758.html) | money | `REFERENCE_ONLY`; copyrighted standard | no raw; standards facts only | current maintenance must be checked at publication | usable reference |
 | `SRC-ARG-DECREE-2128-1991` | Argentina.gob.ar / official law | [Decree 2128/1991](https://www.argentina.gob.ar/normativa/nacional/decreto-2128-1991-7384/texto) | money | `MANUAL_PUBLIC_FACT`; official legal text | no raw copy; cited legal fact | stable legal reference | usable P0 reference |
 | `SRC-EU-EURO-UNITS` | European Union / official terminology | [Spelling of “euro” and “cent”](https://european-union.europa.eu/system/files/2020-08/publication6336_en.pdf) | money | `REFERENCE_ONLY`; EU reuse terms need review | no raw; cited fact | stable PDF | usable P0 reference |
-| `SRC-BCRA-A3500` | BCRA / central-bank series | [A 3500 and TCNPM historical series](https://www.bcra.gob.ar/tipo-cambio-referencia-comunicacion-a-3500-tcnpm/) | money | `REFERENCE_ONLY`; dataset terms need review | no raw; source route only | revisions and release timestamp must be captured on acquisition | viable candidate route |
-| `SRC-INDEC-IPC` | INDEC / official statistics | [National CPI series and methodology](https://www.indec.gob.ar/indec/web/Nivel4-Tema-3-5-31) | money | `REFERENCE_ONLY`; INDEC terms need review | no raw; route only | use national series from Dec 2016; preserve revisions/base | viable candidate route |
-| `SRC-ECB-EXR` | ECB / central-bank dataset | [ECB exchange-rate dataset](https://data.ecb.europa.eu/data/datasets/exr/data-information) | money | `REFERENCE_ONLY` pending ECB reuse-policy review | no raw; route only | daily/monthly; informational reference methodology | viable candidate route |
-| `SRC-EUROSTAT-HICP` | Eurostat / official statistics | [HICP data information](https://ec.europa.eu/eurostat/web/hicp/information-data) | money | `REFERENCE_ONLY` pending explicit reuse check | no raw; route only | 2026 classification/base change and revisions must be retained | viable candidate route |
+| `SRC-BCRA-A3500` | BCRA / central-bank series | [A 3500 and TCNPM historical series](https://www.bcra.gob.ar/tipo-cambio-referencia-comunicacion-a-3500-tcnpm/) | money | `REDISTRIBUTABLE_DERIVED`; attribution/context required | no repository raw; fingerprint and transform permitted | official series route; revisions/methodology retained | acquired source binding |
+| `SRC-BCRA-MONETARY-API-V4` | BCRA / official statistics API | [API catalog](https://www.bcra.gob.ar/apis-banco-central/); [series 5 cutoff query](https://api.bcra.gob.ar/estadisticas/v4.0/monetarias/5?desde=2025-01-01&hasta=2026-08-07&limit=3000) | money | `REDISTRIBUTABLE_DERIVED`; public-information reuse | no raw mirror; query fingerprint/derived transform | series ID 5, exact unit/frequency/coverage | acquired reproducible route |
+| `SRC-BCRA-A8359` | BCRA / official communication | [Communication A8359](https://www.bcra.gob.ar/archivos/Pdfs/comytexord/A8359.pdf) | money | `REFERENCE_ONLY`; official regulation | no raw; cited methodology facts | effective 2 Jan 2026 | usable current methodology |
+| `SRC-BCRA-REUSE` | BCRA / public-information policy | [Access to public information](https://web2.bcra.gob.ar/Institucional/Acceso_Informacion.asp) | money/license | `REDISTRIBUTABLE_DERIVED`; source context retained | project does not exercise raw bulk redistribution | permits copy/analyze/reprocess/reuse/redistribution of public information | clears derived-binding review |
+| `SRC-INDEC-IPC` | INDEC / official statistics | [National CPI series and methodology](https://www.indec.gob.ar/indec/web/Nivel4-Tema-3-5-31); [official CSV](https://www.indec.gob.ar/ftp/cuadros/economia/serie_ipc_aperturas.csv) | money | `REDISTRIBUTABLE_DERIVED`; attribution required | no repository raw; acquired fingerprint retained | national Dec-2016 base; monthly revisions retained | acquired source binding |
+| `SRC-INDEC-REUSE` | INDEC / official reuse notice | [INDEC reuse terms](https://sitioanterior.indec.gob.ar/economico2005/inc_ingresos2.asp) | money/license | `REDISTRIBUTABLE_DERIVED`; attribution/share-alike notice | no raw committed | official reuse route; publication attribution required | clears derived-binding review |
+| `SRC-ECB-EXR` | ECB / central-bank dataset | [USD/EUR series](https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.USD.EUR.SP00.A); [cutoff CSV query](https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?startPeriod=2025-01-01&endPeriod=2026-08-07&format=csvdata) | money | `REDISTRIBUTABLE_DERIVED`; attribution/change disclosure | no repository raw; query fingerprint retained | exact series `EXR.D.USD.EUR.SP00.A` | acquired source binding |
+| `SRC-ECB-REUSE` | ECB / statistical data usage policy | [Usage policy](https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html) | money/license | `REDISTRIBUTABLE_DERIVED`; source attribution | no raw committed | modifications must be disclosed | clears derived-binding review |
+| `SRC-ECB-REFERENCE-METHOD` | ECB / reference-rate methodology | [Euro reference exchange rates](https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html) | money | `MANUAL_PUBLIC_FACT`; ECB reuse terms | no raw; method facts | TARGET working days; informational reference | usable interpretation |
+| `SRC-EUROSTAT-HICP` | Eurostat / official statistics | [HICP data information](https://ec.europa.eu/eurostat/web/hicp/information-data); [cutoff query](https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?lang=en&geo=ES&coicop18=TOTAL&unit=I25&sinceTimePeriod=2025-01&untilTimePeriod=2026-06) | money | `REDISTRIBUTABLE_DERIVED`; attribution/change disclosure | no repository raw; query fingerprint retained | ECOICOP v2/reference 2025 and revisions retained | acquired source binding |
+| `SRC-EUROSTAT-REUSE` | Eurostat / official copyright notice | [Eurostat copyright and reuse](https://ec.europa.eu/eurostat/help/copyright-notice) | money/license | `REDISTRIBUTABLE_DERIVED`; attribution/change disclosure | no raw committed | statistical data/metadata reusable | clears derived-binding review |
 | `SRC-WORLDBANK-ICP` | World Bank ICP / multilateral methodology | [ICP methodology](https://www.worldbank.org/en/programs/icp/methodology) | money | `REFERENCE_ONLY` pending dataset-license/coverage review | no raw; methodology only | actual series/coverage not acquired | viable secondary candidate, not selected |
 
 ## 6. Internal normative sources
@@ -110,6 +123,7 @@ atomic cited public fact under the governance policy.
 | `SRC-INTERNAL-PRODUCT-DECISIONS` | [`G3D_PRODUCT_DECISIONS.md`](G3D_PRODUCT_DECISIONS.md) | `PRODUCT_DEFINED` | post-season market and approved direction |
 | `SRC-INTERNAL-MASTER-SCORING` | [`MASTER_SPEC.docx`](MASTER_SPEC.docx) | `PRODUCT_DEFINED` | internal normative source type; primary scoring values/formulas; not an external dataset |
 | `SRC-INTERNAL-SCORING-MATH` | [`SCORING_MATH_SPEC.md`](SCORING_MATH_SPEC.md) | `PRODUCT_DEFINED` | internal normative source type; exact scoring arithmetic and blockers |
+| `SRC-INTERNAL-AWARD-MATH` | [`NATIONAL_TEAM_AWARDS_MATH_SPEC.md`](NATIONAL_TEAM_AWARDS_MATH_SPEC.md) | `PRODUCT_DEFINED` | comparative/statistical separation and explicit canonical tie-policy framework; no claim about unpublished human ballots |
 
 ## 7. Rejected or deliberately unused sources
 
@@ -117,10 +131,10 @@ atomic cited public fact under the governance policy.
 |---|---|---|
 | Wikipedia pages for editions/currency | `SOURCE_REJECTED` | orientation only; an official source was available |
 | SEO sports aggregators and unsourced format summaries | `SOURCE_REJECTED` | lower source tier and unstable provenance |
-| MARCA pages for Pichichi rules | `SOURCE_REJECTED` | inaccessible/robots and no reproducible rule capture in this campaign |
 | current 2026 Libertadores participant pages | `SOURCE_REJECTED` | wrong edition for the 2025 baseline |
 | post-cutoff 2026/27 competition outcomes | `SOURCE_REJECTED` | post-cutoff fact, not a correction or timeless definition |
 | informal/parallel Argentine FX quotes | `SOURCE_REJECTED` | undefined market/observation semantics; not reproducible official policy |
+| unsourced Pichichi summaries/SEO pages | `SOURCE_REJECTED` | official LALIGA and award-publisher sources became available |
 
 ## 8. Licensing blockers
 
@@ -129,9 +143,9 @@ atomic cited public fact under the governance policy.
 - G3D-3C must review whether its normalized catalogs contain only uncopyrightable
   public facts/IDs or a protectable substantial extract. This is a publication
   review, not permission to copy source tables.
-- Monetary series acquisition cannot progress past `SOURCE_IDENTIFIED` until
-  each provider's exact download/reuse terms, release timestamp and source hash
-  are recorded.
+- Monetary source bindings may progress to `ACQUIRED`: exact routes, query
+  periods, fingerprints and derived-reuse terms are recorded. Raw mirrors remain
+  outside the repository and normalized series publication remains a later gate.
 - The live LALIGA standings/top-scorer pages require an archive or permitted
   versioned derived record for reproducibility.
 
@@ -141,8 +155,8 @@ No licensing ambiguity was converted into `REDISTRIBUTABLE_RAW` or
 ## 9. Artifact review declaration
 
 - Evidence selection: all source identities used by `EV-P0-001` through
-  `EV-P0-081` in [P0 Evidence Index](P0_EVIDENCE_INDEX.md).
+  `EV-P0-101` in [P0 Evidence Index](P0_EVIDENCE_INDEX.md).
 - Limitations: conservative source-level classification; cited public facts do
   not imply raw or substantial-derived redistribution rights.
-- Unresolved material conflicts: none. `LICENSE_REVIEW_REQUIRED` is a freeze
-  blocker, not an evidence conflict.
+- Unresolved material conflicts: none. No raw external artifact was committed;
+  substantial raw redistribution remains outside the approved consumer scope.

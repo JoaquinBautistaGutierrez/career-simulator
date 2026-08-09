@@ -424,3 +424,18 @@ regla para IDs futuros. Un golden nuevo debe declarar `acceptanceUse` y no
 hereda el catch-all. Distributional regression no reemplaza Monte Carlo: fija
 draws e intermediates exactos, mientras los 77 `PT-*` evalúan frecuencias y
 distancias agregadas.
+
+## 14. Catalog-input readiness G3D-3B2
+
+All 139 goldens remain `SPECIFIED`; none advances to `INPUTS_FROZEN` and no
+expected output was computed. The focused candidates remove these input gaps:
+
+| Golden group | Newly ready catalog input | Still missing before expected output |
+|---|---|---|
+| `GV-AWD-*` (8) | five AwardDefinition families/categories/tie policies; Pichichi alias semantics | EngineParameterSet award values, numeric abstract-field profile and fixture draws |
+| `GV-NT-*` (9) | ordinary FIFA/Argentina window IDs, Q checkpoints and opportunity maxima | nationalTeam parameters and fixed scheduled/realized fixture inputs |
+| `GV-CALENDAR-001`, `GV-CONGEST-001` | ordinary-window mapping plus existing stage/market candidates | exact fixture candidate, ParameterSet adapters and future freeze hash |
+| `GV-MKT-VAL/FEE/SALARY-*`, `GV-MONEY-ERROR-001` | four monetary source bindings and exact `TR-MONEY-NORMALIZE-V1` arithmetic | calibrated monetary inputs, representable bound fixture and ParameterSet values |
+
+These are readiness changes only. Catalog hashes are candidate provenance, not
+published data/scoring versions, and no golden arithmetic result is asserted.

@@ -566,3 +566,17 @@ otro target.
 - ningún target alcanza `VALIDATED`, `ACCEPTED` o `FROZEN_V1` sin run/report
   hashes;
 - `PASS|PASS_WITH_WARNING|FAIL` y uncertainty policy se heredan del target set.
+
+## 13. Definition/data-readiness overlay G3D-3B2
+
+No target ID, product value, tolerance or status count changes. The 186 targets
+retain the exhaustive G3D-3D classification. Only dependency metadata advances:
+
+| Target families | Readiness metadata | Still required |
+|---|---|---|
+| `CT-AWD-*` | `DEFINITION_AVAILABLE=TRUE`; five AwardDefinition candidates consumer-complete | P1 award histories, calibrated field profiles/parameters and Monte Carlo |
+| `CT-CAL-*`, `CT-NT-*` that consume ordinary windows | `DEFINITION_AVAILABLE=TRUE`; `OBSERVATIONAL_DEPENDENCY_CLEARED=P0_CALENDAR` | P1 national histories and calibrated exposure/pressure values |
+| money-dependent `CT-MKT-*` | `DATA_AVAILABLE=P0_SOURCE_SERIES_ACQUIRED`; exact transform available | P1 fee/salary observations and normalized monetary artifact |
+
+`DATA_AVAILABLE` never supplies an observed target range. Product numeric
+targets from G3D-3D are immutable in this phase.

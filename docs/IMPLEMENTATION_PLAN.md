@@ -2689,3 +2689,31 @@ tracks.
 4. todos los candidate parameter values y sensitivity runs;
 5. 139 expected goldens, independent verification y acceptance reports;
 6. atomic Data V1 y Scoring bundle publication.
+
+### Cierre G3D-3B2 — Focused P0 Gap Closure
+
+**Resultado:** `P0_DATA_READY_WITH_NONBLOCKING_LIMITATIONS`.
+
+Queda cerrado en candidate state:
+
+- cinco AwardDefinitions consumer-complete, con reglas 2025 verificadas o
+  `VERIFIED_BY_CONTINUITY`, POTY ballot no público clasificado y Pichichi como
+  alias externo/presentation del top-scorer estadístico;
+- ordinary Argentina senior calendar mediante ventanas FIFA 2026, selección/Q,
+  máximos de oportunidad y separación de World Cup progression;
+- cuatro bindings monetarios oficiales adquiridos/fingerprinted, reuse review y
+  `TR-MONEY-NORMALIZE-V1` racional exacto con `ROUND_HALF_EVEN` final;
+- DR-021/025/027 en `RESOLVED_DATA_V1_CANDIDATE` para su scope V1.
+
+No se publica Data V1, no se normaliza un mirror monetario, no se inicia P1 y no
+se asigna ningún valor de los 275 templates. Los 186 targets y 77 product targets
+no cambian; los 139 goldens siguen sin expected outputs.
+
+#### Secuencia autorizable después de G3D-3B2
+
+1. revisión futura de freeze/publicación atómica del bundle P0;
+2. `G3D-P1` observational evidence acquisition según los manifests existentes;
+3. preparación de calibración inicial solo bajo autorización separada;
+4. scoring IJL/catalog/cohorts permanece en su track, sin ampliarlo aquí.
+
+Esta fase no inicia automáticamente ninguno de esos pasos.

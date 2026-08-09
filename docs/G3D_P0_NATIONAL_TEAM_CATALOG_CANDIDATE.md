@@ -4,10 +4,11 @@
 
 ```yaml
 artifactId: G3D_P0_NATIONAL_TEAM_CATALOG_CANDIDATE
-artifactVersion: g3d-3c-candidate-1
+artifactVersion: g3d-3b2-candidate-2
 schemaVersion: VERTICAL_SLICE_DATA_CATALOG_SPEC.NationalTeamDefinition.v1
 sourceSnapshotId: RSNAP-G3D3B-2026-08-07-C1
-datasetCandidateId: DS-NATIONAL-COMPETITION-CATALOG@candidate/RSNAP-G3D3B-2026-08-07-C1/002
+datasetCandidateId: DS-NATIONAL-COMPETITION-CATALOG@candidate/RSNAP-G3D3B-2026-08-07-C1/002-r2
+parentCandidateId: DS-NATIONAL-COMPETITION-CATALOG@candidate/RSNAP-G3D3B-2026-08-07-C1/002
 state: NORMALIZED_WITH_LIMITATIONS
 candidateDataVersionRef: DATA-V1-CANDIDATE-NOT-PUBLISHED
 candidateHashRef: G3D_P0_CANDIDATE_HASH_MANIFEST.md
@@ -50,7 +51,11 @@ groupSize: 4
 guaranteedMatchEquivalents: 3
 conditionalStages: [STAGE-WC-R32, STAGE-WC-R16, STAGE-WC-QF, STAGE-WC-SF, STAGE-WC-FINAL]
 pressureProfileRef: PENDING_DATA
-ordinaryInternationalWindowsRef: PENDING_DATA
+ordinaryInternationalWindowsRef:
+  - INTL-WINDOW-MEN-2026-MAR
+  - INTL-WINDOW-MEN-2026-JUN
+  - INTL-WINDOW-MEN-2026-SEP-OCT
+  - INTL-WINDOW-MEN-2026-NOV
 ```
 
 El resultado adquirido Argentina runner-up es un fact histórico de edición, no
@@ -63,7 +68,7 @@ un baseline causal de fuerza ni una protección de identidad.
 | NationalTeam identity | `VALIDATED_CANDIDATE` | none |
 | Argentina-only policy ref | `VALIDATED_CANDIDATE` | none; policy closed by ADR-082 |
 | World Cup 2026 format/calendar context | `VALIDATED_CANDIDATE` | pressure adapter values remain later data |
-| ordinary senior calendar | `PENDING_DATA` | `GAP-P0-CAL-001` |
+| ordinary senior calendar | `VALIDATED_CANDIDATE` | four FIFA window opportunities acquired in EV-P0-091..092; actual Argentina fixtures remain runtime/catalog inputs only when published |
 | reach/visibility and selection field history | `PENDING_DATA` | P1 calibration evidence |
 
 The dataset candidate remains `NORMALIZED_WITH_LIMITATIONS`; no field was

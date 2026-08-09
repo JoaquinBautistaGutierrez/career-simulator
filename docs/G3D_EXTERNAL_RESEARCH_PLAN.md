@@ -261,3 +261,21 @@ G3D-3C replaces a general P0 repeat with an optional, bounded
 Scoring gaps `GAP-P0-SCR-001..003` belong to product/P2 calibration, not web
 P0 repetition. G3D-3B2 may run in parallel with G3D-3D; it does not calibrate,
 normalize a full Data V1 or broaden P1 research.
+
+## 14. G3D-3B2 focused closure result
+
+Campaign lineage remains `RSNAP-G3D3B-2026-08-07-C1` with immutable
+`EV-P0-001..081`. G3D-3B2 adds `EV-P0-082..101` and no P1 scope.
+
+| Gap IDs | Result | Residual limitation | State |
+|---|---|---|---|
+| `GAP-P0-AWD-001` | 2025 fields/electorates/results acquired; detailed prior procedure explicitly `VERIFIED_BY_CONTINUITY` | no independently published complete 2025 rules document | `CLOSED_WITH_NONBLOCKING_LIMITATION` |
+| `GAP-P0-AWD-002` | LALIGA POTY identity/window/winner verified; unpublished human mechanics classified; abstract model consumer complete | real electorate/ballot/tie remain `NOT_PUBLICLY_DOCUMENTED` | `CLOSED_WITH_NONBLOCKING_LIMITATION` |
+| `GAP-P0-AWD-003` | neutral top-scorer canonical identity and MARCA/Pichichi alias bound; real tie procedure classified non-public; simulation `SHARED` explicit | live 2025/26 stat archive remains a later freeze-quality concern | `CLOSED_WITH_NONBLOCKING_LIMITATION` |
+| `GAP-P0-CAL-001` | FIFA ordinary 2026 windows, Q/checkpoints and maximum opportunities acquired | no Argentina fixture inferred; Sep-Oct realized allocation awaits schedule fact | `CLOSED` |
+| `GAP-P0-MON-001` | four official source extracts/routes, units, periods, SHA-256 and reuse terms acquired | normalized retained series artifact not yet published | `CLOSED_FOR_SOURCE_BINDING` |
+| `GAP-P0-MON-002` | base price period, common FX date, missing-date, exact rational and rounding contract fixed | golden/example output not computed | `CLOSED` |
+
+Result: **`P0_DATA_READY_WITH_NONBLOCKING_LIMITATIONS`**. Award, Calendar and
+Money candidates can enter a future atomic freeze review; Data V1 remains
+unpublished. P1 observational acquisition is ready but was not started.

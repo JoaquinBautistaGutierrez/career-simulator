@@ -710,3 +710,17 @@ Scoring.
 
 No se añadió ningún value, default, alias ni path. Todo template calibrable
 permanece `UNASSIGNED`; G3D-3D no crea `EngineParameterSetCandidate`.
+
+## 19. P0 dependency overlay G3D-3B2
+
+The 275 templates remain value-free and `UNASSIGNED`. Only prior blockers are
+reclassified:
+
+| Dimension / branches | Previous dependency | G3D-3B2 state |
+|---|---|---|
+| `{award}` / `awards.*` | identity bound, Definition partial | five Definitions `CATALOG_BOUND_VALIDATED_CANDIDATE`; numeric field parameters still unassigned |
+| `nationalTeam.*`, `roleMinutes.*`, `health.*` calendar adapters | ordinary international calendar pending | FIFA window/Q candidate bound; exposure/selection coefficients still unassigned |
+| `{moneySourceBinding}` / `transfersMarket.*` monetary adapters | source route only | four sources and exact transform `SOURCE_BINDING_VALIDATED_CANDIDATE`; observed fee/salary data still pending |
+
+No path, alias, classification, sensitivity, target consumer or value changed.
+No `EngineParameterSetCandidate` was created.

@@ -5729,6 +5729,29 @@ Award/Calendar/Money.
 Readiness: `GO_FOR_P1_AND_INITIAL_CALIBRATION_PREPARATION`. Preparación no
 autoriza calibrar ni publicar un `EngineParameterSet`.
 
+## 12.4 Reconciliación G3D-3B2 — Focused P0 gap closure
+
+G3D-3B2 preserves `referenceCutoffDate=2026-08-07T23:59:59.999Z`, the 81
+original EvidenceRecords and all resolved policies. It adds `EV-P0-082..101`
+only for Award, ordinary Argentina international calendar and Money sources/
+transforms.
+
+| DR | V1 data-scope state after G3D-3B2 | Closed candidate contract | Remaining non-P0 gate |
+|---|---|---|---|
+| `DR-021` | `RESOLVED_DATA_V1_CANDIDATE` | club/national stage→Q, guaranteed/conditional opportunity, FIFA ordinary windows, selection checkpoints, season close and post-season market causal ordering | atomic CalendarDefinition freeze, exact future schedule facts and calibrated context values; no full fixtures required |
+| `DR-025` | `RESOLVED_DATA_V1_CANDIDATE` for the five Award slots | identity, edition, family/category, evaluation semantics, field profile, ordinal/tie policy and Pichichi alias all consumer-complete | numeric abstract-field calibration, P1 history, scoring catalog and atomic publication; non-public human ballots are provenance-only |
+| `DR-027` | `RESOLVED_DATA_V1_CANDIDATE` for native Money/source/transform | ARS/EUR minor units, four official bindings/fingerprints/terms, base price period, common FX date, rational arithmetic, missing-date and HALF_EVEN policy | normalized retained series artifact, monetary goldens and P1 fee/salary evidence; no coefficient/value was calibrated |
+
+`DR-035/036/065..068` are not reopened. Their future candidate-hash references
+must use the G3D-3B2 revised manifest. `DATA_V1_NOT_PUBLISHED`, all 275 parameter
+templates remain value-free, all 139 golden outputs remain pending, and scoring
+gaps outside Award identity bindings are unchanged.
+
+Readiness: `P0_DATA_READY_WITH_NONBLOCKING_LIMITATIONS` and P1 research ready.
+The limitations are explicit (continuity/non-public ballots, no inferred
+fixtures, no normalized retained monetary series) and do not conceal a causal
+V1 Definition field.
+
 ## 13. Matriz de cierre
 
 | Gate | Decisiones necesarias | Estado actual |

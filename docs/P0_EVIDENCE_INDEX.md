@@ -24,7 +24,8 @@ URL, licencia y restricciones en
 [`SOURCE_LICENSE_MANIFEST.md`](SOURCE_LICENSE_MANIFEST.md). El texto extraido
 es el fact conservado; no se conserva el HTML/PDF raw. `A`, `B`, `C` y `D`
 significan `TIER_A`..`TIER_D`. `M` es `MANUAL_PUBLIC_FACT`, `R` es
-`REFERENCE_ONLY` y `P` es `PRODUCT_DEFINED`. Salvo indicacion contraria,
+`REFERENCE_ONLY`, `O` es `REDISTRIBUTABLE_DERIVED` y `P` es
+`PRODUCT_DEFINED`. Salvo indicacion contraria,
 `licensingState=CLASSIFIED_REFERENCE_ONLY`, `validation=REVIEWED_AGAINST_SOURCE`,
 `conflict=CONSISTENT` y los reviewers son los del header.
 
@@ -129,31 +130,56 @@ significan `TIER_A`..`TIER_D`. `M` es `MANUAL_PUBLIC_FACT`, `R` es
 | `EV-P0-080` | `RS-P0-COMP-FORMAT` | LaLiga positions 18-20 descend; the 2025/26 closed edition relegated Real Oviedo, Girona and Mallorca. | mobility output | `SRC-LALIGA-RELEGATION-2025-26` / organizer / A | 2025/26; `PRE_CUTOFF_CLOSED` | M/R | HIGH | mobility request boundary |
 | `EV-P0-081` | `RS-P0-CALENDAR` | LALIGA's next summer transfer period after the closed 2025/26 edition is 1 Jul-1 Sep 2026; the winter period is observed but excluded from V1 gameplay by product policy. | dates/policy boundary | `SRC-LALIGA-SUMMER-WINDOW-2026` / organizer / A | Jul-Sep 2026; `PRE_CUTOFF_PARTIAL` | M/R | HIGH | market/registration mapping |
 
-## 6. Evidence counts and conflicts
+## 6. G3D-3B2 focused gap-closure evidence
+
+The original `EV-P0-001..081` records are immutable. These records supplement
+them without changing the cutoff or original claims.
+
+| evidenceId | researchId | Claim and extracted fact/value | Units | sourceId / type / tier | Period; cutoff class | Usage/license | Confidence; validation/conflict/relationship | Downstream consumers |
+|---|---|---|---|---|---|---|---|---|
+| `EV-P0-082` | `RS-P0-AWARD-CATALOG` | The 2025 men's Ballon d'Or field has 30 nominees and a jury drawn from journalists representing the top 100 men's FIFA-ranked countries. | field/electorate | `SRC-UEFA-BALLON-NOMINEES-2025` / co-organizer release / A | 2025 award; `PRE_CUTOFF_CLOSED` | M/R | HIGH; `SUPPLEMENTS EV-P0-032,033` | Ballon AwardDefinition |
+| `EV-P0-083` | `RS-P0-AWARD-CATALOG` | The official 2025 voting publication identifies the award with the 2024/25 season, publishes one ordered ranking and repeats the top-ten 15/12/10/8/7/5/4/3/2/1 point ballot. | window/ordinal ballot | `SRC-UEFA-BALLON-VOTING-2025` / co-organizer result / A | 2024/25; `PRE_CUTOFF_CLOSED` | M/R | HIGH; `SUPPLEMENTS EV-P0-033` | Ballon ordinal profile |
+| `EV-P0-084` | `RS-P0-AWARD-CATALOG` | Kopa Trophy men 2025 has 10 nominees and former men's Ballon d'Or winners as electorate. | field/electorate | `SRC-UEFA-BALLON-NOMINEES-2025` / co-organizer release / A | 2025; `PRE_CUTOFF_CLOSED` | M/R | HIGH; `SUPPLEMENTS EV-P0-034,035` | Kopa AwardDefinition |
+| `EV-P0-085` | `RS-P0-AWARD-CATALOG` | Kopa's under-21-at-31-July rule, top-three 5/3/1 ballot and ordered tie resolution are retained for 2025 as `VERIFIED_BY_CONTINUITY`: the 2025 field/electorate and ranked result match the published recurring procedure and no contrary 2025 rule was found. | eligibility/procedure status | `SRC-UEFA-BALLON-RULES` + `SRC-UEFA-BALLON-VOTING-2025` / primary continuity / A | 2025; `TIMELESS_DEFINITION` plus closed edition | M/R | MEDIUM-HIGH; `SUPPLEMENTS EV-P0-035` | Kopa provenance/profile |
+| `EV-P0-086` | `RS-P0-AWARD-CATALOG` | Yashin Trophy men 2025 is the goalkeeper category, has 10 nominees and uses the men's Ballon d'Or jury. | category/field/electorate | `SRC-UEFA-BALLON-NOMINEES-2025` / co-organizer release / A | 2025; `PRE_CUTOFF_CLOSED` | M/R | HIGH; `SUPPLEMENTS EV-P0-036,037` | Yashin AwardDefinition |
+| `EV-P0-087` | `RS-P0-AWARD-CATALOG` | Yashin's top-three 5/3/1 ballot and ordered tie resolution are `VERIFIED_BY_CONTINUITY` for 2025 from the published recurring procedure and the 2025 ranked result; no contrary 2025 rule was found. | procedure status | `SRC-UEFA-BALLON-RULES` + `SRC-UEFA-BALLON-VOTING-2025` / primary continuity / A | 2025; `TIMELESS_DEFINITION` plus closed edition | M/R | MEDIUM-HIGH; `SUPPLEMENTS EV-P0-037` | Yashin provenance/profile |
+| `EV-P0-088` | `RS-P0-AWARD-CATALOG` | LALIGA officially publishes a 2025/26 Player of the Season and unique winner, but its public award pages do not document the candidate field, electorate, fan/professional split, ballot or tie procedure; those fields are `NOT_PUBLICLY_DOCUMENTED`, not `DATA_NOT_YET_FOUND`. | rule-field classification | `SRC-LALIGA-AWARDS-2025-26` + `SRC-LALIGA-POTY-2025-26` / organizer / A | 2025/26; `PRE_CUTOFF_CLOSED` | M/R | HIGH after stopping-rule review; `SUPPLEMENTS EV-P0-038,039` | POTY Definition boundary |
+| `EV-P0-089` | `RS-P0-AWARD-CATALOG` | LALIGA describes Pichichi as the prize for its competition's top scorer, while MARCA is the publisher awarding the named trophy; V1 keeps neutral `LALIGA_TOP_SCORER` canonical and binds `PICHICHI` as external-award/presentation alias. | identity/alias | `SRC-LALIGA-PICHICHI-BINDING` + `SRC-MARCA-PICHICHI-DEFINITION` / organizer plus award publisher / A | recurring definition; `TIMELESS_DEFINITION` | M/R | HIGH; `SUPPLEMENTS EV-P0-040,041` | award canonical IDs/aliases |
+| `EV-P0-090` | `RS-P0-AWARD-CATALOG` | No acquired official 2025/26 rule publishes a Pichichi/LaLiga scorer tie procedure, so the real rule is `NOT_PUBLICLY_DOCUMENTED`; V1 explicitly selects the approved statistical simulation policy `SHARED` to preserve equal leaderboard facts without RNG. | real-rule limitation / simulation policy | `SRC-LALIGA-TOPSCORER-2025-26` + `SRC-INTERNAL-AWARD-MATH` / primary absence plus internal normative / D | 2025/26/V1; `TIMELESS_DEFINITION` | R/P | HIGH after stopping-rule review; `SUPPLEMENTS EV-P0-039` | top-scorer tie policy |
+| `EV-P0-091` | `RS-P0-CALENDAR` | FIFA's 2026 men's calendar defines ordinary windows 23-31 Mar (max 2), 1-9 Jun (max 2), 21 Sep-6 Oct (max 4) and 9-17 Nov (max 2). | UTC date ranges / max matches | `SRC-FIFA-MENS-IMC-2025-2030` / FIFA primary / A | 2026; `TIMELESS_DEFINITION` | M/R | HIGH; `SUPPLEMENTS` national-calendar records | Argentina selection/exposure/Q mapping |
+| `EV-P0-092` | `RS-P0-CALENDAR` | The 2026 World Cup runs 11 Jun-19 Jul; mandatory release begins 25 May after the last club match, with the published final exception, so the June ordinary window and tournament exposure are distinct contexts. | date/context boundary | `SRC-FIFA-MENS-IMC-2025-2030` + `SRC-FIFA-WC-RESULTS-2026` / FIFA primary / A | 2026; `PRE_CUTOFF_CLOSED` | M/R | HIGH; `SUPPLEMENTS EV-P0-028..030` | calendar overlap/health exposure |
+| `EV-P0-093` | `RS-P0-MONEY-POLICY-DATA` | INDEC national total CPI is monthly, base Dec-2016=100; the official cutoff-compatible CSV through 2026-06 was retrieved and fingerprinted as 2,440,299 bytes, SHA-256 `3f9ef54bf117c47d5e2967b6b2129644fa028a6abd66463b043183f6ddef563c`. | index/bytes/hash | `SRC-INDEC-IPC` / official statistics / A | Dec-2016..Jun-2026; `PRE_CUTOFF_CLOSED` | O | HIGH; `SUPPLEMENTS EV-P0-067` | ARS inflation binding |
+| `EV-P0-094` | `RS-P0-MONEY-POLICY-DATA` | INDEC statistical reuse permits reproduction/reuse with source attribution; G3D-3B2 still commits no raw series and retains only fingerprint/derived-safe metadata. | license policy | `SRC-INDEC-REUSE` / official terms / A | retrieved 2026-08-09; `TIMELESS_DEFINITION` | O | HIGH | source-license manifest |
+| `EV-P0-095` | `RS-P0-MONEY-POLICY-DATA` | Eurostat series `prc_hicp_minr`, Spain, total ECOICOP v2, unit `I25` is monthly HICP with reference 2025=100 and revision metadata; the 2025-01..2026-06 extract is 5,176 bytes, SHA-256 `d2cf56765523d1de3790eaf6b2415605ab7780ca35544d3e3e05677471d516b8`. | series/index/bytes/hash | `SRC-EUROSTAT-HICP` / official statistics / A | Jan-2025..Jun-2026; `PRE_CUTOFF_CLOSED` | O | HIGH; `SUPPLEMENTS EV-P0-069` | EUR/Spain inflation binding |
+| `EV-P0-096` | `RS-P0-MONEY-POLICY-DATA` | Eurostat statistical data/metadata may be reused with attribution and disclosure of modifications. | license policy | `SRC-EUROSTAT-REUSE` / official terms / A | retrieved 2026-08-09; `TIMELESS_DEFINITION` | O | HIGH | source-license manifest |
+| `EV-P0-097` | `RS-P0-MONEY-POLICY-DATA` | BCRA API monetary series ID 5 is the daily wholesale reference exchange rate in ARS per USD, with coverage from 2002-03-04; the 2025-01-01..2026-08-07 extract is 18,598 bytes, SHA-256 `8e2b903ef1062fba328bb0a2dc11768f8431bcdc2f09f542f6266b7c1b19a1e5`. | ARS/USD/bytes/hash | `SRC-BCRA-MONETARY-API-V4` / central-bank API / A | through cutoff; `PRE_CUTOFF_CLOSED` | O | HIGH; `SUPPLEMENTS EV-P0-068` | FX binding |
+| `EV-P0-098` | `RS-P0-MONEY-POLICY-DATA` | BCRA Communication A8359 defines the current qualifying-operation volume-weighted reference methodology effective 2026-01-02; prior dates retain their applicable published methodology. | methodology/effective date | `SRC-BCRA-A8359` / central-bank regulation / A | effective 2 Jan 2026; `TIMELESS_DEFINITION` | M/R | HIGH; `SUPPLEMENTS EV-P0-068` | FX revision semantics |
+| `EV-P0-099` | `RS-P0-MONEY-POLICY-DATA` | BCRA's public-information route permits copying, analysis, reprocessing, reuse and redistribution; the project conservatively exercises derived reuse only and commits no raw bulk mirror. | license policy | `SRC-BCRA-REUSE` / official terms / A | retrieved 2026-08-09; `TIMELESS_DEFINITION` | O | HIGH | source-license manifest |
+| `EV-P0-100` | `RS-P0-MONEY-POLICY-DATA` | ECB series `EXR.D.USD.EUR.SP00.A` is daily USD per EUR, spot average on TARGET working days; the 2025-01-01..2026-08-07 CSV is 85,146 bytes, SHA-256 `d4794b1d62168f5c2c7712d98da864bd83fb81f40cfdfe664e6961597f0e056d`. | USD/EUR/bytes/hash | `SRC-ECB-EXR` / central-bank dataset / A | through cutoff; `PRE_CUTOFF_CLOSED` | O | HIGH; `SUPPLEMENTS EV-P0-069` | FX bridge binding |
+| `EV-P0-101` | `RS-P0-MONEY-POLICY-DATA` | ECB statistical data may be reused with source attribution and disclosure of modifications; reference rates are informational, not transaction recommendations. | license/methodology policy | `SRC-ECB-REUSE` + `SRC-ECB-REFERENCE-METHOD` / official terms/method / A | retrieved 2026-08-09; `TIMELESS_DEFINITION` | O | HIGH | source license and interpretation |
+
+## 7. Evidence counts and conflicts
 
 | Tier | Count | Interpretation |
 |---|---:|---|
-| `TIER_A` | 76 | official/federation/organizer/statistical-authority or internal normative primary facts |
+| `TIER_A` | 95 | official/federation/organizer/statistical-authority or internal normative primary facts |
 | `TIER_B` | 1 | winner-club corroboration for the Pichichi label |
 | `TIER_C` | 0 | no proxy was used to close P0 identity/format claims |
-| `TIER_D` | 4 | explicitly approved product/policy facts, never represented as observation |
-| **Total** | **81** | atomic EvidenceRecords |
+| `TIER_D` | 5 | explicitly approved product/policy facts, never represented as observation |
+| **Total** | **101** | atomic EvidenceRecords |
 
-No contradictory result or edition claim remained material. Two limitations are
-preserved rather than hidden:
+No material conflict remains. Two nonblocking limitations are preserved:
 
-1. Ballon d'Or/Kopa/Yashin voting mechanics are documented by the co-organizer
-   for the 2024 rule edition; continuity to 2025 must be checked when G3D-3C
-   freezes the AwardDefinitions.
-2. LALIGA's public winner/stat pages do not expose complete field/tie mechanics
-   for the league POTY or scorer award. This is `RESEARCH_INCOMPLETE` for those
-   fields, not a conflicting source.
+1. selected 2025 Ballon-family procedure fields are
+   `VERIFIED_BY_CONTINUITY`, not mislabeled as independently published 2025 rules;
+2. LALIGA POTY human ballot fields are `NOT_PUBLICLY_DOCUMENTED` and are not
+   required by the approved simulation abstraction.
 
 Rejected/unused orientation sources and reasons are in
 [`SOURCE_LICENSE_MANIFEST.md`](SOURCE_LICENSE_MANIFEST.md). No record was
 silently averaged or promoted in tier.
 
-## 7. Candidate artifact integrity
+## 8. Candidate artifact integrity
 
 These SHA-256 values fingerprint the ten G3D-3B documentary artifacts exactly
 as acquired. They are candidate provenance hashes, not `dataVersion` hashes and
