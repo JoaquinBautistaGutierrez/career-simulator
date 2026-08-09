@@ -329,3 +329,52 @@ Un fixture synthetic nunca se renombra como V1. `INPUTS_FROZEN` requiere
 `DataArtifactManifest`/ParameterSet/config hashes resolubles. Required catalog
 links y expected-output blockers forman parte del future golden manifest.
 
+## 10. Input-dependency classes G3D-3A
+
+Cada golden recibe una clase dominante, aplicando precedencia `D > C > B > A`:
+
+| Clase | Significado |
+|---|---|
+| `A_MATH_ONLY` | Inputs estructurales/matemáticos normativos; puede calcularse sin dataset ni parámetros calibrados. |
+| `B_PARAMETER_REQUIRED` | Requiere valores de un `EngineParameterSet` candidate, pero no un catálogo observado V1. |
+| `C_CATALOG_OR_DATA_REQUIRED` | Requiere Definition, mapping, dataset o identity de data; puede requerir además ParameterSet. |
+| `D_SCORING_CONFIGURATION_REQUIRED` | Requiere `ScoringConfiguration`/`ScoringCalibrationData`; puede requerir además facts/data. |
+
+La clase marca cuándo puede congelarse el expected oficial, no impide crear un
+fixture sintético no publicable.
+
+### 10.1 Asignación exhaustiva
+
+| Golden IDs | Clase dominante | Motivo |
+|---|---|---|
+| `GV-MATH-*`, `GV-CRE-MATH-001`, `GV-DEV-DOMPOS-001`, `GV-AVAIL-UNION-001`, `GV-SOC-OVERFLOW-001`, `GV-FIN-NOREOPEN-001` | `A_MATH_ONLY` | algoritmo/boundary estructural cerrado; no balance/data real |
+| `GV-DEV-EVOL-001`, `GV-DEV-SIGN-001`, `GV-CRE-SUIT-001`, `GV-DEV-RETRAIN-001`, `GV-ROLE-SOFTMAX-001`, `GV-ROLE-PERSIST-001`, `GV-MIN-EXPECTED-001` | `B_PARAMETER_REQUIRED` | ecuaciones exactas con fixture parameters |
+| `GV-PERF-TASK-001`, `GV-PERF-FACTORS-001`, `GV-PERF-CONS-001`, `GV-PERF-EVID-001`, `GV-FORM-UPDATE-001` | `B_PARAMETER_REQUIRED` | aritmética Performance/Form sin catalog identity obligatoria |
+| `GV-HLT-FAT-001`, `GV-HLT-FIT-001`, `GV-REC-PROGRESS-001` | `B_PARAMETER_REQUIRED` | state transition parametrizada con contexto sintético suficiente |
+| `GV-MKT-AGE-001`, `GV-RET-AUTO-001` | `B_PARAMETER_REQUIRED` | age curve/tooling policy candidate, sin source observed necesaria |
+| restantes IDs de §§5.2–5.10, excepto `GV-FIN-COMPLETE-001` | `C_CATALOG_OR_DATA_REQUIRED` | usan position/calendar/injury/club/competition/money/national/award/reach/lifecycle Definitions o facts |
+| `GV-FIN-COMPLETE-001` y todos `GV-SCR-*` | `D_SCORING_CONFIGURATION_REQUIRED` | final score/snapshot o arithmetic/config de Scoring |
+
+La regla “restantes §§5.2–5.10” es cerrada sobre los IDs listados en este
+registry; un ID futuro debe declarar clase explícita y no hereda un default.
+Los 139 goldens actuales quedan cubiertos una vez, por precedencia.
+
+### 10.2 Readiness por clase
+
+- A puede pasar a `INPUTS_FROZEN` cuando el profile/schema normativo esté
+  versionado; no espera G3D-3B.
+- B espera un candidate con hash; no exige que sea `FROZEN_V1` para calcular un
+  expected candidate, pero sí para publicar V1.
+- C espera los catalog/dataset candidates aplicables en `FROZEN` y todos sus
+  mappings/hashes.
+- D espera el par inmutable `ScoringConfiguration` +
+  `ScoringCalibrationData` y los gameplay facts/IDs que consume.
+
+Ningún output cambia de `SPECIFIED` en G3D-3A. Conteo: **139**.
+
+## 11. Referencias G3D-3A
+
+- [Reference Snapshot Policy](G3D_REFERENCE_SNAPSHOT_POLICY.md)
+- [G3D Data Governance](G3D_DATA_GOVERNANCE.md)
+- [G3D P0 Acquisition Spec](G3D_P0_ACQUISITION_SPEC.md)
+

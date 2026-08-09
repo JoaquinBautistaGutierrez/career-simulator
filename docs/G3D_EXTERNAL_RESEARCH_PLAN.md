@@ -137,3 +137,47 @@ Aplican las usage classes `REDISTRIBUTABLE_RAW`, `REDISTRIBUTABLE_DERIVED`,
 completa y privacy classes están en
 [G3D Data Governance](G3D_DATA_GOVERNANCE.md).
 
+## 9. Gate hacia adquisición P0
+
+G3D-3A aprueba:
+
+1. `referenceCutoffDate` policy y regla de ediciones;
+2. roles/reviewers, solo-project mode y storage/licensing policy;
+3. 16 club-selection slots y candidate method;
+4. `EvidenceRecord`, source-identification template y hash retention;
+5. scopes ARS/EUR y monetary dates;
+6. mappings Position/Competition/Injury;
+7. raw-data privacy/anonymization policy para player observations.
+
+Al abrir G3D-3B todavía deben registrarse `approverRef`, congelarse el valor
+concreto de `referenceCutoffDate` y revisarse cada source antes de captura. Se
+declara `GO_CONDITIONAL`: esos controles son first steps de la campaña, no
+blockers matemáticos. No se requiere elegir parámetros de gameplay.
+
+## 10. Artifacts y stopping
+
+P0 produce, como mínimo:
+
+- `REFERENCE_EDITION_MANIFEST`;
+- `COMPETITION_FORMAT_EVIDENCE`;
+- `CALENDAR_EVIDENCE`;
+- `DETAILED_CLUB_SELECTION_REPORT`;
+- `EXTERNAL_CLUB_SCOPE_MANIFEST`;
+- `NATIONAL_TEAM_REFERENCE_EVIDENCE`;
+- `AWARD_CATALOG_EVIDENCE`;
+- `MONETARY_REFERENCE_EVIDENCE`;
+- `SCORING_CATALOG_EVIDENCE`;
+- `SOURCE_LICENSE_MANIFEST`.
+
+Un task termina cuando sus required fields tienen evidence suficiente o
+missing explícito, la ruta de licencia está identificada, los conflictos
+materiales están resueltos/aislados y el artifact cumple acceptance. No se busca
+indefinidamente una fuente perfecta.
+
+## 11. Referencias
+
+- [Reference Snapshot Policy](G3D_REFERENCE_SNAPSHOT_POLICY.md)
+- [G3D Data Governance](G3D_DATA_GOVERNANCE.md)
+- [G3D P0 Acquisition Spec](G3D_P0_ACQUISITION_SPEC.md)
+- [Calibration Dataset Registry](CALIBRATION_DATASET_REGISTRY.md)
+

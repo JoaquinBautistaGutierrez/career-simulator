@@ -586,3 +586,52 @@ La cardinalidad escalar se calcula desde hashes de esos catálogos al congelar
 el candidate. Agregar una key después de publicación crea nueva versión/hash;
 no activa un default. Los 275 templates canónicos no cambian en G3D-2.
 
+## 15. Provenance y acquisition dependencies G3D-3A
+
+No se asigna ningún `currentValue` ni se cambia publication status. Cada rama
+hereda el siguiente `provenanceGate` antes de que un template calibrable pueda
+avanzar de `UNASSIGNED`:
+
+| Rama | P0 artifacts / evidence gate | Owner de valor posterior | Restricción |
+|---|---|---|---|
+| `player.creation` | `REFERENCE_EDITION_MANIFEST`; Position mapping; player/trait/foot source manifests | `CALIBRATION_OWNER`, con Product en equivalence | hidden proxies no se presentan como observados |
+| `development` | cutoff/window policy; longitudinal source/license/privacy manifests | `CALIBRATION_OWNER` | ventana y censoring deben validarse |
+| `roleMinutes` | `COMPETITION_FORMAT_EVIDENCE`, `CALENDAR_EVIDENCE`, registration bindings | `CALIBRATION_OWNER` | no opportunity inventada |
+| `performance` | cutoff/context mappings y P1 performance source manifests | `CALIBRATION_OWNER` | GK/CM/ST units/exposure compatibles |
+| `health` | Calendar evidence + six-definition publication route + public-sports privacy review | `CALIBRATION_OWNER` | no private medical data; denominator obligatorio |
+| `clubWorld` | `DETAILED_CLUB_SELECTION_REPORT`, `EXTERNAL_CLUB_SCOPE_MANIFEST`, club source manifests | `CALIBRATION_OWNER` | identity facts y proxy estimates separados |
+| `competitions` | `REFERENCE_EDITION_MANIFEST`, `COMPETITION_FORMAT_EVIDENCE`, `CALENDAR_EVIDENCE` | `CALIBRATION_OWNER` sobre data bindings frozen | Definition values pertenecen a data, no parameter defaults |
+| `transfers` | external-club scope, Calendar/registration y `MONETARY_REFERENCE_EVIDENCE` | `CALIBRATION_OWNER` | Money/valuation evidence conserva date/currency/license |
+| `nationalTeam` | `NATIONAL_TEAM_REFERENCE_EVIDENCE`, calendar y eligibility binding | `CALIBRATION_OWNER` | no eligibility inferida |
+| `awards` | `AWARD_CATALOG_EVIDENCE` y AwardDefinitions frozen | `CALIBRATION_OWNER` | exactly five V1 slots; no scoring points |
+| `reputationSocial` | reach/social source manifests, platform/date/privacy definitions | `CALIBRATION_OWNER` + Product para construct targets | follower observations no son gameplay truth universal |
+| `retirementComeback` | longitudinal career source/privacy manifest + external-tier activity definition | `CALIBRATION_OWNER` + Product para comeback/finalization ranges | censoring y lower-tier continuity obligatorios |
+| `scoringConfiguration` | `SCORING_CATALOG_EVIDENCE`, gameplay definition hashes | `SCORING_OWNER` | solo valores normativos; missing permanece `DATA_REQUIRED` |
+| `scoringCalibrationData` | frozen PRI/CC/social cohorts + cutoff/provenance chain | `SCORING_OWNER` | separado de `EngineParameterSet` |
+
+### 15.1 Metadata heredada por template
+
+Todo valor futuro debe añadir:
+
+```text
+researchSnapshotId?
+sourceEvidenceIds[]
+datasetCandidateIds[]
+transformationIds[]
+productDecisionIds[]
+ownerApprovalRefs[]
+```
+
+`STRUCTURAL_FIXED` puede no requerir dataset, pero conserva normative source.
+`PRODUCT_DEFINED` conserva Product approval. Un valor derivado de datos no
+avanza sin source→evidence→transform→estimate lineage.
+
+No se crearon aliases ni deprecations en G3D-3A. Conteo: **275 templates
+canónicos**, todos con los mismos paths y valores/estados previos.
+
+## 16. Referencias G3D-3A
+
+- [Reference Snapshot Policy](G3D_REFERENCE_SNAPSHOT_POLICY.md)
+- [G3D Data Governance](G3D_DATA_GOVERNANCE.md)
+- [G3D P0 Acquisition Spec](G3D_P0_ACQUISITION_SPEC.md)
+

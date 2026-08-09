@@ -378,3 +378,63 @@ vincula al baseline manifest.
 `RULE_PENDING` hasta publicar tolerancias/rangos. Su métrica y aggregation ya
 están cerradas por `G3D_PRODUCT_DECISIONS.md`.
 
+## 9. Tolerance-source gate G3D-3A
+
+Cada una de las 186 rows obtiene `toleranceSourceGate` mediante su `targetType`
+y las columnas External/Product ya registradas. No se asignan rangos.
+
+| Gate | Regla |
+|---|---|
+| `NORMATIVE_INVARIANT` | `INVARIANT`: aceptación proviene de matemática/spec; no espera evidencia observada ni product range. |
+| `OBSERVED_EVIDENCE_REQUIRED` | `CALIBRATION_TARGET` con external evidence `sí` y product decision `no`. |
+| `PRODUCT_NUMERIC_DECISION_REQUIRED` | `CALIBRATION_TARGET` con external `no` y product `sí`. |
+| `EVIDENCE_AND_PRODUCT_REQUIRED` | `CALIBRATION_TARGET` con ambos `sí`; evidencia informa, producto elige tradeoff/tolerance. |
+| `DIAGNOSTIC_NO_ACCEPTANCE_RANGE` | `DIAGNOSTIC`: se recolecta/reportan métricas, pero no falla un candidate salvo promoción/versionada a target. |
+
+Si una row declara evidence/product `conditional`, el gate conserva la
+condición en vez de promoverla silenciosamente. Cambiar el gate requiere update
+del registry y rationale.
+
+### 9.1 Binding por familias
+
+| Target patterns | Tolerance source gate dominante | Prerequisite |
+|---|---|---|
+| `CT-CRE-CAP/TRAIT/FOOT/CORR/POWER/SUIT-*`, `CT-DEV-*` observacionales | `OBSERVED_EVIDENCE_REQUIRED` | player/development datasets normalizados; window statistical validation |
+| `CT-CRE-EQUIV-*` | `EVIDENCE_AND_PRODUCT_REQUIRED` | cohort baseline + `PD-G3D-008` tolerances en G3D-3D |
+| `CT-ROLE-*`, `CT-MIN-*`, `CT-APP-*`, `CT-START-*` | `OBSERVED_EVIDENCE_REQUIRED` salvo design constraints | Calendar/Competition + exposure datasets |
+| `CT-PERF-*`, `CT-ST-*`, `CT-CM-*`, `CT-GK-*`, `CT-PROD-*` | `OBSERVED_EVIDENCE_REQUIRED`; tails son diagnostics hasta rango aprobado | position/context/exposure evidence |
+| `CT-HLT-*`, `CT-INJ-*`, `CT-REC-*`, `CT-REL-*`, `CT-SEQ-*` | `OBSERVED_EVIDENCE_REQUIRED`; taxonomy scope puede requerir Product | exposure/recovery datasets + six definitions |
+| `CT-CLUB-*`, `CT-MGR-*`, `CT-TACTIC-*`, `CT-PCOMP-*` | `EVIDENCE_AND_PRODUCT_REQUIRED` para proxies; observed para outcomes | club portfolio/definitions + proxy construct approval |
+| `CT-CAL-*`, `CT-COMP-*`, `CT-WORLD-*` | facts/invariants `NORMATIVE_INVARIANT`; distributions `OBSERVED_EVIDENCE_REQUIRED` | P0 formats/calendar then histories |
+| `CT-MKT-*`, `CT-CONTRACT-*` | `OBSERVED_EVIDENCE_REQUIRED`; unpublished terms may use explicit Product fallback | P0 money/windows + P1 transaction datasets |
+| `CT-NT-*`, `CT-AWD-*` | `OBSERVED_EVIDENCE_REQUIRED`; scope/tail targets may be `EVIDENCE_AND_PRODUCT_REQUIRED` | P0 definitions, P1 histories |
+| `CT-REP-*`, `CT-SOC-*` | `EVIDENCE_AND_PRODUCT_REQUIRED` | platform/construct evidence + product balance |
+| `CT-RET-*` | `OBSERVED_EVIDENCE_REQUIRED` | longitudinal retirement dataset |
+| `CT-CB-*`, `CT-FIN-*` frequency/timing | `EVIDENCE_AND_PRODUCT_REQUIRED` | observed careers + `PD-G3D-011/012` numeric targets |
+| `CT-SCR-PRI/CC/ACH/NAT/AWD/REC-*` | `OBSERVED_EVIDENCE_REQUIRED` o normative catalog según row | frozen scoring datasets/catalog |
+| `CT-SCR-TIER/POP/PC-*` | `EVIDENCE_AND_PRODUCT_REQUIRED` | end-to-end evidence + `PD-G3D-009/010` |
+| `CT-E2E-*` | combinación heredada; acceptance solo tras upstream gates | todos los artifacts aceptados |
+
+### 9.2 Product numeric blockers
+
+Continúan sin tolerance:
+
+- Quick/Custom equivalence (`PD-G3D-008`);
+- high-tier rarity profile (`PD-G3D-009`, `BALANCED` recomendado);
+- social contribution balance (`PD-G3D-010`);
+- comeback/finalization frequencies (`PD-G3D-011/012`);
+- sample/privacy ranges para claims públicos (`PD-G3D-014`, DR-035).
+
+`PRODUCT_OWNER` aprueba esos números en G3D-3D, informado por sensitivity de
+`CALIBRATION_OWNER`/`SCORING_OWNER`. Ninguno se presenta como external fact.
+
+Conteo después de G3D-3A: **186 target IDs**, sin aliases nuevos ni tolerancias
+inventadas.
+
+## 10. Referencias G3D-3A
+
+- [Reference Snapshot Policy](G3D_REFERENCE_SNAPSHOT_POLICY.md)
+- [G3D Data Governance](G3D_DATA_GOVERNANCE.md)
+- [G3D Product Decisions](G3D_PRODUCT_DECISIONS.md)
+- [G3D P0 Acquisition Spec](G3D_P0_ACQUISITION_SPEC.md)
+

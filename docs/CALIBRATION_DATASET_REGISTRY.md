@@ -460,3 +460,87 @@ Aliases/deprecations G3D-2: ninguno. `DS-CLUB-VERTICAL-SLICE` conserva tanto
 identidad como evidence por ser un único publication bundle; sus raw sources
 pueden ser múltiples artifacts sin crear otro datasetId.
 
+## 13. Governance y reference-window bindings G3D-3A
+
+Las siguientes 40 bindings son metadata heredable; no cambian IDs ni estado
+`PLANNED`.
+
+Leyenda compacta:
+
+- cutoff: `CLOSED` = `PRE_CUTOFF_CLOSED`; `PARTIAL` = snapshot
+  `PRE_CUTOFF_PARTIAL` autorizado; `TIMELESS+CLOSED` separa definition estable
+  de edition binding;
+- window decision: `ER`, `PD`, `SV`, `ER+SV`, `NA` corresponden a
+  `EXTERNAL_RESEARCH`, `PRODUCT_DECISION`, `STATISTICAL_VALIDATION`,
+  `EXTERNAL_RESEARCH_AND_STATISTICAL_VALIDATION`, `NOT_APPLICABLE`;
+- owners: primary owner / research owner; `DATA` = `DATA_OWNER` y `SCORING` =
+  `SCORING_OWNER`. Todo freeze añade `TECHNICAL_VALIDATOR` y
+  `PROVENANCE_REVIEWER`;
+- usage es postura inicial conservadora. Cada source concreta requiere review;
+  `REFERENCE_ONLY` no puede elevarse sin aprobación;
+- privacy usa las clases de
+  [G3D Data Governance](G3D_DATA_GOVERNANCE.md).
+
+| Dataset ID | Observation category / cutoff / window | Owner / privacy | Initial usage class | Research / acquisition artifact | Freeze prerequisites |
+|---|---|---|---|---|---|
+| `DS-PLAYER-CREATION-REFERENCE` | `SNAPSHOT`; `CLOSED|PARTIAL`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P1 player exposure/development; dataset candidate manifest | cutoff, position mapping, license/privacy, cohort/bias validation |
+| `DS-PLAYER-TRAIT-REFERENCE` | `SNAPSHOT`; `CLOSED|PARTIAL`; `ER` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P1 development + product construct artifact | proxy semantics, uncertainty, no identity/hidden-trait claim |
+| `DS-PLAYER-FOOT-REFERENCE` | `MULTI_SEASON`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P1 player exposure | foot definition, denominator, mapping, license |
+| `DS-POSITION-EVALUATION-REFERENCE` | `MULTI_SEASON`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P1 performance | GK/CM/ST mapping and task comparability |
+| `DS-DEVELOPMENT-LONGITUDINAL` | `LONGITUDINAL`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `LOCAL_PRIVATE_SOURCE` | P1 development | pseudonymization, censoring/survivorship, comparable periods |
+| `DS-POSITION-USAGE-HISTORY` | `LONGITUDINAL`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P3 position history | minute conservation and ambiguous-label review |
+| `DS-ROLE-MINUTES-REFERENCE` | `MULTI_SEASON`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P1 player exposure | calendar opportunity, denominator and membership mapping |
+| `DS-PERFORMANCE-REFERENCE` | `MULTI_SEASON`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P1 performance | source methodology/units, exposure, GK/CM/ST coverage |
+| `DS-PERFORMANCE-LONGITUDINAL` | `LONGITUDINAL`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `LOCAL_PRIVATE_SOURCE` | P1 performance | pseudonymization, ordered periods, no same-window leakage |
+| `DS-PRESSURE-PERFORMANCE-REFERENCE` | `MULTI_SEASON`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P3 pressure | pressure definition, sample/bias review, source coverage |
+| `DS-INJURY-EXPOSURE` | `MULTI_SEASON`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `LOCAL_PRIVATE_SOURCE` | P1 injury exposure | public sports-only, compatible denominator/origin/taxonomy |
+| `DS-INJURY-RECOVERY` | `LONGITUDINAL`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `LOCAL_PRIVATE_SOURCE` | P1 injury recovery | public sports-only, censoring/relapse, six-family mapping |
+| `DS-CLUB-VERTICAL-SLICE` | `SNAPSHOT`; `PARTIAL` + identity `TIMELESS`; `ER` | DATA/DATA; `PUBLIC_ENTITY_IDENTIFIED` | `MANUAL_PUBLIC_FACT` | P0 club identity; `DETAILED_CLUB_SELECTION_REPORT` | cutoff membership, 16 IDs, portfolio evidence, rights/license |
+| `DS-CLUB-HISTORICAL-STRENGTH` | `HISTORICAL`; `CLOSED`; `ER+SV` | DATA/DATA; `PUBLIC_ENTITY_IDENTIFIED` | `REFERENCE_ONLY` | P1 club sporting | format/context transforms, complete IDs, drift review |
+| `DS-CLUB-FINANCIAL-REFERENCE` | `MONETARY_SERIES`; `CLOSED|PARTIAL`; `ER+SV` | DATA/DATA; `PUBLIC_ENTITY_IDENTIFIED` | `REFERENCE_ONLY` | P1 club institutional | currency/date/proxy definition, license, normalization refs |
+| `DS-MANAGER-TENURE` | `LONGITUDINAL`; `CLOSED`; `ER+SV` | DATA/DATA; `PUBLIC_ENTITY_IDENTIFIED` | `MANUAL_PUBLIC_FACT` | P1 manager/squad | spell/interim/reason policy, cutoff and completeness |
+| `DS-SQUAD-COMPETITION-PROXY` | `SNAPSHOT`; `PARTIAL`; `ER+SV` | DATA/DATA; `AGGREGATED_NON_IDENTIFYING` | `REDISTRIBUTABLE_DERIVED` pending review | P1 manager/squad | source license, position mapping, aggregation/privacy review |
+| `DS-COMPETITION-CATALOG` | `SINGLE_EDITION`; `TIMELESS+CLOSED`; `ER` | DATA/DATA; `NO_PERSON_DATA` | `MANUAL_PUBLIC_FACT` | P0 baseline/format; `REFERENCE_EDITION_MANIFEST` + `COMPETITION_FORMAT_EVIDENCE` | official IDs/format/stages/exposure, license manifest, no conflicts |
+| `DS-NATIONAL-COMPETITION-CATALOG` | `SINGLE_EDITION`; `TIMELESS+CLOSED`; `ER` | DATA/DATA; `NO_PERSON_DATA` | `MANUAL_PUBLIC_FACT` | P0 national; `NATIONAL_TEAM_REFERENCE_EVIDENCE` | definition/calendar/eligibility sources and ADR-082 binding |
+| `DS-AWARD-DEFINITION-CATALOG` | `SINGLE_EDITION`; `TIMELESS+CLOSED`; `ER` | DATA/DATA; `NO_PERSON_DATA` | `MANUAL_PUBLIC_FACT` | P0 awards; `AWARD_CATALOG_EVIDENCE` | exactly five verified definitions, timing/field/tie, license |
+| `DS-CALENDAR-SLICE` | `SINGLE_EDITION`; `CLOSED`; `ER` | DATA/DATA; `NO_PERSON_DATA` | `MANUAL_PUBLIC_FACT` | P0 calendar; `CALENDAR_EVIDENCE` | cutoff/format bindings, phase→Q, market/registration windows |
+| `DS-COMPETITION-HISTORY` | `HISTORICAL`; `CLOSED`; `ER+SV` | DATA/DATA; `PUBLIC_ENTITY_IDENTIFIED` | `MANUAL_PUBLIC_FACT` | P1 competition history | format/participant/outcome mapping and anomaly policy |
+| `DS-TRANSFER-HISTORY` | `MULTI_SEASON`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P1 transfer/contract | operation/effective date, club IDs, selection bias and license |
+| `DS-TRANSFER-FEES` | `MONETARY_SERIES`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P1 transfer/contract | disclosed/add-ons semantics, currency/date, money evidence |
+| `DS-MARKET-VALUATION-PROXY` | `SNAPSHOT`; `PARTIAL`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P3 market valuation | methodology/version/license; diagnostic-only claim |
+| `DS-SALARY-REFERENCE` | `MONETARY_SERIES`; `CLOSED|PARTIAL`; `ER+SV` | DATA/DATA; `AGGREGATED_NON_IDENTIFYING` | `REFERENCE_ONLY` | P1 transfer/contract | gross/net/unit/date comparability and privacy/license |
+| `DS-CONTRACT-REFERENCE` | `MULTI_SEASON`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P1 transfer/contract | option/term semantics, operation mapping, license |
+| `DS-CURRENCY-INFLATION` | `MONETARY_SERIES`; `CLOSED|PARTIAL`; `ER` | DATA/DATA; `NO_PERSON_DATA` | `REFERENCE_ONLY` | P0 money; `MONETARY_REFERENCE_EVIDENCE` | official units/series/date/revisions, source license, transform spec |
+| `DS-NATIONAL-SELECTION-HISTORY` | `LONGITUDINAL`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `REFERENCE_ONLY` | P1 national history | calendar/roster/position coverage; no eligibility inference |
+| `DS-NATIONAL-COMPETITION-HISTORY` | `HISTORICAL`; `CLOSED`; `ER+SV` | DATA/DATA; `PUBLIC_ENTITY_IDENTIFIED` | `MANUAL_PUBLIC_FACT` | P1 national history | National definitions, edition/format/outcome mapping |
+| `DS-AWARD-HISTORY` | `HISTORICAL`; `CLOSED`; `ER+SV` | DATA/DATA; `PUBLIC_ENTITY_IDENTIFIED` | `MANUAL_PUBLIC_FACT` | P1 award history | five-definition mapping, nomination/tie completeness |
+| `DS-REPUTATION-REFERENCE` | `SNAPSHOT`; `PARTIAL`; `ER` | DATA/DATA; `AGGREGATED_NON_IDENTIFYING` | `REFERENCE_ONLY` | P3 reputation | construct validity, region/reach and product interpretation |
+| `DS-SOCIAL-AUDIENCE-REFERENCE` | `SOCIAL_SNAPSHOT`; `PARTIAL`; `ER+SV` | DATA/DATA; `PUBLIC_FIGURE_METRIC` | `REFERENCE_ONLY` | P3 reputation/social | platform/date/account age/metric/license/privacy |
+| `DS-SOCIAL-ENGAGEMENT-REFERENCE` | `SOCIAL_SNAPSHOT`; `PARTIAL`; `ER+SV` | DATA/DATA; `PUBLIC_FIGURE_METRIC` | `REFERENCE_ONLY` | P3 reputation/social | denominator/platform era, no audience identities |
+| `DS-PUBLIC-ATTENTION-REFERENCE` | `MULTI_SEASON`; `CLOSED|PARTIAL`; `ER+SV` | DATA/DATA; `AGGREGATED_NON_IDENTIFYING` | `REFERENCE_ONLY` | P3 attention | event window/baseline/region and causal limitation |
+| `DS-CAREER-RETIREMENT-HISTORY` | `LONGITUDINAL`; `CLOSED`; `ER+SV` | DATA/DATA; `ANONYMIZED_OBSERVATION` | `LOCAL_PRIVATE_SOURCE` | P1 retirement | pseudonymization, activity/comeback definitions, censoring/lower-tier |
+| `DS-SCORING-PRI-COHORTS` | `MULTI_SEASON`; `CLOSED`; `ER+SV` | SCORING/DATA; `AGGREGATED_NON_IDENTIFYING` | `REDISTRIBUTABLE_DERIVED` pending review | P2 PRI | frozen upstream performance/exposure cohorts and provenance |
+| `DS-SCORING-CONTRIBUTION-COHORTS` | `LONGITUDINAL`; `CLOSED`; `ER+SV` | SCORING/DATA; `AGGREGATED_NON_IDENTIFYING` | `REDISTRIBUTABLE_DERIVED` pending review | P2 CC | contribution/eligibility facts, product transform review |
+| `DS-SCORING-CATALOG` | `HISTORICAL`; `TIMELESS+CLOSED`; `ER` | SCORING/SCORING; `NO_PERSON_DATA` | `PRODUCT_DEFINED` | P0 scoring; `SCORING_CATALOG_EVIDENCE` | MASTER/ADR provenance, public identity refs, exact missing/data states |
+| `DS-SCORING-SOCIAL-COHORTS` | `SOCIAL_SNAPSHOT`; `PARTIAL`; `ER+SV` | SCORING/DATA; `AGGREGATED_NON_IDENTIFYING` | `REDISTRIBUTABLE_DERIVED` pending review | P2 social scoring | social source/license, authorized metric, product balance, no double count |
+
+### 13.1 Global freeze prerequisites
+
+Además de la última columna, toda row exige:
+
+1. `referenceCutoffDate` y cutoff classification resolubles;
+2. `SourceReference`, `EvidenceRecord` y `SOURCE_LICENSE_MANIFEST`;
+3. usage/license/privacy class revisadas;
+4. source/transform/output hashes o fingerprint permitido;
+5. units, mappings, missingness/censoring y anomaly disposition;
+6. owner y reviewer approvals por rol.
+
+No se crearon DatasetDefinitions nuevas. Conteo después de G3D-3A: **40**.
+
+## 14. Referencias G3D-3A
+
+- [Reference Snapshot Policy](G3D_REFERENCE_SNAPSHOT_POLICY.md)
+- [G3D Data Governance](G3D_DATA_GOVERNANCE.md)
+- [G3D P0 Acquisition Spec](G3D_P0_ACQUISITION_SPEC.md)
+- [G3D External Research Plan](G3D_EXTERNAL_RESEARCH_PLAN.md)
+
