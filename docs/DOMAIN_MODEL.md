@@ -110,9 +110,10 @@ Posee modelos públicos sanitizados y renders de estados cerrados. No recalcula 
 
 Reputation posee Sporting/Public Reputation y Public Attention; Social posee
 Audience/Engagement; Retirement posee `PlayerPlayingStatus`, assessments,
-oportunidades y episodios de retiro/regreso. Son módulos del núcleo de
-simulación con estados distintos. Ninguno posee capabilities, contratos,
-CareerScore, lifecycle terminal o ScoreLedger.
+oportunidades y episodios de retiro/regreso. Career/Application posee
+`CareerFinalizationState` y el lifecycle terminal fijado por ADR-079. Son
+módulos con estados distintos. Ninguno de Reputation/Social/Retirement posee
+capabilities, contratos, CareerScore o ScoreLedger.
 
 ## 4. Agregados y propiedad
 
@@ -264,6 +265,8 @@ Son agregados editoriales inmutables una vez publicados.
 | `AudienceState` | Player dentro de Career | Followers exactos, engagement y breakdown regional autorizado. |
 | `RetirementEpisode` | `retirementEpisodeId` | Retiro deportivo identificado con causa, oportunidad, decisión y versiones; no Career completion. |
 | `ComebackEpisode` | `comebackEpisodeId` | Regreso identificado y relacionado con un episodio de retiro. |
+| `RetirementComebackState` | Player dentro de Career | Playing status, trends, episodios/counters y lifecycle watermarks; no CareerStatus. |
+| `CareerFinalizationState` | Career | Boundary confirmado, terminal cursor, closed fact set, artefactos/integridad y transición FINALIZING→COMPLETED. |
 | `SeasonState` | `seasonId` | Acumuladores y fase de una temporada todavía no cerrada. |
 | `SeasonWindowState` | `seasonId` + `Q1`–`Q4` | Oportunidad, disponibilidad, rol, uso efectivo, producción, salud y consecuencias confirmados del tramo agregado. |
 | `MarketPerception` | Observador + Player + punto/contexto | Proyección de conocimiento, evidencia, riesgo, incertidumbre y valoración; no estado verdadero. |
@@ -516,7 +519,9 @@ consecuencia permanente sobre capabilities. Una lesión resuelta en
 ### 6.5 Transfers, Market y Contracts
 
 La especificación normativa completa está en
-[`TRANSFER_MARKET_CONTRACT_SPEC.md`](TRANSFER_MARKET_CONTRACT_SPEC.md).
+[`TRANSFER_MARKET_CONTRACT_SPEC.md`](TRANSFER_MARKET_CONTRACT_SPEC.md); sus
+familias matemáticas están en
+[`TRANSFER_MARKET_CONTRACT_MATH_SPEC.md`](TRANSFER_MARKET_CONTRACT_MATH_SPEC.md).
 
 El pipeline es:
 
@@ -525,6 +530,8 @@ MarketPerception
 -> ClubNeed
 -> TransferInterest
 -> TransferOffer
+-> SellerResponse
+-> ContractProposal
 -> TransferNegotiation
 -> PlayerDecision
 -> TransferOutcome
@@ -563,9 +570,11 @@ Career abierta puede contener un jugador retirado y una decisión de comeback.
 `RetirementEpisode`/`ComebackEpisode` preservan identidad y causa, permitiendo
 retiro→regreso→retiro. El primer retiro no completa/rankea la Career.
 
-ADR-062 aclara ADR-016 sin añadir `CareerStatus.RETIRED -> ACTIVE`. DR-069 debe
-definir cursor posretiro, boundary irreversible, scoring final y terminación
-práctica.
+ADR-062 aclara ADR-016 sin añadir `CareerStatus.RETIRED -> ACTIVE`. ADR-079
+resuelve DR-069: quarters/seasons continúan durante retiro abierto; las
+suboperaciones lifecycle producen retiro/comeback/finalization; y
+`CareerFinalizationConfirmed` entra en `CareerStatus.RETIRED`/FINALIZING,
+cierra el fact frontier y precede a `COMPLETED`.
 
 ## 7. Catálogos de solo lectura
 
@@ -574,6 +583,8 @@ El motor recibe interfaces conceptuales inmutables:
 | Catálogo | Consultas esperadas |
 |---|---|
 | `FootballCatalog` | `ClubDefinition`, `LeagueDefinition`, `CompetitionDefinition`, `NationalTeamDefinition`, `AwardDefinition`, `ReputationMarketDefinition`, país, jerarquía y reglas por ID, todos ligados a `dataVersion`. |
+| `VerticalSliceDataCatalog` | `VerticalSliceBaselineManifest`, `CalendarDefinition`, `MarketWindowDefinition`, `RegistrationEligibilityPolicy`, `ExternalClubDefinition`, `InjuryFamilyDefinition` y mappings, todos con provenance/hash. |
+| `CalibrationEvidenceCatalog` | `DatasetDefinition`, transformation manifests, normalized observations, evidence tier y confidence; nunca es estado causal de una Career sin publicación posterior. |
 | `ContentCatalog` | Oportunidades por ventana/familia, DomainEvents, cadenas, hechos requeridos y efectos compilados. |
 | `NarrativeCatalog` | Presentaciones localizadas por DomainEvent, sensibilidad y contentVersion; no contiene efectos. |
 | `ScoringRules` | Valores, fórmulas, topes de puntos y política anti-duplicación por versión. |
@@ -584,6 +595,21 @@ Un catálogo:
 - devuelve resultados en orden estable;
 - no consulta DB durante la simulación;
 - no puede cambiar mientras se ejecuta una carrera.
+
+G3D-2 añade las siguientes semánticas sin fijar schema técnico:
+
+- `VerticalSliceBaselineManifest` identifica corte común, temporada nominal por
+  jurisdicción, artifacts, hashes y confidence;
+- `ExternalClubContext` es un field no identificable y no puede poseer
+  contrato, championship ni fact nominal;
+- `MaterializedExternalClubState` referencia una identidad real del catálogo y
+  se deriva determinísticamente cuando la simulación la necesita;
+- `MoneyObservation` conserva minor units, currency, date/period y provenance;
+  un purchasing-power context es derivado, no `Money`, conforme a ADR-083;
+- una `RegistrationEligibilityPolicy` ausente produce `PENDING_DATA`, nunca un
+  boolean permissive por defecto;
+- `NationalTeamEligibility` V1 solo puede confirmar Argentina conforme a
+  ADR-082; España como club context no modifica esa relación.
 
 ## 8. Posición, uso efectivo y reconversión
 
@@ -621,7 +647,8 @@ y selección conservan exposiciones independientes.
 - `ResolveDecision`
 - `RetirePlayer` (retiro deportivo; produce `RetirementOccurred` conforme a
   DR-063/ADR-010)
-- `RequestCareerFinalization` (candidato; precondiciones pendientes de DR-069)
+- `RequestCareerFinalization` (crea oportunidad/decisión, no cierra por sí solo)
+- `ConfirmCareerFinalization` (irreversible; produce `CareerFinalizationConfirmed`)
 - `CompleteCareer`
 - `AbandonCareer`
 
@@ -651,7 +678,8 @@ Los `PERSISTED_DOMAIN_FACT` canónicos se agrupan así:
 - **Lifecycle/decisiones:** `CareerStarted`, `SeasonStarted`,
   `SeasonWindowClosed`, `SeasonCompleted`, `DecisionRequested`,
   `DecisionResolved`, `CareerAbandoned`, `CareerInvalidated`,
-  `CareerCompleted`, `DiscoveryConfirmed`, `ScoringCorrectionAuthorized`.
+  `CareerFinalizationConfirmed`, `CareerCompleted`, `DiscoveryConfirmed`,
+  `ScoringCorrectionAuthorized`.
 - **Player/Development/Role:** `PlayerCapabilitiesChanged`,
   `PlayerDynamicStateChanged`, `PrimaryPositionChanged`,
   `SquadStatusChanged`, `SportingRoleAssigned`, `MinutesRecorded`,
@@ -713,8 +741,9 @@ Aliases que no se emiten:
 - `FollowersChanged` → `FollowerCountUpdated`;
 - `PlayerRetired` → `RetirementOccurred`.
 
-`CareerFinalizationRequested` es un comando/internal signal hasta cerrar
-DR-069. `CompetitionFinished` es el único outcome colectivo fact; sus vistas no
+`CareerFinalizationRequested` es un comando/internal signal;
+`CareerFinalizationConfirmed` es el fact terminal cerrado por ADR-079.
+`CompetitionFinished` es el único outcome colectivo fact; sus vistas no
 duplican la ocurrencia.
 
 ### 10.2 Eventos de juego
@@ -780,8 +809,8 @@ Reglas:
 - `ACTIVE`: Career abierta y ejecutable sin decisión pendiente; el jugador
   puede estar deportivamente activo o retirado.
 - `WAITING_DECISION`: interrupción mecánica; no admite otro advance.
-- `RETIRED`: cierre deportivo ya irreversible para esa Career; falta
-  consolidación y scoring final.
+- `RETIRED`: etapa FINALIZING irreversible; el fact frontier está cerrado y
+  faltan consolidación, scoring final e integridad/compatibilidad.
 - `COMPLETED`: cierre completo; solo puede cambiar posteriormente a `INVALIDATED`.
 - `ABANDONED`: terminal, no reabrible y no elegible.
 - `INVALIDATED`: terminal, preservado para auditoría y no elegible.
@@ -799,7 +828,7 @@ stateDiagram-v2
 
 Esta máquina solo opera mientras `CareerStatus` permanece `ACTIVE` o
 `WAITING_DECISION`. Un comeback no reabre `CareerStatus.RETIRED`.
-DR-069 define cuándo el retiro pasa a cierre irreversible.
+ADR-079 define `CareerFinalizationConfirmed` como el boundary irreversible.
 
 ## 13. Pipeline de temporada
 
@@ -813,6 +842,10 @@ ROLE_AND_MINUTES
 
 for Q1, Q2, Q3, Q4:
   AVAILABILITY(Qn)
+    lifecycle.retirement
+    lifecycle.comeback
+    lifecycle.finalization
+    medical
   PRODUCTION(Qn)
   HEALTH(Qn)
   CONSEQUENCES(Qn)
@@ -1094,11 +1127,12 @@ Los rechazos deben ser tipados y estables, por ejemplo:
 
 Los detalles internos, trazas probabilísticas y datos sensibles no se exponen automáticamente al usuario.
 
-## 17. Puntos aún no modelables sin decisión
+## 17. Puntos aún no implementables sin publicación/data
 
 No deben completarse por inferencia:
 
-- fórmulas de producción, desarrollo, lesiones, mercado, selección y mundo;
+- valores iniciales, datasets, Definitions, targets y goldens de producción,
+  desarrollo, Health, mercado, selección y mundo; las familias G3C están cerradas;
 - valores/targets del ParameterSet de rol/minutos y producers upstream de
   TacticalFit, competencia, disponibilidad médica y oportunidad;
 - hazard, severidad, recuperación, recaída, secuela, fitness/fatigue y
@@ -1109,25 +1143,56 @@ No deben completarse por inferencia:
   DR-021; SeasonId ordinal y unidad ya están cerrados;
 - matemática, escalas, streams, parámetros y fixtures de Club/Competitions/World
   de DR-022;
-- catálogo real, external pool, promotion/relegation y continuidad fuera del
-  tier detallado de DR-025/065;
+- catálogo real, fields, promotion/relegation, adapters y goldens del pool
+  híbrido de ADR-081/DR-025/065;
 - valores/targets de reconversión; su fórmula ya está cerrada por ADR-071;
-- fórmula exacta del Coeficiente de Contribución;
-- funciones/distribuciones/streams/parámetros de Market/Transfers/Contracts de
-  DR-008/058;
-- fuente, moneda de referencia, conversión, calibración y presentación de
-  DR-027;
-- time points/ventanas de mercado y cursor mid-season de DR-021/067;
-- `RegistrationEligibility` y reglas de inscripción de DR-066;
-- matemática, calendario/cursor, streams y fixtures de National Team de DR-059;
-- nacionalidad deportiva, antecedentes y transiciones de eligibility
-  internacional de DR-068;
-- matemática, catálogo, posición dominante, métricas GK, streams y fixtures de
-  Awards de DR-049/055/060/063;
+- weights/splines/cohortes y goldens iniciales del Coeficiente de Contribución;
+- values, datasets, targets y goldens de Market/Transfers/Contracts de
+  DR-008/058; sus funciones/samplers están cerrados;
+- fuentes monetarias nativas, contextos normalizados, rates/inflación,
+  calibración y presentación de DR-027;
+- datos/time points de la ventana `MARKET` post-season de DR-021/067;
+  mid-season queda fuera de V1;
+- datasets/policies de `RegistrationEligibility` post-season de DR-066;
+- calendar/data, parámetros calibrados y expected fixtures de National Team;
+- manifest autoritativo de la nacionalidad deportiva Argentina-only V1 de
+  ADR-082/DR-068; otras transiciones están fuera del slice;
+- catálogo, calibration data y expected fixtures de Awards; posición dominante
+  y matemática están cerradas;
 - parámetros/costes y evidencia Monte Carlo de Creation Budget;
 - políticas automáticas y su elegibilidad;
 - contrato de conteo del contenido del vertical slice;
 - contenido habilitado fuera de `GK`, `CM` y `ST` en el slice;
-- fórmulas y reglas de scoring todavía abiertas.
+- `ScoringConfiguration`, `ScoringCalibrationData`, catálogos y expected
+  goldens; fórmulas/reglas están cerradas por ADR-080.
 
 Estos puntos enlazan con `DECISIONS_REQUIRED.md`.
+
+## 18. Modelo de dominio de Scoring tras G3C-11
+
+El dominio competitivo queda compuesto por:
+
+```text
+closed DomainFact frontier
++ ScoringConfiguration(scoringVersion, configurationHash)
++ ScoringCalibrationData(calibrationDataHash, provenance)
+-> ScoreLedgerEntry[]
+-> ScoreLedger
+-> ScoreSnapshot
+```
+
+`ScoreLedgerEntry` referencia facts, rule, scope, categoría, racional exacto,
+transforms/CC/equivalence/caps, `ROUND_HALF_UP` y puntos enteros. El ledger es
+append-only; corrections crean `REVERSAL` y posting nuevo. `ScoreSnapshot`
+contiene las cinco versiones, hashes de ParameterSet/config/calibration,
+fact frontier, ledger digest, seis subtotales, prior sporting points, PC, tier,
+compatibility key e integridad.
+
+`ScoringConfiguration` no es Content ni `EngineParameterSet` y no introduce
+una sexta versión. Scoring no posee RNG, no modifica facts/gameplay y no usa
+`LeagueCompetitiveStrength`, MarketValue o CareerScore como inputs causales.
+
+Las fórmulas exactas pertenecen a
+[`SCORING_MATH_SPEC.md`](SCORING_MATH_SPEC.md). El catálogo vertical y los
+schemas ejecutables continúan pendientes de publicación; no deben completarse
+por inferencia.

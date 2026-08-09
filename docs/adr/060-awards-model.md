@@ -149,8 +149,9 @@ candidate evaluation son trazas por defecto. DR-063/ADR-010 fijan
 
 ### Costes y restricciones
 
-- DR-060 sigue bloqueando matemática, fields y empate;
-- DR-049 debe cerrar dominancia;
+- ADR-077 cierra matemática, fields y empate; DR-060 sigue bloqueando values,
+  data, evidence y calibración;
+- DR-049 ya cierra dominancia por exposición efectiva mediante ADR-071;
 - DR-055/063 debe cerrar métricas/facts;
 - DR-025 debe cerrar catálogo real;
 - DR-010 debe cerrar puntos y anti-duplicación;
@@ -163,6 +164,18 @@ candidate evaluation son trazas por defecto. DR-063/ADR-010 fijan
 - G3B-I05 queda como contenido/calibración externalizados.
 - El scope del slice conserva un premio global, uno juvenil y tres
   posicionales o de competición sin inventar IDs.
+
+## Refinamiento matemático G3C-8
+
+[ADR-077](./077-national-team-awards-mathematics.md) y
+[`NATIONAL_TEAM_AWARDS_MATH_SPEC.md`](../NATIONAL_TEAM_AWARDS_MATH_SPEC.md)
+cierran comparative Normal field, statistical NB2 field, candidate utility,
+judging residual, rank ordinal único y tie policies sin RNG. G3B-I02–I04 y
+DR-060 pasan a `PARTIAL_CALIBRATION`.
+
+Este ADR conserva su autoridad estructural. DR-025, values por Definition,
+evidence mappings, targets y goldens siguen pendientes. Awards no aplica score
+o anti-duplicación.
 
 ## Gates y tests requeridos
 
@@ -192,6 +205,8 @@ Antes de implementar:
 ## Referencias
 
 - [Especificación de selección y premios](../NATIONAL_TEAM_AWARDS_SPEC.md)
+- [Especificación matemática](../NATIONAL_TEAM_AWARDS_MATH_SPEC.md)
+- [ADR-077: matemática de Selection/Awards](./077-national-team-awards-mathematics.md)
 - [ADR-011: Posiciones](./011-position-taxonomy.md)
 - [ADR-014: DSL](./014-event-dsl.md)
 - [ADR-018: Vertical slice](./018-initial-vertical-slice.md)

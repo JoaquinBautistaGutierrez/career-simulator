@@ -438,3 +438,24 @@ inventadas.
 - [G3D Product Decisions](G3D_PRODUCT_DECISIONS.md)
 - [G3D P0 Acquisition Spec](G3D_P0_ACQUISITION_SPEC.md)
 
+## 11. Catalog dependency overlay G3D-3C
+
+Los 186 target IDs y sus tolerance gates permanecen invariantes. Ningún rango,
+tolerance ni observed value fue asignado.
+
+| Target families | Catalog state after G3D-3C | Remaining prerequisite |
+|---|---|---|
+| `CT-CAL-*`, `CT-COMP-*` | `CATALOG_BOUND_WITH_LIMITATIONS` | exact partial cup/Argentina annual/calendar fields plus P1 histories |
+| `CT-CLUB-*`, `CT-MGR-*`, `CT-TACTIC-*`, `CT-PCOMP-*` | `IDENTITY_CATALOG_BOUND` | all causal club baselines and longitudinal evidence |
+| `CT-ROLE-*`, `CT-MIN-*`, `CT-APP-*`, `CT-START-*` | `CALENDAR_CANDIDATE_BOUND` | exact opportunity evidence and P1 role/minutes observations |
+| `CT-PERF-*`, `CT-ST-*`, `CT-CM-*`, `CT-GK-*` | `CONTEXT_IDENTITY_BOUND` | performance/exposure and club-environment evidence |
+| `CT-MKT-*`, `CT-CONTRACT-*` | `CURRENCY_AND_MARKET_BOUND_WITH_LIMITATIONS` | monetary series, external materialization and P1 transactions |
+| `CT-NT-*` | `NT_IDENTITY_AND_MAJOR_CONTEXT_BOUND` | ordinary windows, histories and observed selection evidence |
+| `CT-AWD-*` | `FIVE_IDENTITIES_BOUND_DEFINITIONS_PARTIAL` | `GAP-P0-AWD-001..003` plus histories |
+| `CT-SCR-*` | `SCORING_IDENTITY_SUBSET_BOUND` | IJL/config/catalog gaps and scoring cohorts |
+| other target families | `UNCHANGED` | their G3D-3A/P1/P2/P3 dependencies |
+
+`CATALOG_BOUND` only resolves join identity. It does not satisfy
+`OBSERVED_EVIDENCE_REQUIRED`, `PRODUCT_NUMERIC_DECISION_REQUIRED` or
+`EVIDENCE_AND_PRODUCT_REQUIRED`. G3D-3D remains owner of numeric product
+tolerances.

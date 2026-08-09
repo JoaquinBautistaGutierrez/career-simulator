@@ -571,3 +571,28 @@ Primary provenance:
 - [Source License Manifest](SOURCE_LICENSE_MANIFEST.md);
 - [G3D External Research Plan §12](G3D_EXTERNAL_RESEARCH_PLAN.md#12-resultado-de-la-campaña-g3d-3b).
 
+## 16. Normalization overlay G3D-3C
+
+G3D-3C conserva los 40 `datasetId` y no crea `dataVersion`. Los estados de
+subset evitan promover un bundle con campos críticos pendientes.
+
+| Dataset ID | Candidate ID / dataset state | Normalized coverage | Remaining gate |
+|---|---|---|---|
+| `DS-COMPETITION-CATALOG` | `.../001`; `NORMALIZED_WITH_LIMITATIONS` | six identities/editions/formats; four core formats `VALIDATED_CANDIDATE` | Copa Argentina/Copa del Rey detailed tie/qualification fields; atomic freeze |
+| `DS-NATIONAL-COMPETITION-CATALOG` | `.../002`; `NORMALIZED_WITH_LIMITATIONS` | Argentina identity/policy and World Cup 2026 context `VALIDATED_CANDIDATE` | ordinary international calendar and P1 histories |
+| `DS-CALENDAR-SLICE` | `.../003`; `NORMALIZED_WITH_LIMITATIONS` | stage→Q, guaranteed/conditional exposure and post-season market candidate | ordinary international windows, exact within-stage allocations and registration detail |
+| `DS-CLUB-VERTICAL-SLICE` | `.../004`; `SOURCE_IDENTIFIED` | 16-identity/membership subartifact `VALIDATED_CANDIDATE` | attack/defense/control, prestige, finance, development, medical, stability and reach P1 evidence |
+| `DS-AWARD-DEFINITION-CATALOG` | `.../005`; `NORMALIZED_WITH_LIMITATIONS` | five identity/edition candidates | `GAP-P0-AWD-001..003`; no full definition validated |
+| `DS-CURRENCY-INFLATION` | `.../006`; `SOURCE_IDENTIFIED` | ARS/EUR currency and source-routing policy `VALIDATED_CANDIDATE` | actual series/vintages, terms, base date and transform |
+| `DS-SCORING-CATALOG` | `.../007`; `NORMALIZED_WITH_LIMITATIONS` | 12 gameplay↔scoring IDs and normative subset | IJL, equivalence, records/milestones/historic and cohort resources |
+
+Elipsis en candidate IDs significa el prefijo normativo
+`@candidate/RSNAP-G3D3B-2026-08-07-C1`. Los otros 33 datasets conservan su
+estado anterior. No hay datasets `FROZEN`; no se adquirió raw externo ni se
+asignó un valor de calibración.
+
+Artifacts canónicos:
+
+- [Normalization Spec](G3D_P0_NORMALIZATION_SPEC.md);
+- [Candidate Hash Manifest](G3D_P0_CANDIDATE_HASH_MANIFEST.md);
+- [Data V1 Readiness](G3D_3C_DATA_V1_READINESS_REPORT.md).

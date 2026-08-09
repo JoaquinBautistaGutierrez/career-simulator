@@ -134,6 +134,13 @@ Rechazado porque cambia carreras sin cambiar su referencia.
 
 Rechazado para la cabecera canónica: el nombre único es `dataVersion`.
 
+## Aclaración G3C-11
+
+`ScoringConfiguration` y `ScoringCalibrationData` son recursos inmutables
+hash-addressed gobernados por `scoringVersion`; no son versiones canónicas
+adicionales. Una `scoringVersion` oficial resuelve a un único par de hashes.
+La compatibility key V1 de ADR-080 incluye las cinco versiones y esos hashes.
+
 ## Pruebas requeridas
 
 - Career no valida si falta una de las cinco versiones.
@@ -152,4 +159,5 @@ Rechazado para la cabecera canónica: el nombre único es `dataVersion`.
 - [ADR-007: Canonicalización y hashing](./007-canonicalization-and-hashing.md)
 - [ADR-014: DSL de eventos](./014-event-dsl.md)
 - [ADR-010: Domain Facts y ScoreLedger estructural](./010-scoring-ledger-and-domain-facts.md)
+- [ADR-080: Matemática exacta de Scoring](./080-exact-scoring-mathematics.md)
 - [Registro de decisiones](../DECISIONS_REQUIRED.md#dr-015--taxonomía-de-versiones)

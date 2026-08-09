@@ -149,7 +149,8 @@ mecánica.
 
 ### Costes y restricciones
 
-- DR-059 sigue bloqueando matemática y cursor;
+- ADR-077 cierra la matemática; DR-059 sigue bloqueando values, data,
+  eligibility y cursor;
 - DR-021 debe cerrar calendario;
 - DR-022 debe cerrar fields/support/world;
 - DR-068 debe cerrar elegibilidad;
@@ -163,6 +164,17 @@ mecánica.
 - G3B-H05 queda como calibración externalizada.
 - G3B-H02 conserva dependencia explícita de DR-068.
 - G3B-H03/H04 conservan dependencia temporal de DR-059/021.
+
+## Refinamiento matemático G3C-8
+
+[ADR-077](./077-national-team-awards-mathematics.md) y
+[`NATIONAL_TEAM_AWARDS_MATH_SPEC.md`](../NATIONAL_TEAM_AWARDS_MATH_SPEC.md)
+cierran field Gaussian core/elite, candidate merit, call-up/squad logistic,
+incumbency AR(1), adapter internacional de Role/Minutes, strength/generation y
+outcomes agregados. G3B-H01–H04 y DR-059 pasan a `PARTIAL_CALIBRATION`.
+
+Este ADR conserva su autoridad estructural. DR-021/025/068, values, evidence,
+targets y goldens siguen pendientes; no se infiere nacionalidad o calendario.
 
 ## Gates y tests requeridos
 
@@ -191,6 +203,8 @@ Antes de implementar:
 ## Referencias
 
 - [Especificación de selección y premios](../NATIONAL_TEAM_AWARDS_SPEC.md)
+- [Especificación matemática](../NATIONAL_TEAM_AWARDS_MATH_SPEC.md)
+- [ADR-077: matemática de Selection/Awards](./077-national-team-awards-mathematics.md)
 - [ADR-013: State machine](./013-season-state-machine.md)
 - [ADR-022: Mundo agregado](./022-club-competition-world-model.md)
 - [ADR-043: Ventanas de eventos](./043-event-opportunity-windows.md)

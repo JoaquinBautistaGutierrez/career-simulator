@@ -275,7 +275,9 @@ health event
 ```
 
 El sistema de Health determina lesión, recuperación, recaída y secuela conforme
-a [`HEALTH_INJURY_SPEC.md`](HEALTH_INJURY_SPEC.md). Development recibe:
+a [`HEALTH_INJURY_SPEC.md`](HEALTH_INJURY_SPEC.md) y su cierre matemático
+[`HEALTH_INJURY_RECOVERY_MATH_SPEC.md`](HEALTH_INJURY_RECOVERY_MATH_SPEC.md).
+Development recibe:
 
 - `LoadState` y exposición realizada;
 - inactividad/recuperación confirmadas;
@@ -287,6 +289,20 @@ Solo una secuela o estado de salud confirmado puede entrar como causa de
 evolución. Una misma lesión puede tener desenlaces diferentes. Health no crea
 el vector de deltas ni el aplica a capabilities; Development conserva ese
 ownership dentro de `CAPABILITY_EVOLUTION(Qn)`.
+
+G3C-5 fija `sequelaBurden[i,q]` como composición acotada de burden activo y
+affinity versionado entre `InjuryFamily` y capability family. Ese signal entra
+en el término de wear ya definido por G3C-2; no es un delta de capability.
+
+G3C-10 y
+[`RETIREMENT_COMEBACK_FINALIZATION_MATH_SPEC.md`](RETIREMENT_COMEBACK_FINALIZATION_MATH_SPEC.md)
+fijan la policy durante retiro deportivo con Career abierta: maturation,
+wear y shocks continúan; experience y DevelopmentEnvironment de
+club/manager/training son cero; `inactivitySignal=1` entra en wear mediante
+`wearInactivityWeight[f]`. No se congelan ni borran capabilities y no existe
+forced decline. Al volver, se usan inputs reales desde el siguiente boundary
+habilitado. `CareerFinalizationConfirmed` sí detiene futuras operaciones de
+Development para esa Career.
 
 Una consecuencia `TEMPORARY` puede afectar contexto/wear mientras permanezca
 vigente; `PERSISTENT` no implica automáticamente un delta ni una magnitud fija.
@@ -421,7 +437,8 @@ Dependencias externas aún abiertas:
   precisión, streams, parámetros y fixtures de rol/minutos;
 - G3B-E01 y G3B-E07/DR-057: estructura aceptada por ADR-057; faltan dinámica,
   hazard, distribuciones, mapping de secuelas, precisión, streams y fixtures;
-- G3B-F01/DR-022: representación y escalas del entorno de club;
+- G3B-F01/DR-022: representación, dominios y equations del entorno cerrados
+  por ADR-075; faltan values, targets, data y goldens;
 - G3B-B06: coeficientes/targets de reconversión; DR-048 está resuelta;
 - G3B-D01/D02/DR-055: A06 y la interfaz estructural de Performance quedaron
   cerradas por ADR-055; faltan funciones, escalas, parámetros y evidencia

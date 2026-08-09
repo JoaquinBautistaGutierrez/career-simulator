@@ -378,3 +378,26 @@ Ningún output cambia de `SPECIFIED` en G3D-3A. Conteo: **139**.
 - [G3D Data Governance](G3D_DATA_GOVERNANCE.md)
 - [G3D P0 Acquisition Spec](G3D_P0_ACQUISITION_SPEC.md)
 
+## 12. Catalog-input readiness G3D-3C
+
+All 139 goldens remain `SPECIFIED`; no expected output was computed. G3D-3C
+identified 50 concrete catalog-dependent goldens in the club/competition (13),
+National Team/Awards (17), Money (1) and Scoring (19) groups.
+
+| Binding group | Golden count | Catalog input state | Still missing |
+|---|---:|---|---|
+| Club/Competition/Calendar | 13 | identities/stages/editions available; partial calendar | EngineParameterSet, club baselines, exact calendar fixtures/params |
+| National Team | 9 | Argentina identity, policy and World Cup context available | parameters, ordinary calendar and fixed fixtures |
+| Awards | 8 | five award identities available | complete AwardDefinitions, parameters and fields/ties |
+| Money representation | 1 | ARS/EUR identity/minor unit available | representable bounds and fixed fixture/config |
+| Scoring | 19 | 12 scoring/gameplay refs and normative subset available | ScoringConfiguration/Data, IJL/catalog/cohorts |
+
+Three structural vectors now have all catalog identity inputs needed to freeze
+their future fixture shape: `GV-MOBILITY-BOUNDARY-001`,
+`GV-NT-INELIGIBLE-001` and `GV-MONEY-ERROR-001`. This does not mean their
+expected outputs are computed or independently verified.
+
+All other 47 catalog-dependent vectors are `CATALOG_INPUTS_PARTIAL`. In
+particular, Award tie/eligibility vectors remain blocked by definition fields,
+and `GV-CALENDAR-001` remains blocked by the partial Q/calendar candidate.
+No golden advances to `INPUTS_FROZEN` in this phase.

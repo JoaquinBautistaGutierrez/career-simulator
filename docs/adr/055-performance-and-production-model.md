@@ -1,6 +1,7 @@
 # ADR-055: Estructura de Performance y producción por posición
 
-- **Estado:** Aceptado — alcance estructural; interfaz Health aclarada por ADR-057; DR-055 permanece parcialmente abierta
+- **Estado:** Aceptado — alcance estructural; matemática refinada por ADR-073;
+  DR-055 en `PARTIAL_CALIBRATION`
 - **Fecha:** 2026-07-28
 - **Decisión relacionada:** DR-055
 - **Especificación normativa:** [`../PERFORMANCE_MODEL_SPEC.md`](../PERFORMANCE_MODEL_SPEC.md)
@@ -22,8 +23,8 @@ Sin una frontera explícita, una implementación podía:
 - truncar outliers mediante caps editoriales;
 - filtrar latentes verdaderos a premios, mercado o scoring.
 
-Las familias de distribuciones, coeficientes y calibración todavía no están
-aprobadas. Este ADR fija la arquitectura matemática sin inventarlos.
+Este ADR fijó la arquitectura estructural. ADR-073 selecciona posteriormente
+las familias y ecuaciones; coeficientes y calibración permanecen pendientes.
 
 ## Decisión
 
@@ -185,8 +186,9 @@ depende de scoring y Performance no crea `ScoreLedgerEntry`.
 - G3B-D02 a D09 quedan estructuralmente restringidas y parcialmente abiertas por
   matemática o dependencias.
 - G3B-D10 queda como calibración externalizada.
-- DR-055 permanece `BLOCKER_G3` por funciones, distribuciones, escalas,
-  precisión, correlaciones, streams, parámetros y fixtures.
+- ADR-073 lleva DR-055 a `PARTIAL_CALIBRATION`: funciones, distribuciones,
+  samplers, precisión, correlaciones y streams están cerrados; faltan valores,
+  targets, goldens y producers upstream.
 - DR-056 permanece abierta por dinámica de forma/confianza/managerTrust/morale.
 - DR-010 permanece abierta: este ADR define evidencia, no percentiles, CC ni
   puntos.
@@ -194,6 +196,23 @@ depende de scoring y Performance no crea `ScoreLedgerEntry`.
   —errores, penales y distribución— sin inventar counters; disciplina
   permanece fuera de Performance; ADR-072/DR-064 ya cierran el aggregate de
   availability. El catálogo DR-063 ya define el envelope de producción.
+
+## Refinamiento G3C-4
+
+[ADR-073](./073-performance-production-form-mathematics.md) y
+[`PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md`](../PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md)
+fijan:
+
+- task abilities en logit seguro;
+- Underlying Performance Normal multidimensional;
+- NB2/Binomial e inverse-CDF log-space;
+- grafos ST/CM/GK;
+- pressure/evidence/surprise;
+- Form AR(1);
+- agregación Q/season.
+
+Las decisiones G3B-D02–D09 quedan `PARTIAL_CALIBRATION`; este ADR deja de ser
+la última autoridad matemática, pero conserva la arquitectura causal.
 
 ## Gates y tests requeridos
 
@@ -213,5 +232,5 @@ Antes de implementar:
 12. agregación Q→temporada conserva splits y no vuelve a sortear;
 13. schemas concretos conformes a los facts y allowlist ya aprobados por
     DR-063/ADR-010;
-14. parámetros, precisión y streams versionados;
+14. valores de parámetros publicados y streams versionados;
 15. golden/property tests y Monte Carlo cumplen targets aprobados.

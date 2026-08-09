@@ -47,6 +47,8 @@ resultados distintos sin conocer el solapamiento causal.
     normativos de ADR-070. Una rama determinada no consume draws innecesarios.
 11. Todos los coeficientes permanecen en `EngineParameterSet.roleMinutes`.
     Scoring no interviene.
+12. `AppearanceSummaryRecorded` puede transportar eligibility agregada de clean
+    sheets para GK; ADR-073 la consume sin volver a resolver role/minutos.
 
 La especificación completa es
 [`ROLE_MINUTES_MATH_SPEC.md`](../ROLE_MINUTES_MATH_SPEC.md).
@@ -72,8 +74,8 @@ La especificación completa es
 - DR-054 pasa a calibración: faltan valores, no ecuaciones.
 - DR-021 queda parcialmente resuelta respecto de SeasonId ordinal, Q y
   boundary de oportunidad; formatos/generación del calendario siguen abiertos.
-- Health deberá entregar una asignación médica agregada compatible además de
-  su envelope.
+- ADR-074 cierra la asignación médica agregada compatible además del envelope;
+  faltan sus valores, catálogo y goldens.
 - Club/World deberá producir `PositionCompetition`, `TacticalFit` y
   `TeamMinutesOpportunity`.
 - No se introducen cooldowns, caps editoriales ni dependencia instantánea de
@@ -94,3 +96,14 @@ La especificación completa es
 
 Cambiar ecuaciones, ordering, composición de availability, samplers o consumo
 de streams requiere revisar este ADR y la versión participante del replay.
+
+## Refinamiento G3C-4
+
+ADR-073 define `previousPerformanceSignal` desde surprise/evidence de una Q
+cerrada y consume `cleanSheetEligibleAppearances/Minutes`. No modifica softmax,
+minute share, appearances/starts ni causalidad de este ADR.
+
+## Referencias adicionales
+
+- [ADR-073](./073-performance-production-form-mathematics.md)
+- [Performance Math](../PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md)

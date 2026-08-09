@@ -370,6 +370,26 @@ Owners:
 - cada causa `OTHER` conserva owner e identidad tipados;
 - `AvailabilityAggregator`, en la orquestación del engine, compone.
 
+**Cierre de interfaz G3C-5.** ADR-074 fija que cada episodio médico activo al
+inicio de Q produce, por competición, un prefijo ordinal:
+
+```text
+unavailableUnits[e,c] =
+  ROUND_HALF_EVEN(
+    teamMinutesOpportunity[c]
+    * (1 - episodeAvailability[e])
+  )
+
+medicalInterval[e,c] =
+  [0, unavailableUnits[e,c])
+```
+
+con logical bounds dentro de la oportunidad. Health calcula exact union entre
+episodios y entrega los intervalos disjuntos resultantes. Una causa médica con
+timing ordinal explícito conserva sus propios intervalos validados. Role &
+Minutes no ejecuta esas ecuaciones, no conoce traits médicos y solo valida que
+allocation/share coincidan.
+
 ### 8.2 Unión exacta
 
 Por competición `c`:
@@ -507,6 +527,34 @@ expectedMinutes = availableMinutes * expectedShare
 Se conserva como binary64 derivado para auditoría/narrativa. Una proyección
 entera usa `ROUND_HALF_EVEN`, pero no reemplaza `actualMinutes`.
 `expectedMinutes` es `INTERNAL_SIGNAL`, no `PERSISTED_DOMAIN_FACT`.
+
+### 9.2.1 Proyección market-purpose
+
+G3C-7 reutiliza las mismas ecuaciones mediante
+`MarketOpportunityProjection`, sin resolver una ventana deportiva:
+
+```text
+candidate club context
++ perceived player/context inputs
++ market-purpose prior state
+→ role utilities/probabilities
+→ conditional minute-share means
+→ expectedOpportunity
+```
+
+Reglas:
+
+- no samplea `SportingRole`;
+- no samplea minute share;
+- usa `stableSoftmax` y `LogitNormalMeanGaussHermite10V1`;
+- no emite `SportingRoleAssigned`, `MinutesRecorded` ni facts;
+- no modifica previous role, trust, form o affiliation;
+- `ContractExpectation` puede ser una señal contextual separada, nunca un role;
+- el output `[0,1]` es una previsión de oportunidad, no una promesa.
+
+Los priors/adapters market-purpose viven en
+`EngineParameterSet.transfers.opportunityProjection`; no duplican los
+coeficientes causales de Role & Minutes.
 
 ### 9.3 Disponibilidad cero
 
@@ -721,6 +769,32 @@ A <= starts*dS + (appearances-starts)*dN
 El modelo no divide ingenuamente por 90, admite una aparición con pocos
 minutos y conserva varianza agregada.
 
+### 13.3 Eligibility agregada para clean sheets
+
+Performance GK consume:
+
+```text
+cleanSheetEligibleAppearances
+cleanSheetEligibleMinutes
+
+0 <= cleanSheetEligibleAppearances <= appearances
+0 <= cleanSheetEligibleMinutes <= actualMinutes
+
+cleanSheetEligibleAppearances = 0
+  iff cleanSheetEligibleMinutes = 0
+
+cleanSheetEligibleAppearances > 0
+  implies cleanSheetEligibleMinutes > 0
+```
+
+Role & Minutes conserva y transmite estos valores desde la policy versionada de
+calendario/participación. No decide aquí qué reglamento concede una clean sheet,
+no crea fixtures y no vuelve a contar minutos.
+
+G3C-4 deriva `cleanSheets` desde `goalsConceded` y estas unidades agregadas; no
+samplea clean sheets independientemente. La fórmula está en
+[`PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md`](PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md).
+
 ## 14. EffectiveUsage
 
 `EffectiveUsage` queda como `DERIVED_SUMMARY`:
@@ -827,7 +901,7 @@ Con sigmas oficiales positivas y utilities finitas:
 | `WindowAvailabilityAssessed` | `DERIVED_SUMMARY` | sources, unión, share, availableMinutes |
 | `SportingRoleAssigned` | `PERSISTED_DOMAIN_FACT` | context, role, effectivePosition |
 | `MinutesRecorded` | `PERSISTED_DOMAIN_FACT` | total, por competición/posición |
-| `AppearanceSummaryRecorded` | `PERSISTED_DOMAIN_FACT` | appearances/starts por scope |
+| `AppearanceSummaryRecorded` | `PERSISTED_DOMAIN_FACT` | appearances/starts y eligibility GK por scope cuando aplique |
 | `EffectivePositionUsed` | `DERIVED_SUMMARY` | se deriva de MinutesRecorded |
 | `EffectiveUsage` | `DERIVED_SUMMARY` | vista agregada de participación |
 
@@ -1100,7 +1174,8 @@ Antes de implementar Role & Minutes oficial:
 - publicar valores de todos los parámetros
   `INITIAL_CALIBRATION_REQUIRED`;
 - aprobar los goldens de §20 y el primitive GH10;
-- Health debe producir asignación médica compatible, no solo share;
+- Health produce la asignación médica cerrada por ADR-074; su implementación
+  requiere aún ParameterSet, catálogo y goldens;
 - G3C-6 debe producir TeamMinutesOpportunity, PositionCompetition y
   TacticalFit;
 - cerrar el catálogo/formatos pendientes de DR-021;
@@ -1112,6 +1187,45 @@ No existe blocker estructural para comenzar G3C-4. Performance puede consumir
 `actualMinutes`, el breakdown por competición/posición, role, context y
 evidence contracts sin esperar los valores finales de calibración.
 
+**Reconciliación G3C-4 (2026-07-29):** `PreviousPerformanceSignal` se
+materializa desde `PerformanceSurprise` y `evidenceStrength` de una ventana
+cerrada; nunca desde goals/assists aislados. Para GK, el boundary añade
+eligibility agregada de clean sheets sin alterar role o minutos.
+
+**Reconciliación G3C-6 (2026-07-29):**
+
+- `TacticalFit ∈ (0,1)` se produce mediante suitability y mismatch táctico
+  parametrizado; Role & Minutes no lo recalcula;
+- `PositionCompetition` se produce por Position mediante AR(1) en logit y
+  conserva strength/depth/entrenchment en `[0,1]`;
+- `TeamMinutesOpportunity` usa match equivalents enteros y contiene solo fases
+  garantizadas o alcanzadas antes de la Q;
+- los contextos canónicos de calendario son
+  `scheduleDifficultyUnit, congestionUnit ∈ [0,1]`; cuando una ecuación local
+  requiere señal firmada usa `center01(unit)`;
+- un checkpoint de progresión en `CONSEQUENCES(Qn)` solo habilita oportunidad
+  de Q futura y no modifica minutos cerrados.
+
+El producer normativo es
+[`CLUB_COMPETITION_WORLD_MATH_SPEC.md`](CLUB_COMPETITION_WORLD_MATH_SPEC.md).
+
+**Adapter G3C-8 — National Team (2026-08-01):**
+
+- reutiliza el mismo softmax, matriz de transición, Logit-Normal, GH10,
+  apportionment y appearances/starts;
+- su enum ordenado es `BENCH < ROTATION < STARTER < KEY_PLAYER`;
+- `trustSignal` es incumbency/selector trust, nunca club managerTrust;
+- quality/previousPerformance/context son snapshots nacionales autorizados;
+- competition se deriva de `SelectionCompetitionField` y la oportunidad de
+  `InternationalTeamMinutesOpportunity`;
+- state, facts y stream keys discriminan `NATIONAL_TEAM` y permanecen
+  separados de club;
+- `nationalTeam.roleMinutesProfileRef` referencia
+  `roleMinutes.adapters.nationalTeam`, sin duplicar constantes.
+
+La definición completa del adapter, call-up y upstream field está en
+[`NATIONAL_TEAM_AWARDS_MATH_SPEC.md`](NATIONAL_TEAM_AWARDS_MATH_SPEC.md).
+
 ## 24. Referencias
 
 - [Contrato matemático y de calibración](MATHEMATICAL_CALIBRATION_CONTRACT.md)
@@ -1119,6 +1233,7 @@ evidence contracts sin esperar los valores finales de calibración.
 - [Player Model](PLAYER_MODEL_SPEC.md)
 - [Creation & Development matemático](CREATION_DEVELOPMENT_MATH_SPEC.md)
 - [Health & Injury](HEALTH_INJURY_SPEC.md)
+- [Health matemática](HEALTH_INJURY_RECOVERY_MATH_SPEC.md)
 - [Performance Model](PERFORMANCE_MODEL_SPEC.md)
 - [Club, Competition & World](CLUB_COMPETITION_WORLD_SPEC.md)
 - [Catálogo de facts y scoring](SCORING_FACTS_SPEC.md)
@@ -1128,3 +1243,15 @@ evidence contracts sin esperar los valores finales de calibración.
 - [ADR-070](adr/070-mathematical-runtime-and-parameter-sets.md)
 - [ADR-071](adr/071-creation-development-mathematics.md)
 - [ADR-072](adr/072-role-minutes-and-availability-mathematics.md)
+- [ADR-073](adr/073-performance-production-form-mathematics.md)
+- [ADR-074](adr/074-health-injury-recovery-mathematics.md)
+- [ADR-075](adr/075-club-competition-world-mathematics.md)
+- [Performance Math](PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md)
+- [Club/Competition/World Math](CLUB_COMPETITION_WORLD_MATH_SPEC.md)
+
+## 38. Adapter de Scoring G3C-11
+
+Scoring consume minutos, starts, appearances, opportunity, position usage y
+sus scopes cerrados. SportingRole no asigna PRI ni CC. Availability no resta
+puntos directamente: afecta upstream la exposición realizada. El scorer no
+recalcula minutos ni modifica este modelo.

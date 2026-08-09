@@ -1,10 +1,10 @@
 # Health, Injury & Recovery Specification
 
-**Estado:** normativa estructural para G3B — Bloque 5; matemática ejecutable y
-calibración pendientes  
-**Fecha:** 2026-07-28  
+**Estado:** normativa estructural para G3B — Bloque 5; matemática cerrada por
+G3C-5, calibración y catálogo médico pendientes  
+**Fecha:** 2026-07-29  
 **Autoridad:** `MASTER_SPEC v0.8`, ADR-002 a ADR-005, ADR-012, ADR-013,
-ADR-014, ADR-018, ADR-042, ADR-052 a ADR-055 y ADR-057  
+ADR-014, ADR-018, ADR-042, ADR-052 a ADR-055, ADR-057 y ADR-074  
 **Decisiones afectadas:** DR-008, DR-021, DR-022, DR-042, DR-053 a DR-057,
 DR-063 y DR-064  
 **Board:** G3B-E01 a G3B-E08 y refinamientos directos de B02, B04, B05,
@@ -14,24 +14,23 @@ C04 a C06, D02, D05 a D09, F01, F04 y L02
 
 Esta especificación fija la estructura causal del estado de salud, la
 disponibilidad médica, la carga, las lesiones, la recuperación, la recaída y
-las secuelas. No elige:
+las secuelas. La matemática ejecutable quedó fijada en
+[`HEALTH_INJURY_RECOVERY_MATH_SPEC.md`](HEALTH_INJURY_RECOVERY_MATH_SPEC.md).
+Este documento no elige:
 
 - coeficientes;
-- escalas numéricas concretas;
-- familias de distribuciones;
 - hazards base;
 - taxonomía clínica completa;
 - valores para las seis lesiones del vertical slice;
-- precisión o cuantización;
+- tolerancias/targets;
 - parámetros de balance.
 
 No implementa lesiones, entrenamiento diario, calendario, disciplina,
 decisiones médicas, retiro ni gameplay. Esos elementos solo reciben o entregan
 contratos conceptuales.
 
-La matemática ejecutable de DR-057 permanece abierta. Toda cantidad calibrable
-se carga posteriormente desde configuración versionada; esta especificación no
-autoriza defaults hardcoded.
+DR-057 queda `PARTIAL_CALIBRATION`. Toda cantidad calibrable se carga desde
+configuración versionada; esta especificación no autoriza defaults hardcoded.
 
 ## 2. Ownership y separación del modelo
 
@@ -496,20 +495,22 @@ Health no recalcula minutos ni Performance infiere una lesión desde el rating.
 ### 10.4 `HEALTH(Qn)`
 
 Health consume estado inicial más exposición/carga realizada. Dentro de esta
-operación deben existir dependencias explícitas equivalentes a:
+operación el orden matemático fijado por ADR-074 es:
 
 1. registrar exposición realizada;
 2. actualizar la representación de carga;
-3. evaluar/progresar condiciones y recuperación existentes;
-4. generar y resolver oportunidades de recaída/agravamiento;
-5. generar y resolver nuevas oportunidades de lesión;
-6. producir señales post-health de fitness, fatigue, restricciones y posibles
-   secuelas.
+3. resolver candidates post-window de fatigue y fitness;
+4. generar y resolver lesiones nuevas mediante compound Poisson;
+5. progresar recuperación de episodios preexistentes;
+6. resolver recaídas de episodios preexistentes elegibles;
+7. resolver secuelas de episodios completados;
+8. producir el checkpoint Health para Qn+1.
 
-El orden total entre oportunidades independientes y sus familias debe quedar
-versionado por DR-057. Cada ocurrencia confirmada aplica sus consecuencias
-antes de una oportunidad posterior que dependa de ese nuevo estado. Ningún
-orden se deriva de una colección incidental.
+Un episodio nuevo no progresa ni recae en la misma resolución agregada. El
+hazard snapshot del compound Poisson se congela antes del count para no
+inventar cronología match-by-match. Cada occurrence se materializa por ordinal
+y su estado queda aplicado antes de cualquier operación posterior que lo
+consuma. Ningún orden se deriva de una colección incidental.
 
 ### 10.5 `CONSEQUENCES(Qn)`
 
@@ -718,43 +719,41 @@ Todos estos valores deben vivir en configuración versionada:
 - targets/tolerancias Monte Carlo de incidencia, duración, ausencia, recaída,
   secuela y carga.
 
-ADR-072/DR-064 ya cierran la composición del `AvailabilityEnvelope` agregado.
-Health conserva pendiente producir su asignación médica compatible en G3C-5.
+ADR-072/DR-064 cierran la composición del `AvailabilityEnvelope` agregado.
+ADR-074/G3C-5 cierra la asignación médica mediante intervalos prefix ordinales
+y exact union, sin absorber disciplina.
 
 ## 16. Resolución del Design Board
 
-| ID | Estado tras Bloque 5 | Cierre estructural | Pendiente |
+| ID | Estado tras G3C-5 | Cierre matemático | Pendiente |
 |---|---|---|---|
-| G3B-E01 | Resuelta estructuralmente | HealthState separado, ownership, MedicalAvailability y frontera aggregate. | Dominios, funciones y parámetros. |
-| G3B-E02 | Parcial | Familias de exposición, oportunidades tipadas, multiplicidad y ausencia de caps. | Proceso/distribución exactos. |
-| G3B-E03 | Parcial | Covariables, trazabilidad y semántica de hazard contextual. | Función, integración y riesgos competitivos. |
+| G3B-E01 | Resuelta estructuralmente | HealthState separado, ownership, MedicalAvailability y frontera aggregate. | Valores del ParameterSet. |
+| G3B-E02 | `PARTIAL_CALIBRATION` | Dose rates competitiva/training y compound Poisson sin caps. | Valores, producers y targets. |
+| G3B-E03 | `PARTIAL_CALIBRATION` | Competing cumulative hazards por family/origin en log-rate. | Intercepts, betas y catálogo. |
 | G3B-E04 | Parcial/calibrable | Familia mecánica separada de severidad y narrativa. | Taxonomía completa y seis lesiones del slice. |
-| G3B-E05 | Parcial | Severidad, duración esperada/realizada y recovery state separados. | Distribuciones y curvas. |
-| G3B-E06 | Parcial | Retorno parcial, relación causal de recaída y ausencia de cooldown. | Readiness/hazard/transiciones cuantitativas. |
-| G3B-E07 | Parcial | `SequelaProfile`, ownership Health→Development y tipos de persistencia. | Probabilidades, magnitudes e interacción matemática. |
+| G3B-E05 | `PARTIAL_CALIBRATION` | Severity logistic-Normal, requirement LogNormal y progreso softplus. | Valores/targets médicos. |
+| G3B-E06 | `PARTIAL_CALIBRATION` | Readiness continuo, intervalos exactos y relapse Poisson relacionado. | Valores/targets. |
+| G3B-E07 | `PARTIAL_CALIBRATION` | Logistic occurrence/type, burden logistic-Normal y decay temporal. | Affinities, valores y targets. |
 | G3B-E08 | Calibración externalizada | Registro de parámetros y targets definido. | Valores y targets aprobados. |
 
-Ninguna decisión calibrable se convierte en bloqueo del schema si el motor
-puede consumirla desde configuración tipada. Sí bloquean gameplay la familia
-matemática, precisión, orden de oportunidades, streams y fixtures aprobados.
+No queda una decisión G3C-5 abierta por falta de familia matemática o sampler.
+La publicación de schemas/engine de gameplay sigue bloqueada por valores,
+catálogo, goldens y calibration gates.
 
 ## 17. Decisiones y gates pendientes
 
-DR-057 permanece `BLOCKER_G3` hasta aprobar:
+DR-057 pasa a `PARTIAL_CALIBRATION`. Antes de implementar deben aprobarse:
 
-- forma funcional del hazard y hazard→probabilidad;
-- proceso exacto de múltiples oportunidades;
-- familias/distribuciones de severidad, duración, recuperación, recaída y
-  secuela;
-- dominios y transiciones de fitness/fatigue;
-- precisión, cuantización y composición matemática;
-- contextos de streams;
-- parámetros iniciales y seis lesiones del slice;
-- golden fixtures y targets Monte Carlo.
+- valores completos de `EngineParameterSet.health`;
+- seis `InjuryFamilyDefinition` del slice;
+- producers upstream de G3C-6;
+- schemas conformes a DR-063;
+- expected outputs y hashes de golden fixtures;
+- targets/tolerancias y suites Monte Carlo;
+- replay cross-runtime de samplers, exp/log y quantization.
 
-DR-064 queda resuelta por ADR-072. G3C-5 debe cerrar cómo la matemática de
-Health genera `unavailableExposureAllocation`, manteniendo consistencia con el
-envelope y sin absorber disciplina.
+DR-064 permanece resuelta por ADR-072. G3C-5 ya cierra
+`unavailableExposureAllocation` sin absorber disciplina.
 
 Antes de implementar Health se requieren tests/gates para:
 

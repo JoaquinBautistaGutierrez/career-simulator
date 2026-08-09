@@ -635,3 +635,40 @@ canónicos**, todos con los mismos paths y valores/estados previos.
 - [G3D Data Governance](G3D_DATA_GOVERNANCE.md)
 - [G3D P0 Acquisition Spec](G3D_P0_ACQUISITION_SPEC.md)
 
+## 17. Catalog cardinality overlay G3D-3C
+
+Los 275 templates y todos sus `currentValue`/publication statuses permanecen
+sin cambios. G3D-3C solo fija cardinalidades de expansión que ya se desprenden
+de catálogos candidatos; ninguna cifra siguiente es un coeficiente.
+
+| Dimension template | Candidate cardinality / IDs | `catalogCardinalityStatus` | Effect |
+|---|---|---|---|
+| `{position}` | 3: `GK`,`CM`,`ST` | `CATALOG_BOUND` | expansion can be prepared |
+| `{country|detailedContext}` | 2: `COUNTRY-ARG`,`COUNTRY-ESP` | `CATALOG_BOUND_CANDIDATE` | context refs stable, values unassigned |
+| `{detailedClub}` | 16 | `CATALOG_BOUND_CANDIDATE` | identity expansion only; all club baseline values pending |
+| `{clubCompetition}` | 6 | `CATALOG_BOUND_CANDIDATE_WITH_LIMITATIONS` | format-indexed templates can bind; two definitions partial |
+| `{nationalCompetition}` | 1: World Cup 2026 context | `CATALOG_BOUND_CANDIDATE` | ordinary calendar remains pending |
+| `{competitionDefinition}` | 7 total including national context | `CATALOG_BOUND_CANDIDATE_WITH_LIMITATIONS` | no scoring/gameplay value implied |
+| `{competitionEdition}` | 7 | `CATALOG_BOUND_CANDIDATE` | season/edition refs stable |
+| `{competitionFormat}` | 7 | `CATALOG_BOUND_CANDIDATE_WITH_LIMITATIONS` | exact partial fields remain missing |
+| `{nationalTeam}` | 1: `NT-ARG-SENIOR-MEN` | `CATALOG_BOUND_CANDIDATE` | selection parameters remain unassigned |
+| `{award}` | 5 | `IDENTITY_BOUND_DEFINITION_PARTIAL` | no expansion can be frozen until mechanics close |
+| `{currency}` | 2: ARS/EUR | `CATALOG_BOUND_CANDIDATE` | series/value transforms remain pending |
+| `{moneySourceBinding}` | 4 primary routes | `SOURCE_ROUTE_BOUND` | no observations/values acquired |
+| `{scoringCompetitionDefinition}` | 7 | `IDENTITY_BOUND_CONFIGURATION_PENDING` | IJL/config values not assigned |
+| `{scoringAwardDefinition}` | 5 | `IDENTITY_BOUND_CONFIGURATION_PENDING` | Award fields and config pending |
+| `{materializableExternalClub}` | open, demand-driven | `CARDINALITY_PENDING_DATA` | no default/wildcard expansion |
+| `{injuryFamily}` | 6 candidate slots | `UNCHANGED_PENDING_DATA` | outside G3D-3C normalization |
+
+Canonical IDs and the exact count are in
+[G3D P0 Canonical ID Registry](G3D_P0_CANONICAL_ID_REGISTRY.md). A candidate
+cardinality does not advance a parameter from `UNASSIGNED`, and a later catalog
+change requires a new candidate hash/data lineage.
+
+### 17.1 Provenance bindings
+
+Affected branches now reference `G3D3C-P0-CATALOG-CANDIDATE-C1` and the
+corresponding candidate hash. `competitions`, `roleMinutes`, `clubWorld`,
+`nationalTeam`, `awards`, `transfersMarket` and scoring templates inherit the
+limitations recorded in the readiness report. No aliases/deprecations were
+added to parameter paths.

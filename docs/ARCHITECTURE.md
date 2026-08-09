@@ -199,9 +199,13 @@ Retirement sigue la frontera de
 [ADR-062](adr/062-playing-retirement-and-comeback.md): `domain` posee
 `PlayerPlayingStatus`, motivation assessment, opportunities y episodios;
 `engine` orquesta hazard, decisión, retiro y comeback. Career lifecycle
-permanece separado. Un retiro deportivo no completa Career ni crea score.
-DR-069 debe cerrar cursor posretiro, boundary irreversible, scoring final y
-terminación antes de implementar el runner terminal.
+permanece separado. [ADR-079](adr/079-retirement-comeback-finalization-mathematics.md)
+reutiliza quarters/seasons mediante suboperaciones lifecycle, deja módulos
+on-field lógicamente en cero durante retiro abierto y reserva
+`CareerStatus.RETIRED` para FINALIZING. Un retiro deportivo no completa Career
+ni crea score. `CareerFinalizationConfirmed` cierra el fact frontier; el
+pipeline idempotente terminal produce artefactos/integridad y después
+`CareerCompleted`.
 
 La frontera transversal de [ADR-010](adr/010-scoring-ledger-and-domain-facts.md)
 se aplica a todos los módulos: `engine` puede producir `DomainFact` tipados,
@@ -495,7 +499,100 @@ sustituyen campos del `VersionSet` de Career.
 - Los ParameterSets candidatos solo existen fuera de Careers oficiales hasta
   ser aprobados.
 
-### 10.3 Contenido declarativo seguro
+### 10.3 Registro y publicación de calibración
+
+G3D separa cuatro clases de artefactos:
+
+```text
+Calibration Parameter Registry
++ Calibration Target Registry
++ Calibration Dataset Registry
++ Golden Vector Registry
+  -> ParameterSet candidates / Scoring bundle candidates
+  -> MonteCarloRun artifacts
+  -> CalibrationAcceptanceReport
+  -> immutable V1 publication
+```
+
+Los registros son documentación/contrato y no estado de Career. Un
+`ParameterSetCandidateManifest` es append-only, identifica parent, paths
+cambiados, rationale, sources, targets esperados, hash y outcome. Un
+`MonteCarloRunManifest` liga candidate, datasets, seed set, scenario, futura
+code version y result hash. Un `CalibrationAcceptanceReport` liga todos esos
+artefactos con los siete gates de G3D.
+
+El loader futuro debe rechazar:
+
+- path duplicado, alias serializado o expansión requerida ausente;
+- valor fuera de dominio, NaN/Infinity/-0 canónico o default implícito;
+- dataset/transform/hash no resoluble;
+- una `engineVersion` oficial asociada a más de un ParameterSet hash;
+- una `scoringVersion` oficial asociada a más de un par config/calibration;
+- mezcla de parámetros de gameplay y Scoring.
+
+Los candidatos pueden diferir por hash sin crear una sexta versión únicamente
+fuera de Careers oficiales. Después de publicar, ADR-070/080 exige nueva
+versión causal y retención del artefacto anterior.
+
+### 10.4 Publicación de catálogos del vertical slice
+
+G3D-2 fija una frontera explícita entre investigación, artifacts derivados y
+releases ejecutables:
+
+```text
+source observation + license/provenance
+  -> licensed acquisition route
+  -> raw artifact when permitted OR EvidenceRecord/fingerprint/allowed aggregate
+  -> versioned reproducible transform
+  -> normalized candidate dataset/catalog
+  -> schema + referential + semantic validation
+  -> frozen manifest/hash
+  -> dataVersion or scoring calibration publication
+```
+
+Ningún `ParameterSetCandidate`, `ScoringConfiguration` o golden con input de
+catálogo puede aceptarse contra un artifact sin hash/manifest congelado. Los
+valores faltantes se representan como estado de publicación (`PLANNED`,
+`PENDING_DATA`, etc.), nunca mediante zero/default silencioso.
+
+G3D-3A añade un boundary previo:
+
+```text
+ReferenceSnapshotPolicy + DataGovernance + P0ResearchPlan
+  -> researchSnapshotId + frozen referenceCutoffDate
+  -> SourceReference + license/privacy classification
+  -> EvidenceRecord
+  -> datasetCandidateId
+```
+
+`researchSnapshotId` y `datasetCandidateId` son provenance de construcción, no
+nuevas versiones competitivas. Una adquisición no se convierte en
+`dataVersion`: atraviesa `ACQUIRED -> NORMALIZED -> VALIDATED -> FROZEN` y luego
+un publication manifest decide su inclusión. Un cutoff usado por Data V1 es
+inmutable; actualizarlo crea lineage y `dataVersion` nuevos.
+
+Raw external bytes no se almacenan por defecto. `REFERENCE_ONLY` y
+`LOCAL_PRIVATE_SOURCE` usan source fingerprint, EvidenceRecords y derivados
+permitidos; `LICENSE_REVIEW_REQUIRED` bloquea freeze. Technical validation,
+evidence/provenance review y Product approval son gates separados. En
+solo-project mode una persona puede ejercer varios roles, pero registra una
+aprobación explícita por rol y artifact hash.
+
+El scope V1 detallado contiene ocho clubes reales por cada una de Argentina y
+España. ADR-081 añade un pool externo híbrido: identidades nominales del
+catálogo real más fields no identificables. Los fields pueden contribuir a
+distribuciones, pero no ser club contractual, champion ni sujeto de un fact
+nominal. La materialización de una identidad es determinista y versionada.
+
+ADR-082 fija Argentina como nacionalidad deportiva inicial y única del
+protagonista V1. Este policy no reemplaza el `NationalTeamEligibility`
+autoritativo: el dato ausente mantiene la ejecución en `PENDING_DATA`.
+
+`Money` persiste en unidades menores y moneda nativa. Los índices de poder
+adquisitivo son artifacts derivados para calibración y nunca mutan, suman o
+comparan importes nativos sin un contexto de conversión versionado.
+
+### 10.5 Contenido declarativo seguro
 
 El DSL se rige por [ADR-014](adr/014-event-dsl.md), admite únicamente operadores, combinadores, efectos, paths y hechos whitelisted. Su compilador debe:
 
@@ -545,9 +642,13 @@ Las carreras locales usan un adaptador local y quedan fuera del ranking oficial 
 RNG. La función conceptual es:
 
 ```text
-DomainFact[] + ScoringRuleDefinition[] + scoringVersion
+DomainFact[]
++ ScoringConfiguration
++ ScoringCalibrationData
++ scoringVersion
   -> ScoreLedger
-  -> PC
+  -> exact integer PC
+  -> ScoreSnapshot
 ```
 
 El `ScoreLedger`:
@@ -562,8 +663,9 @@ El `ScoreLedger`:
 
 ADR-009 fija `0.00 <= CC <= 1.10` y reserva el tramo superior a `1.00` para
 rendimiento extraordinario derivado. CC se aplica por defecto solo a logros
-colectivos de club o selección; no a PRI, PPI, PRL o PBR. La fórmula ejecutable
-y el resto del scoring siguen bloqueados por DR-008 y DR-010.
+colectivos de club o selección; no a PRI, PPI, PRL o PBR. ADR-080 cierra su
+fórmula racional continua y el resto de la matemática de Scoring. Quedan
+pendientes configuración/calibration data, catálogos y expected goldens.
 
 [ADR-010](adr/010-scoring-ledger-and-domain-facts.md) y
 [`SCORING_FACTS_SPEC.md`](SCORING_FACTS_SPEC.md) cierran estructuralmente
@@ -591,13 +693,24 @@ determinista.
 El ranking es una proyección autoritativa de carreras completadas y verificadas. Nunca acepta score, estadísticas, premios o ledger creados por el cliente.
 
 Un `RetirementOccurred` reversible no habilita ranking. Solo `COMPLETED`, tras
-el boundary terminal de ADR-016/DR-069 y scoring final confirmado, puede
-proyectarse al ranking.
+`CareerFinalizationConfirmed`, scoring final, integridad y compatibilidad,
+puede proyectarse al ranking. `CareerStatus.RETIRED`/FINALIZING aún no es
+elegible.
 
-La proyección se materializa como `ScoreSnapshot` inmutable e identifica
-`careerId`, `scoringVersion`, contexto de compatibilidad, hash del fact set,
-hash y total del ledger e integridad. Igual `scoringVersion` es necesaria pero
-no suficiente para mezclar leaderboards; DR-036 conserva la clave completa.
+La proyección se materializa como `ScoreSnapshot` inmutable e identifica el
+fact frontier, cinco versiones, hashes de ParameterSet/config/calibration,
+ledger digest, seis subtotales, prior sporting points, PC, tier, integridad y
+compatibility key. V1 exige igualdad exacta de la tuple de ADR-080; DR-036
+no habilita comparación entre claves diferentes.
+
+La vista principal conserva una sola fila por `LeaderboardUserKey` y exact
+compatibility key: la Career elegible con mayor PC. Un empate usa logical
+finalization order y luego `careerId` canónico, sin RNG. Esta es una proyección,
+no una limitación de intentos: todas las Careers permanecen en profile/audit
+según DR-033/037. Antes de publicar faltan definir identity pseudónima,
+guest/account merge, borrado y appeal; esos datos no alteran el motor.
+La proyección queda normada por
+[ADR-084](adr/084-main-leaderboard-best-career-projection.md).
 
 - el servidor calcula o reproduce con el mismo núcleo;
 - cada entrada declara versión competitiva;
@@ -648,6 +761,12 @@ Career. Consume engine puro, ParameterSet candidato, seed set y
 CalibrationTargets; produce evidencia y diagnostics. Un guard técnico devuelve
 `INCONCLUSIVE_GUARD_REACHED` y nunca crea un outcome de gameplay.
 
+G3D-1 no implementa el harness. Una fase posterior puede implementar primitives,
+schemas, samplers normativos, canonicalization/hash, registry validators,
+golden harness y un skeleton de Monte Carlo sin valores de gameplay. Continúan
+bloqueados los modelos con valores no publicados, Scoring competitivo,
+outcomes del slice y leaderboard.
+
 ## 15. Despliegue mínimo evolutivo
 
 1. CLI y packages puros, sin infraestructura de runtime.
@@ -660,16 +779,16 @@ El vertical slice inicial queda limitado por [ADR-018](adr/018-initial-vertical-
 
 Su frontera competitiva mínima sigue
 [`CLUB_COMPETITION_WORLD_SPEC.md`](CLUB_COMPETITION_WORLD_SPEC.md): dos ligas,
-6–10 clubes reales detallados por liga, sus dos copas domésticas, Libertadores,
+ocho clubes reales detallados por liga, sus dos copas domésticas, Libertadores,
 Champions y contratos para torneos de selección. IDs/fuentes pertenecen a
-DR-025; participantes externos, movilidad y continuidad, a DR-065. Esta
+DR-025; participantes externos, movilidad y continuidad siguen ADR-081. Esta
 arquitectura no autoriza fixtures, plantillas completas ni identidades
 inventadas.
 
 El slice necesita además una `NationalTeamDefinition` argentina, fields
 internacionales mínimos y exactamente un premio global, uno juvenil y tres
-premios posicionales o de competición. Esto no asigna automáticamente
-nacionalidad deportiva al protagonista: DR-068 debe resolver eligibility.
+premios posicionales o de competición. ADR-082 fija Argentina como nacionalidad
+deportiva inicial y única V1; el manifest autoritativo sigue `DATA_REQUIRED`.
 
 ## 16. Registro arquitectónico
 
@@ -730,20 +849,46 @@ ADRs aceptados:
   creación, desarrollo, reconversión y posición histórica.
 - [ADR-072](adr/072-role-minutes-and-availability-mathematics.md): softmax de
   role, availability, Logit-Normal de minutos y appearances/starts.
+- [ADR-079](adr/079-retirement-comeback-finalization-mathematics.md): hazards de
+  retiro/comeback, cursor posretiro y boundary irreversible de finalización.
+- [ADR-080](adr/080-exact-scoring-mathematics.md): racionales exactos, PRI, CC,
+  categorías, caps, ledger, snapshot y configuración/calibración de Scoring.
+- [ADR-081](adr/081-hybrid-external-club-pool.md): pool externo híbrido,
+  identidad real, fields no identificables y materialización determinista.
+- [ADR-082](adr/082-vertical-slice-sporting-nationality.md): nacionalidad
+  deportiva Argentina-only del protagonista para V1.
+- [ADR-083](adr/083-native-money-and-calibration-normalization.md): Money nativo
+  exacto y artifact normalizado, derivado y versionado para calibración.
+- [ADR-084](adr/084-main-leaderboard-best-career-projection.md): mejor Career
+  elegible por usuario y exact compatibility key en la tabla principal V1.
+- [G3D Reference Snapshot Policy](G3D_REFERENCE_SNAPSHOT_POLICY.md): cutoff,
+  editions y observation windows.
+- [G3D Data Governance](G3D_DATA_GOVERNANCE.md): ownership, licencias,
+  redistribución y privacidad de research.
+- [Calibration Parameter Registry](CALIBRATION_PARAMETER_REGISTRY.md): paths,
+  metadata, dependencies y publication state.
+- [Calibration Target Registry](CALIBRATION_TARGET_REGISTRY.md): invariants,
+  targets, diagnostics y acceptance rules.
+- [Calibration Dataset Registry](CALIBRATION_DATASET_REGISTRY.md): datasets,
+  mappings, evidence y provenance.
+- [Golden Vector Registry](GOLDEN_VECTOR_REGISTRY.md): fixtures, outputs y
+  verificación independiente.
 
 ADRs todavía necesarios cuando se cierren sus decisiones:
 
 - parámetros de Creation Budget y protocolo de equivalencia;
 - automatización y elegibilidad competitiva;
 - conteo editorial, alcance posicional del vertical slice y cálculo de posición dominante;
-- scope competitivo, pools externos y continuidad tras cambios de tier;
-- elegibilidad/inscripción posterior a movimientos;
-- cadencia de Market y movimientos entre Qs;
-- calendario/cursor internacional y nacionalidad deportiva/elegibilidad del
+- publicación de catálogo/fields, movilidad y goldens del pool híbrido;
+- publicación de elegibilidad/inscripción posterior a movimientos;
+- datos de la ventana `MARKET` post-season y cualquier futura propuesta
+  mid-season;
+- calendario/cursor internacional y manifest de elegibilidad deportiva del
   vertical slice;
 - snapshots, logs, replay y retención;
 - servidor autoritativo, modos de confianza y reconciliación;
-- fórmulas y configuración matemática todavía abiertas de ScoreLedger;
+- bundle inicial de configuración/calibración, catálogos y goldens de
+  ScoreLedger; su matemática está cerrada por ADR-080;
 - datos reales, fuentes y assets licenciados;
 - renderer de share cards;
 - telemetría, privacidad y retención.

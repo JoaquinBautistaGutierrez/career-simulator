@@ -1,15 +1,17 @@
 # Reputation, Social & Retirement — especificación estructural
 
-- Estado: **estructura normativa aceptada para G3B Bloque 9**
+- Estado: **estructura normativa; Reputation/Social refinado en G3C-9 y Retirement/Comeback/Finalization en G3C-10**
 - Fecha: 2026-07-28
 - Alcance: reputación deportiva, reputación pública, audiencia social, retiro
   deportivo, regreso y frontera de finalización
-- No autoriza: gameplay, fórmulas, distribuciones, parámetros, scoring,
+- No autoriza: implementación de gameplay, valores de parámetros, scoring,
   sponsors ni cierre automático de una Career
 - Decisiones relacionadas: DR-008, DR-010, DR-016, DR-017, DR-061, DR-062,
   DR-063 y DR-069
-- ADR: [ADR-061](adr/061-reputation-and-social-model.md) y
-  [ADR-062](adr/062-playing-retirement-and-comeback.md)
+- ADR: [ADR-061](adr/061-reputation-and-social-model.md),
+  [ADR-062](adr/062-playing-retirement-and-comeback.md),
+  [ADR-078](adr/078-reputation-public-attention-social-mathematics.md) y
+  [ADR-079](adr/079-retirement-comeback-finalization-mathematics.md)
 
 ## 1. Propósito
 
@@ -25,9 +27,11 @@ Este documento cierra la estructura que debe soportar el motor para:
 - permitir más de un retiro y un regreso dentro de una misma Career;
 - mantener separado el retiro deportivo del lifecycle terminal del run.
 
-No selecciona ecuaciones, familias de distribución, escalas numéricas,
-precisión, coeficientes, thresholds ni valores iniciales. Esos elementos siguen
-en DR-061/062 y en el Parameter Registry.
+La estructura de Reputation/Social queda refinada por
+[`REPUTATION_SOCIAL_MATH_SPEC.md`](REPUTATION_SOCIAL_MATH_SPEC.md), que selecciona
+ecuaciones, samplers, escalas, precisión y ParameterSet sin asignar values.
+Retirement/Comeback conserva calibración pendiente; su matemática, cursor y
+finalización quedan cerrados por G3C-10/ADR-079. DR-069 está resuelta.
 
 ## 2. Fuentes y precedencia
 
@@ -127,8 +131,8 @@ No existe `fameOverall`. Cada componente conserva:
 - memoria mínima necesaria para la dinámica elegida;
 - parameter set y versiones participantes.
 
-La precisión, los dominios numéricos y la forma de comprimir memoria siguen
-pendientes en DR-061.
+G3C-9 fija standing/evidence `0..10000`, memoria exponencial por source family,
+watermark/fact ledger para deduplicación y cuantización `ROUND_HALF_EVEN`.
 
 ### 5.2 `SportingReputationState`
 
@@ -205,8 +209,9 @@ Esto permite:
 - fama local fuerte y alcance global bajo;
 - atención viral alta con reputación acumulada todavía baja.
 
-La escala/precisión de awareness y sentiment sigue pendiente en DR-061. Las
-categorías visibles son proyecciones, no el estado canónico.
+Awareness persiste en `0..10000`; sentiment, en `-10000..10000`. Ambas usan
+estado logit separado y `ROUND_HALF_EVEN`. Las categorías visibles siguen
+siendo proyecciones, no el estado canónico.
 
 ### 5.5 Inputs públicos
 
@@ -269,7 +274,9 @@ La vista global:
 - no garantiza que una señal local se difunda;
 - no impone que un mercado pequeño sea irrelevante.
 
-La fórmula de agregación/difusión sigue externalizada.
+G3C-9 fija difusión lagged de un paso y proyecciones globales ponderadas. La
+topología, los pesos concretos y reach baselines permanecen externalizados en
+`dataVersion`/ParameterSet.
 
 ## 7. Attention, Social y audiencia
 
@@ -317,16 +324,16 @@ AudienceState
   lastUpdatedAt
 ```
 
-`FollowerCount` es un entero exacto no negativo. Debe soportar magnitudes grandes
-sin float persistido. La representación técnica final —por ejemplo entero de
-rango ampliado o decimal string canónica— se cierra con schemas/DR-063.
+`FollowerCount` es un `uint64` exacto no negativo por partición de audiencia no
+superpuesta. El total es suma exacta derivada; binary64 solo se usa dentro del
+adapter log-space atómico. Overflow produce error tipado, nunca clipping.
 
-`EngagementState` describe intensidad/actividad de la audiencia y es distinto
-del tamaño. Su dominio sigue pendiente. Una audiencia pequeña puede tener gran
-engagement y una audiencia masiva, engagement bajo.
+`EngagementState` describe intensidad/actividad en `0..10000` y es distinto del
+tamaño. Una audiencia pequeña puede tener gran engagement y una audiencia
+masiva, engagement bajo.
 
-El breakdown regional es opcional solo si la vista global puede reconstruirse y
-los consumidores del slice no pierden local/global. Si se persiste:
+El breakdown regional de audiencia es autoritativo mediante partitions no
+superpuestas; la vista global se reconstruye:
 
 ```text
 sum(followersByMarket) = total followers
@@ -337,7 +344,7 @@ por inferencia.
 
 ### 7.4 Dinámica de followers
 
-La futura resolución separa conceptualmente:
+La resolución matemática separa:
 
 - adquisición orgánica;
 - pérdida/churn;
@@ -345,8 +352,10 @@ La futura resolución separa conceptualmente:
 - difusión entre mercados;
 - corrección/regresión posterior a un pico.
 
-Se muestrean cambios enteros. No se redondea una expectativa continua como
-resultado final ni se clampa un outlier por criterio editorial.
+Adquisición y churn se resuelven como tasas realizadas `softplus` con shocks
+Normal en `log1p(followers)`; una mixture Bernoulli añade la cola viral. El
+entero se cuantiza solo después de la transición estocástica realizada y nunca
+se clampa un outlier por criterio editorial.
 
 Debe poder ocurrir:
 
@@ -357,8 +366,8 @@ Debe poder ocurrir:
 - pérdida fuerte;
 - larga estabilidad.
 
-La familia de proceso, overdispersion, correlaciones y parámetros permanecen en
-DR-061.
+La familia, correlaciones, samplers y streams quedan cerrados por ADR-078; sus
+values y targets permanecen en calibración.
 
 ### 7.5 Control de feedback
 
@@ -373,9 +382,9 @@ facts confirmados
 ```
 
 Una actualización no se realimenta a sí misma dentro del mismo boundary.
-Persistence, regression, saturation dinámica y shocks se parametrizan. La
-saturación matemática puede reducir crecimiento marginal, pero no es un hard
-cap editorial de followers.
+Reputation states usan snapshots previos entre sí; Social consume los
+candidates nuevos y no vuelve a ejecutar Reputation. Persistence, regression,
+scale effects y shocks se parametrizan. No existe hard cap editorial.
 
 ## 8. Sponsors y vida comercial
 
@@ -426,9 +435,10 @@ Combinaciones estructuralmente relevantes:
 | `RETIRED` | `RETIRED` | Actividad ya declarada irreversiblemente cerrada para esa Career; falta consolidación |
 | `COMPLETED` | `RETIRED` | Career cerrada, score final y proyecciones terminales confirmados |
 
-`CareerStatus.RETIRED` no significa “primer retiro deportivo”. Sigue siendo la
-etapa pre-`COMPLETED` de ADR-016 y no admite comeback. DR-069 debe decidir cuándo
-una Career abierta cruza ese boundary irreversible.
+`CareerStatus.RETIRED` no significa “primer retiro deportivo”. Es
+exclusivamente la etapa **FINALIZING** pre-`COMPLETED` de ADR-016 y no admite
+comeback. ADR-079 fija `CareerFinalizationConfirmed` como el boundary
+irreversible que cierra el fact frontier.
 
 ### 9.2 `PlayerClubAffiliation`
 
@@ -480,7 +490,8 @@ El assessment es una snapshot derivada; no se mantiene un duplicado psicológico
 con dinámica propia.
 
 No es binario, no garantiza continuidad/retiro y no reemplaza `ambition`.
-Dominio, combinación y parámetros siguen en DR-062.
+G3C-10 fija dominio `(0,1)` y predictor logístico parametrizado en
+`RETIREMENT_COMEBACK_FINALIZATION_MATH_SPEC.md`.
 
 ## 11. Hazard y proceso de retiro
 
@@ -518,9 +529,9 @@ RetirementCause
 La taxonomía es extensible/versionada. No obliga a habilitar todas las causas en
 el slice. Cada outcome conserva causa, inputs, oportunidad y referencias.
 
-La forma de combinar hazards —uno compuesto, competing risks u otra familia—
-queda pendiente. Los componentes deben ser auditables y no duplicar el mismo
-antecedente.
+G3C-10 adopta competing risks log-lineales integrados por intervalo para
+`VOLUNTARY|HEALTH|MARKET|OTHER`. `EXTERNAL` solo procede de un fact/policy
+allowlisted. Los componentes son auditables y no duplican antecedentes.
 
 ### 11.3 Transiciones causales
 
@@ -553,21 +564,14 @@ RetirementOpportunity
 No toda evaluación se persiste como fact. `SCORING_FACTS_SPEC.md` fija qué
 queda como fact, summary o internal signal.
 
-### 11.4 Cadencia pendiente
+### 11.4 Cadencia cerrada por G3C-10
 
-ADR-013/043 no contiene una fase mecánica `RETIREMENT`. Usar
-`POSTSEASON_EVENTS` como sustituto automático mezclaría contenido con mecánica;
-usar `SEASON_CLOSE` sin decisión cambiaría el plan por inferencia.
-
-Por ello:
-
-- las oportunidades causadas por facts pueden programarse únicamente mediante
-  contratos ya válidos y ejecutarse en una ventana causal compatible;
-- la evaluación recurrente/anual y su `operationKey` exacta no se fijan aquí;
-- la ubicación de retiro, post-retiro y comeback en `SimulationCursor` se cierra
-  en DR-069 y puede requerir `engineVersion`.
-
-G3B-L01 permanece parcial por este conflicto.
+ADR-079 no añade fase top-level. Al inicio de `AVAILABILITY(Qn)` se ejecutan,
+en orden, `.lifecycle.retirement`, `.lifecycle.comeback` y
+`.lifecycle.finalization`. Cada operación integra el intervalo canónico ya
+cerrado; una oportunidad congela payload/resume cursor antes de
+`WAITING_DECISION`. Playing `RETIRED` mantiene quarters/seasons, con módulos
+on-field lógicamente disabled y sin RNG. G3B-L01 queda `RESOLVED_MATH`.
 
 ## 12. Regreso
 
@@ -646,23 +650,22 @@ sin duplicar temporada, descubrimiento o ScoreLedger.
 - `ABANDONED` e `INVALIDATED` siguen sin ranking;
 - Retirement/Reputation/Social nunca escriben ScoreLedger.
 
-### 13.2 Lo pendiente en DR-069
+### 13.2 Cierre de DR-069
 
-Diseño debe decidir:
+ADR-079 resuelve:
 
-- cuándo deja de poder aparecer una oportunidad de regreso;
-- quién/comando confirma finalización deportiva irreversible;
-- cómo avanza el tiempo con el jugador retirado y Career abierta;
-- si existe una subfase/temporada posretiro o una operación específica;
-- cómo se reconcilia el cierre inmediato del MVP con los regresos míticos;
-- cuándo se congela scoring final y se confirma `CareerStatus.RETIRED`;
-- atomicidad entre scoring/consolidación y `COMPLETED`;
-- cuándo se habilitan mejor carrera, ranking y tarjeta final;
-- cómo se demuestra terminación práctica sin edad máxima de gameplay;
-- migración y cambio de `engineVersion`/schema si corresponde.
+- quarters/seasons continúan mientras Career está abierta y playing retirado;
+- comeback deja de ser elegible al confirmar finalización irreversible;
+- `FinishCareer` se confirma en un lifecycle-safe boundary;
+- `CareerFinalizationConfirmed` cierra facts y entra en
+  `CareerStatus.RETIRED`/FINALIZING;
+- scoring/consolidación son idempotentes sobre el closed fact set;
+- `COMPLETED` solo se confirma al completar artefactos, integridad y
+  compatibilidad;
+- ranking, best Career, final tier y share card terminal se habilitan después;
+- calibration automation y technical guards quedan fuera del gameplay.
 
-Hasta resolver DR-069 no se implementa el runner de retiro/comeback/finalización
-ni el vertical slice terminal.
+No existe edad máxima, forced finalization ni reopening.
 
 ### 13.3 Descubrimientos
 
@@ -686,8 +689,8 @@ facts deportivos/públicos cerrados
 -> actualización Reputation/Social
 -> inputs futuros de Market/Selection/Awards/Events
 
-estado cerrado de temporada/contexto
--> evaluación Retirement en boundary todavía pendiente
+estado cerrado del intervalo anterior
+-> AVAILABILITY(Qn).lifecycle.retirement/comeback/finalization
 -> decisión/interrupción
 -> cambio de PlayerPlayingStatus
 -> eventual comeback o finalización
@@ -699,9 +702,11 @@ confirma en `AWARDS` y la oportunidad narrativa puede evaluarse desde
 `AWARD_EVENTS`; la actualización mecánica de reputación/social debe ubicarse en
 una suboperación causal aprobada, no dentro del evento por atajo.
 
-La ubicación exacta de actualización reputacional recurrente también debe
-formar parte del plan versionado de DR-061/063 si el cursor vigente no la
-contiene explícitamente.
+ADR-078 ubica batches como suboperaciones versionadas de
+`CONSEQUENCES(Qn).reputationSocial` y `SEASON_CLOSE.reputationSocial`. No añade
+una fase top-level: el primer batch consume facts cerrados hasta Health de la
+Q; el segundo, el remanente posterior a Awards/Events antes del commit de
+temporada.
 
 ## 15. Interfaces
 
@@ -753,6 +758,18 @@ Retirement entrega:
 - facts hacia Events, Market/Contracts, Profile y Scoring;
 - solicitud de finalización, no score ni ranking.
 
+### 15.5 Reconciliación Market G3C-7
+
+Market consume únicamente un snapshot purpose-scoped de
+`SportingReputationState` normalizado `[0,1]`, con scope/market/evidence refs.
+`PublicReputation` no entra por defecto en valuation o sporting interest; solo
+puede hacerlo una futura regla explícita para un consumer público/comercial.
+
+Transfers produce facts de interest, offer, negotiation, contract, loan y
+movement. Reputation/Social puede transformarlos posteriormente mediante
+`EvidenceKey`/`causalSignalId`; fee, salary, MarketValue o prestige no escriben
+reputation/followers directamente. G3C-7 no cierra las ecuaciones de DR-061.
+
 ## 16. Outputs y clasificación preliminar
 
 G3B Bloque 10 cerró nombres, identidad, clasificación y payload mínimo en
@@ -765,17 +782,18 @@ G3B Bloque 10 cerró nombres, identidad, clasificación y payload mínimo en
 | `PublicReputationUpdated` | Cambio de estado candidato | Awareness/sentiment actualizados |
 | `RegionalReputationUpdated` | No alias por defecto | Solo si tiene consumidor distinto del state update |
 | `PublicAttentionGenerated` | Fact/señal candidata | Shock público referenciado a facts fuente |
-| `FollowerCountUpdated` | Cambio de estado/fact candidato | Total anterior, delta entero, total posterior y causa |
+| `FollowerCountUpdated` | Cambio de estado/fact candidato | Breakdown/total `uint64` anterior-posterior, delta signed decimal canónico y causas |
 | `EngagementUpdated` | Cambio de estado candidato | Intensidad de audiencia, no followers |
 | `AudienceMilestoneReached` | Fact opcional | Solo si existe consumidor real; nunca score automático |
 | `RetirementHazardEvaluated` | Traza por defecto | Inputs, components y stream; no outcome |
-| `RetirementDecisionRequested` | Fact/decision boundary candidato | Crea `PendingDecision` cuando corresponde |
+| `RetirementDecisionRequested` | Proyección de `DecisionRequested` | Payload frozen y `PendingDecision` cuando corresponde |
 | `RetirementOccurred` | Fact canónico | Cambia `PlayerPlayingStatus` una vez por episodio |
-| `ComebackOpportunityGenerated` | Traza/fact según consumidor | Oportunidad identificada, no regreso |
-| `ComebackDecisionRequested` | Fact/decision boundary candidato | Crea `PendingDecision` |
+| `ComebackOpportunityGenerated` | Traza interna | Oportunidad identificada; se materializa en `DecisionRequested` si requiere choice |
+| `ComebackDecisionRequested` | Proyección de `DecisionRequested` | Crea `PendingDecision` con payload frozen |
 | `ComebackOccurred` | Fact canónico | Cambia `PlayerPlayingStatus` a `ACTIVE` |
-| `CareerFinalizationRequested` | Comando/fact candidato | Solicita boundary terminal; política en DR-069 |
-| `CareerCompleted` | Fact de Career | Solo tras cierre terminal de ADR-016/DR-069 |
+| `CareerFinalizationRequested` | Comando/internal signal | Solicita boundary; no es fact de ocurrencia |
+| `CareerFinalizationConfirmed` | Fact canónico de Career | Cierra terminal cursor/fact frontier y entra en FINALIZING |
+| `CareerCompleted` | Fact de Career | Solo tras artefactos/integridad del boundary ADR-079 |
 
 `PlayerRetired` debe migrarse o declararse alias de `RetirementOccurred`; ambos
 no pueden representar la misma ocurrencia. `FollowersChanged` requiere la misma
@@ -816,9 +834,9 @@ Los nombres finales pertenecen a DR-061/062/063. Consumir una tirada social no
 desplaza Health, Performance, Market, Awards o Retirement. Consumir un hazard de
 retiro no desplaza comeback.
 
-## 18. Parameter Registry Candidates
+## 18. Parameter Registry
 
-### 18.1 Reputation
+### 18.1 Reputation — cerrado como schema de parámetros en G3C-9
 
 - dominios, escalas, precisión y cuantización de standing, awareness,
   sentiment y evidence strength;
@@ -833,7 +851,7 @@ retiro no desplaza comeback.
 - stream namespaces/contexts;
 - golden fixtures y targets Monte Carlo.
 
-### 18.2 Social
+### 18.2 Social — cerrado como schema de parámetros en G3C-9
 
 - representación exacta y rango de `FollowerCount`;
 - dominio/precisión de engagement y attention;
@@ -848,7 +866,7 @@ retiro no desplaza comeback.
 - stream namespaces/contexts;
 - golden fixtures y targets de audiencia/engagement.
 
-### 18.3 Retirement y comeback
+### 18.3 Retirement y comeback — schema cerrado por G3C-10
 
 - dominio/precisión de `CareerMotivationAssessment`;
 - base hazard y competing-risk family;
@@ -865,43 +883,103 @@ retiro no desplaza comeback.
 - orden y stream namespaces/contexts;
 - golden fixtures y targets Monte Carlo de retiro temprano, longevidad,
   carreras extremas, comeback y retiros múltiples;
-- criterios de terminación práctica una vez resuelta DR-069.
+- criterios de terminación práctica y right-censoring de automation/tooling.
 
-No se aprueba ningún valor por este documento.
+Reputation/Social queda en `EngineParameterSet.reputationSocial`; Retirement y
+Comeback quedan en `EngineParameterSet.retirementComeback`. No se aprueba ningún
+valor por este documento.
 
 ## 19. Resolución del Design Board
 
 | ID | Estado tras Bloque 9 | Cierre estructural | Pendiente |
 |---|---|---|---|
-| G3B-K01 | Parcial | Estado deportivo por mercado con standing, evidence strength, memoria y vista global derivada. | Dominio, escala, fórmula, precisión, streams y calibración. |
-| G3B-K02 | Parcial | Pipeline fact→signal→deduplicación→memoria→estado, con una EvidenceKey por causa. | Ecuación, memory kernels, parámetros y fixtures. |
+| G3B-K01 | `PARTIAL_CALIBRATION` | AR(1) logit regional, impulses/evidence, Normal hierarchy, dominio y precisión cerrados. | Values, market data, targets y goldens aprobados. |
+| G3B-K02 | `PARTIAL_CALIBRATION` | Deduplicación/suma canónica, memory kernel, difusión lagged y global derivado cerrados. | Persistence/diffusion values, source profiles y evidencia. |
 | G3B-K03 | Resuelta estructuralmente | Public Reputation separa awareness/sentiment; reach es derivado y attention es estado reciente distinto. | Dominios, precisión y dinámica en DR-061. |
 | G3B-K04 | Resuelta estructuralmente | Grafo data-driven de mercados; home/current se resuelven y global es derivado. | IDs, fuentes, difusión y pesos del slice. |
-| G3B-K05 | Parcial | Followers entero no negativo y engagement/attention separados; shocks comparten causa. | Representación final, distribución de cambios, correlación y parámetros. |
+| G3B-K05 | `PARTIAL_CALIBRATION` | `uint64`, acquisition/churn log-space, viral Bernoulli, engagement AR(1), correlations y streams cerrados. | Rates/sigmas, reach/audience data, targets y goldens. |
 | G3B-K06 | Calibración externalizada | Registry y targets obligatorios. | Valores aprobados. |
 | G3B-K07 | Diferida | Solo se define `CommercialOpportunityContext`. | Política/subsistema futuro de sponsors. |
-| G3B-L01 | Parcial | Oportunidad, decisión, status deportivo y CareerStatus quedan separados. | Punto exacto de cursor y finalización en DR-069. |
-| G3B-L02 | Parcial | Inputs y causas de hazard auditables sin edad máxima. | Familia/función, precisión, streams, parámetros y fixtures. |
+| G3B-L01 | `RESOLVED_MATH` | Cursor Q, post-retirement operations, WAITING_DECISION y finalization boundary fijados. | Implementación. |
+| G3B-L02 | `PARTIAL_CALIBRATION` | Competing-risks hazard, Motivation, decline, samplers, streams y properties cerrados. | Coefficients, targets y expected goldens. |
 | G3B-L03 | Resuelta estructuralmente | Motivation es assessment derivado de trait/estados/contexto; no nuevo trait. | Dominio, transformación y parámetros. |
-| G3B-L04 | Parcial | No club/lesión/edad no fuerzan retiro; decisión normal, instantáneo solo por causa explícita; comeback soportado. | Política exacta de outcomes y boundary terminal DR-069. |
+| G3B-L04 | `PARTIAL_CALIBRATION` | Retirement/manual decision, comeback routes/hazard, viability, multiple cycles y finalization cerrados. | Coefficients, targets y automation fixtures. |
 | G3B-L05 | Calibración externalizada | Registry y targets obligatorios. | Valores aprobados. |
 
 ## 20. Gates restantes
 
 Antes de implementar este bloque:
 
-1. DR-061 debe cerrar dominios, ecuaciones/distribuciones, precisión, streams,
-   parámetros iniciales y fixtures.
-2. DR-062 debe cerrar hazard/competing risks, outcomes, motivation,
-   correlaciones, parámetros y fixtures.
+1. DR-061 queda `PARTIAL_CALIBRATION`: debe aprobar values, mercados/reach,
+   targets y golden outputs; no falta matemática ni sampler.
+2. DR-062 queda `PARTIAL_CALIBRATION`; debe aprobar values, targets y expected
+   golden outputs, sin matemática pendiente.
 3. los schemas deben conformar catálogo, identity, classification,
    idempotencia y allowlist cerrados por ADR-010.
-4. DR-069 debe cerrar cursor posretiro, comeback y finalización irreversible.
+4. DR-069 está resuelta por ADR-079; falta implementación posterior a G3C-11.
 5. DR-025 debe aportar mercados/regiones del slice.
 6. DR-058/065 debe soportar `UNATTACHED` y oportunidades con identidades
    autorizadas.
 7. DR-010 debe decidir PBR, longevity/records, anti-duplicación y scoring final.
 8. Deben aprobarse golden fixtures y tolerancias Monte Carlo.
 
-Hasta entonces no se implementa gameplay de Reputation, Social, Retirement,
-Comeback, finalización competitiva ni scoring.
+Hasta superar los gates no se implementa gameplay de Reputation, Social,
+Retirement, Comeback, finalización competitiva ni scoring.
+
+## 21. Interfaz downstream confirmada por G3C-8
+
+Selection puede consumir únicamente el snapshot lagged de
+`SportingReputation` autorizado. Awards puede consumir Sporting/Public
+Reputation solo si su `AwardDefinition` declara ese feature. Ninguna edición
+usa reputación producida por su propio outcome.
+
+`NationalTeamCallUpIssued`, achievements internacionales y `AwardWon` son
+causas downstream potenciales de Reputation/PublicAttention. G3C-9 fija su
+transformación mediante profiles/impulses y consume el outcome solo en un batch
+posterior; G3C-8 no actualiza reputation, followers o engagement.
+
+## 22. Refinamiento matemático G3C-9
+
+La especificación normativa completa está en
+[`REPUTATION_SOCIAL_MATH_SPEC.md`](REPUTATION_SOCIAL_MATH_SPEC.md). En caso de
+tensión con lenguaje previo que dejaba matemática pendiente, prevalece el
+refinamiento G3C-9 para Reputation/Social. Retirement, Comeback y finalización
+no son alcanzados por esa precedencia y continúan en DR-062/069.
+
+G3C-9 confirma además:
+
+- no `FameOverall`, no CareerScore/MarketValue y no writes desde Content;
+- awareness/sentiment y followers/engagement separados;
+- markets data-driven, audience partitions no superpuestas y global derivado;
+- lag estricto hacia Market/Selection/Awards;
+- no PRL/PBR, Sponsors o Retirement math;
+- G3B-K01/K02/K05 en `PARTIAL_CALIBRATION`.
+
+## 23. Refinamiento matemático G3C-10
+
+La especificación normativa completa está en
+[`RETIREMENT_COMEBACK_FINALIZATION_MATH_SPEC.md`](RETIREMENT_COMEBACK_FINALIZATION_MATH_SPEC.md).
+En caso de tensión con lenguaje previo que dejaba Retirement/Comeback/DR-069
+pendientes, prevalece G3C-10 y ADR-079.
+
+G3C-10 confirma:
+
+- Motivation sigmoid derivada y fulfillment causal sin CareerScore;
+- age sigmoid suave, decline EWMA y competing-risks retirement hazard;
+- user/manual retirement sin RNG, caps, cooldown o forced retirement;
+- comeback hazard con rutas willingness y Market Offer, sin inventar club;
+- cursor Q posretiro con zero on-field exposure y evolución compatible;
+- continuation viability y FinalizationOpportunity sin thresholds;
+- `CareerStatus.RETIRED` reservado a FINALIZING;
+- `CareerFinalizationConfirmed` como freeze del fact frontier;
+- calibration automation/right-censoring fuera de gameplay;
+- DR-069 resuelta, G3B-L01 `RESOLVED_MATH` y L02/L04
+  `PARTIAL_CALIBRATION`.
+
+## 24. Consumo de Scoring tras G3C-11
+
+ADR-080 consume snapshots sociales allowlisted para PBR mediante cohortes
+versionadas, sin permitir writes directos desde Content o Social al ledger.
+Retirement/Comeback no puntúan ni congelan PC; solo
+`CareerFinalizationConfirmed` habilita el snapshot final. PRL/PBR ya tienen
+matemática cerrada, pero sus data/calibration bundles siguen pendientes.

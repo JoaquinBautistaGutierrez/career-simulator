@@ -372,21 +372,28 @@ El rango canónico es `0.00 <= CC <= 1.10`. `CC` se deriva de participación y r
 
 Los valores superiores a `1.00` solo pueden surgir de rendimiento extraordinario, nunca de una bonificación editorial manual. Los intervalos son explicativos y no crean clases mecánicas.
 
-La fórmula, inputs, precisión y redondeo quedan sujetos a la especificación matemática de DR-008/DR-010.
+La fórmula, inputs, precisión y redondeo quedan cerrados por ADR-080; sus
+valores calibrados viven en `ScoringConfiguration`/`ScoringCalibrationData`.
 
 **Aclaración G3B — Bloque 10 (2026-07-28)**
 
 CC es específico de competición/logro y se aplica a logros colectivos de
 `PTC_CLUB` y `PSN`. No se aplica por defecto a `PRI`, `PPI`, `PRL` o `PBR`.
 Sus inputs autorizados son participación, disponibilidad, rendimiento y
-presión confirmados; `SportingRole` no lo determina. La fórmula sigue
-pendiente.
+presión confirmados; `SportingRole` no lo determina.
+
+**Cierre matemático G3C-11 (2026-08-01)**
+
+`ccSignal` combina participación y contribución evidence-weighted mediante
+transforms racionales monótonos; `ccExact=(11/10)*T_CC(ccSignal)` y se cuantiza
+con `ROUND_HALF_UP` en unidades de 1/10000. Cero minutos/inelegibilidad lógica
+produce cero. Quedan weights, cohortes, splines, targets y goldens iniciales.
 
 **Alternativas rechazadas**
 
 - Limitar `CC` a `1.00`.
 - Aplicar una bonificación manual para superar `1.00`.
-- Cerrar una fórmula provisional antes de DR-008/DR-010.
+- Cerrar una fórmula provisional antes de G3C-11.
 - Convertir los intervalos conceptuales en clases rígidas.
 
 **Impacto**
@@ -403,7 +410,7 @@ pendiente.
 - Round-trip conforme al contrato numérico.
 - Ningún efecto de contenido ni input del cliente fija `CC`.
 - Fixtures futuros explican todo valor superior a `1.00` mediante participación/rendimiento.
-- Gate: rango cerrado; fórmula y ScoreLedger siguen bloqueados por DR-008 y DR-010.
+- Gate: fórmula cerrada; faltan configuración calibrada y goldens de ADR-080.
 
 ### DR-011 — Taxonomía canónica de posiciones
 
@@ -733,8 +740,9 @@ deportivamente `RETIRED`; una decisión de comeback usa
 `CareerStatus.RETIRED -> ACTIVE`.
 
 El primer `RetirementOccurred` no obliga la transición de Career a `RETIRED`.
-DR-069 debe decidir el boundary que vuelve irreversible el cierre y habilita
-`RetireCareer`. La matriz aceptada de DR-016 no cambia.
+ADR-079/DR-069 fija `CareerFinalizationConfirmed` como el boundary que vuelve
+irreversible el cierre y habilita FINALIZING. La matriz aceptada de DR-016 no
+cambia.
 
 **Alternativas rechazadas**
 
@@ -753,7 +761,7 @@ DR-069 debe decidir el boundary que vuelve irreversible el cierre y habilita
 - `WAITING_DECISION` se integra con ADR-013.
 - ADR-017 define confirmación, abandono, invalidación competitiva e idempotencia de descubrimientos.
 - ADR-062 separa estado deportivo y lifecycle sin añadir transiciones.
-- DR-069 bloquea el cursor posretiro y la política de finalización irreversible.
+- ADR-079 resuelve cursor posretiro y finalización irreversible.
 
 **Tests requeridos**
 
@@ -773,6 +781,27 @@ Solo una Career `COMPLETED`, íntegra y compatible puede producir un
 `ScoreSnapshot` final elegible. `PlayerPlayingStatus.RETIRED` y
 `CareerStatus.RETIRED` no habilitan ranking definitivo. El primer retiro
 deportivo no congela PC; DR-069 conserva el boundary terminal.
+
+Esta última apertura histórica queda resuelta posteriormente por ADR-079.
+
+**Aclaración G3C-9 (2026-08-01)**
+
+Los batches de Reputation/Social son suboperaciones de una Career abierta y
+no cambian `CareerStatus`. Pueden seguir actualizando estados con
+`PlayerPlayingStatus.RETIRED`, pero no crean cursor posretiro, comeback,
+finalización o ranking. DR-016 permanece intacta y DR-069 conserva el boundary.
+
+Ese era el estado al cierre de G3C-9; G3C-10 lo resuelve sin modificar las
+ecuaciones sociales.
+
+**Cierre G3C-10 (2026-08-01)**
+
+`CareerStatus.RETIRED` se conserva exclusivamente como etapa FINALIZING, no
+como retiro deportivo. `FinishCareer` confirmado con playing `RETIRED` emite
+`CareerFinalizationConfirmed`, cierra el fact frontier y entra en esa etapa.
+Scoring/consolidación/integridad completan un pipeline idempotente y recién
+entonces producen `CareerCompleted`/`COMPLETED`. No hay reopening. ADR-079
+resuelve DR-069 y preserva la matriz de ADR-016.
 
 ### DR-017 — Descubrimientos
 
@@ -819,6 +848,12 @@ descubrimientos previos; completar la Career tampoco los vuelve a confirmar.
 `DiscoveryConfirmed` pertenece al fact ledger de Career, pero no al allowlist
 de Scoring. Un discovery, un `EventInstance` o una presentación narrativa no
 otorgan puntos por existir.
+
+**Aclaración G3C-9 (2026-08-01)**
+
+`PublicEventSignal` siempre referencia un fact/discovery/event ya confirmado y
+no vuelve a confirmar el discovery. Un cambio de Reputation/Social no es un
+discovery implícito ni altera su procedencia o elegibilidad.
 
 **Alternativas rechazadas**
 
@@ -1113,6 +1148,22 @@ El orden queda matemáticamente congelado como contexto upstream→availability
 `previousPerformanceSignal` de una ventana cerrada puede afectar la siguiente.
 Disponibilidad cero determina minutos cero sin consumir draws de participación.
 
+**Confirmación G3C-4 (2026-07-29)**
+
+Performance consume los minutos cerrados por segmento y, con cero minutos,
+produce cero estadísticas on-field sin consumir draws. Su surprise solo puede
+alimentar Form/otros owners después del cierre de Q; nunca modifica role,
+minutos o producción de la misma ventana. ADR-073 preserva íntegramente el
+orden de ADR-042.
+
+**Confirmación G3C-5 (2026-07-29)**
+
+Health(Qn) transforma exposición ya realizada en load, states y outcomes.
+Nuevas lesiones, recaídas y secuelas se confirman atómicamente para el
+checkpoint Qn+1. Su `MedicalAvailabilityEnvelope` se consume recién en
+AVAILABILITY(Qn+1); ningún hazard o recovery reabre Qn. ADR-074 preserva
+íntegramente ADR-042.
+
 ### DR-043 — Ventanas de eventos posteriores
 
 - Estado: Resuelta
@@ -1218,6 +1269,13 @@ usa `DOMINANT_ONLY`. `usageByPosition` suma exactamente `actualMinutes`. La
 extensión multiposicional deberá asignar shares conjuntamente, nunca samplear
 minutos independientes. DR-048/049 ya fueron resueltas por ADR-071; el módulo
 no cambia `primaryPosition`.
+
+**Confirmación G3C-4 (2026-07-29)**
+
+Task abilities, Underlying Performance, producción y summaries se resuelven
+contra `effectivePosition` del segmento. Los splits por posición conservan
+minutos/counts una sola vez y Performance nunca inicia reconversión ni cambia
+`primaryPosition`.
 
 **Tests y gates requeridos**
 
@@ -1424,8 +1482,9 @@ no altera gameplay, lifecycle, facts ni score.
 
 ### DR-008 — Fórmulas faltantes del simulador
 
-**Estado:** Parcialmente resuelta — `BLOCKER_G3`; estructura aceptada el
-2026-07-28, matemática ejecutable pendiente.
+**Estado:** `PARTIAL_CALIBRATION` — G3C-2 a G3C-11 cerraron todas las familias
+matemáticas asignadas; faltan valores iniciales, data/Definitions, expected
+goldens, aceptación Monte Carlo, schemas e implementación autorizada.
 
 **Problema**
 
@@ -1526,8 +1585,9 @@ añade scope, pools externos y continuidad del protagonista.
 
 [ADR-058](adr/058-transfer-market-contract-model.md) y
 [`TRANSFER_MARKET_CONTRACT_SPEC.md`](TRANSFER_MARKET_CONTRACT_SPEC.md) fijan el
-pipeline percepción→necesidad→interés→oferta→negociación→decisión→resultado→
-contrato, percepción observer-specific, `ClubNeed`, acuerdos separados,
+pipeline percepción→necesidad→interés→oferta→seller→propuesta contractual→
+negociación→decisión→resultado→contrato, percepción observer-specific,
+`ClubNeed`, acuerdos separados,
 contrato/expectativa, afiliación dual, Money exacto, loans, free transfers e
 historia multiclub.
 
@@ -1621,6 +1681,159 @@ DR-021 queda parcial únicamente respecto de formatos/generación/integración
 temporal. DR-008 sigue abierta por G3C-4–G3C-11, valores de ParameterSet y
 calibración integrada.
 
+**Avance G3C-4 (2026-07-29)**
+
+[ADR-073](adr/073-performance-production-form-mathematics.md) y
+[`PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md`](PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md)
+cierran las ocho familias G3B-D02–D09:
+
+- task abilities en logit seguro y rendimiento multidimensional;
+- shocks Normal common/domain/specific/pressure;
+- consistency, pressure, evidence y surprise;
+- NB2/Binomial con inverse-CDF log-space;
+- grafos de production ST/CM/GK;
+- Form AR(1) mean-reverting;
+- agregación Q/season/multicontexto.
+
+Las ocho filas pasan a `PARTIAL_CALIBRATION`. No falta familia matemática ni
+sampler; faltan valores, targets, goldens y producers upstream de G3C-5/G3C-6.
+DR-008 continúa abierta por G3C-5–G3C-11 y calibración integrada.
+
+**Avance G3C-5 (2026-07-29)**
+
+[ADR-074](adr/074-health-injury-recovery-mathematics.md) y
+[`HEALTH_INJURY_RECOVERY_MATH_SPEC.md`](HEALTH_INJURY_RECOVERY_MATH_SPEC.md)
+cierran las cinco familias G3B-E02/E03/E05–E07:
+
+- dose/load con memorias acute/chronic;
+- AR(1) independientes de fitness/fatigue;
+- cumulative hazards y counts Poisson por family/origin;
+- severity logistic-Normal;
+- requirement LogNormal y recovery progresiva;
+- intervalos médicos exactos;
+- relapse relacionado;
+- secuela logistic-Normal temporal/persistente.
+
+Las cinco filas pasan a `PARTIAL_CALIBRATION`. El acumulado queda en dos
+`RESOLVED_MATH`, veinticinco `PARTIAL_CALIBRATION` y treinta y seis `PARTIAL`
+asignadas a G3C-6–G3C-11. DR-008 continúa abierta por esos bloques, los valores
+de ParameterSet y la calibración integrada.
+
+**Avance G3C-6 (2026-07-29)**
+
+[ADR-075](adr/075-club-competition-world-mathematics.md) y
+[`CLUB_COMPETITION_WORLD_MATH_SPEC.md`](CLUB_COMPETITION_WORLD_MATH_SPEC.md)
+cierran las cinco familias G3B-F05/F06/J02–J04:
+
+- AR(1) en logit para Club/League/World states;
+- hierarchy Normal global/regional/league/club/competition/residual;
+- manager turnover por hazard y generación correlacionada;
+- TeamMinutesOpportunity por phase graph y match equivalents;
+- progression checkpoint causal dentro de `CONSEQUENCES(Qn)`;
+- noisy utility/canonical rank de league;
+- logistic/Bernoulli de copa/continental;
+- support field, contribución y context producers;
+- rank→`MobilityTransitionRequest`.
+
+Las cinco filas pasan a `PARTIAL_CALIBRATION`. El acumulado queda en dos
+`RESOLVED_MATH`, treinta `PARTIAL_CALIBRATION` y treinta y una `PARTIAL`
+asignadas a G3C-7–G3C-11. DR-008 continúa abierta por esos bloques, values,
+data/policies y calibración integrada. DR-065 no se cierra.
+
+**Avance G3C-7 (2026-07-29)**
+
+[ADR-076](adr/076-transfer-market-contract-mathematics.md) y
+[`TRANSFER_MARKET_CONTRACT_MATH_SPEC.md`](TRANSFER_MARKET_CONTRACT_MATH_SPEC.md)
+cierran las cinco familias G3B-G01–G04/G07:
+
+- campo canónico autorizado, ClubNeed logistic-Normal y fit derivado;
+- Interest/Offer/seller/negotiation mediante logistic y Bernoulli canónico;
+- operation, expectation y duración mediante stable softmax;
+- valuation/fee/salary positivos y separados en log-space;
+- agregación robusta de `MarketReferenceValue`, dinero entero exacto y
+  checkpoint sin resampling.
+
+Las cinco filas pasan a `PARTIAL_CALIBRATION`. El acumulado queda en dos
+`RESOLVED_MATH`, treinta y cinco `PARTIAL_CALIBRATION` y veintiséis `PARTIAL`
+asignadas a G3C-8–G3C-11. DR-008 continúa abierta por esos bloques, los valores
+del ParameterSet, data/policies y calibración integrada. DR-027/065/066/067 no
+se cierran por inferencia.
+
+**Avance G3C-8 (2026-08-01)**
+
+[ADR-077](adr/077-national-team-awards-mathematics.md) y
+[`NATIONAL_TEAM_AWARDS_MATH_SPEC.md`](NATIONAL_TEAM_AWARDS_MATH_SPEC.md)
+cierran las siete familias G3B-H01–H04/I02–I04:
+
+- SelectionCompetitionField Gaussian core/elite y relative comparison;
+- candidate signal, logistic call-up/squad e incumbency AR(1);
+- adapter internacional de Role/Minutes y Performance;
+- NationalTeam strength/generation, support y outcomes agregados;
+- fields comparativos Normal y estadísticos NB2;
+- candidate utility, judging, ranking ordinal y tie policies sin RNG.
+
+Las siete filas pasan a `PARTIAL_CALIBRATION`. El acumulado queda en dos
+`RESOLVED_MATH`, cuarenta y dos `PARTIAL_CALIBRATION` y diecinueve `PARTIAL`
+asignadas a G3C-9–G3C-11. DR-008 continúa abierta por esos bloques, values,
+Definitions, evidencia y calibración integrada. DR-021/025/068 no se cierran
+por inferencia.
+
+**Avance G3C-9 (2026-08-01)**
+
+[ADR-078](adr/078-reputation-public-attention-social-mathematics.md) y
+[`REPUTATION_SOCIAL_MATH_SPEC.md`](REPUTATION_SOCIAL_MATH_SPEC.md) cierran las
+tres familias G3B-K01/K02/K05:
+
+- Sporting Reputation regional mediante AR(1) logit, impulses/evidence y
+  shocks jerárquicos;
+- evidence memory, deduplicación/suma canónica y difusión regional lagged;
+- awareness, sentiment y Public Attention separados;
+- followers `uint64` con acquisition/churn log-space y cola viral Bernoulli;
+- Engagement AR(1), lag, streams, quantization y batches en el pipeline vigente.
+
+Las tres filas pasan a `PARTIAL_CALIBRATION`. El acumulado queda en dos
+`RESOLVED_MATH`, cuarenta y cinco `PARTIAL_CALIBRATION` y dieciséis `PARTIAL`
+asignadas a G3C-10/G3C-11. DR-008 continúa abierta por Retirement, Scoring,
+values, Definitions, evidencia, goldens y calibración integrada. DR-010,
+DR-025, DR-062 y DR-069 no se cierran por inferencia.
+
+**Avance G3C-10 (2026-08-01)**
+
+[ADR-079](adr/079-retirement-comeback-finalization-mathematics.md) y
+[`RETIREMENT_COMEBACK_FINALIZATION_MATH_SPEC.md`](RETIREMENT_COMEBACK_FINALIZATION_MATH_SPEC.md)
+cierran las tres familias G3B-L01/L02/L04:
+
+- Motivation sigmoid, fulfillment, age signal suave y decline EWMA;
+- competing-risks retirement hazard y comeback/finalization hazards;
+- samplers/streams, user decisions sin RNG y frozen resume payloads;
+- cursor Q posretiro y adapters Health/Development/Market/on-field;
+- willingness/Market comeback routes, multiple cycles y viability;
+- `CareerFinalizationConfirmed`, FINALIZING y terminal pipeline idempotente;
+- automation/right-censoring fuera de gameplay.
+
+L01 pasa a `RESOLVED_MATH`; L02/L04 a `PARTIAL_CALIBRATION`. El acumulado es
+tres `RESOLVED_MATH`, cuarenta y siete `PARTIAL_CALIBRATION` y trece `PARTIAL`
+de G3C-11. DR-069 queda resuelta y DR-062 en `PARTIAL_CALIBRATION`. DR-008
+continúa abierta por Scoring, values, Definitions, evidencia, goldens y
+calibración integrada.
+
+**Avance G3C-11 (2026-08-01)**
+
+[ADR-080](adr/080-exact-scoring-mathematics.md) y
+[`SCORING_MATH_SPEC.md`](SCORING_MATH_SPEC.md) cierran las trece familias M:
+
+- racionales exactos, `ROUND_HALF_UP` y operación canónica;
+- PRI posicional/multicontexto, CC, PTC/PSN/PPI, PRL/PBR y caps;
+- cohortes congeladas, ledger/recompute, snapshot y compatibility key;
+- M11/M17 `RESOLVED_MATH`, M02/M07/M09/M18 `PARTIAL_CALIBRATION` y siete
+  filas `DATA_REQUIRED`; ninguna queda sin ecuación/algoritmo.
+
+El acumulado final de las 63 decisiones G3C es: cinco `RESOLVED_MATH`,
+cincuenta y una `PARTIAL_CALIBRATION`, siete `DATA_REQUIRED` y cero `PARTIAL`
+por falta de familia matemática. DR-008 no está bloqueada por matemática
+indefinida; conserva únicamente los gates de publicación/calibración listados
+a continuación.
+
 El cierre debe publicar:
 
 - ecuaciones y orden de evaluación;
@@ -1641,8 +1854,9 @@ No se implementan atributos, producción, desarrollo, salud, mercado, selección
 
 ### DR-010 — Scoring incompleto
 
-**Estado:** Parcialmente resuelta — `BLOCKER_G3`; estructura aceptada el
-2026-07-28, matemática ejecutable pendiente.
+**Estado:** `RESOLVED_MATH` — estructura aceptada el 2026-07-28 y matemática
+exacta aceptada el 2026-08-01; configuración, calibration data, catálogos y
+goldens de publicación pendientes.
 
 **Problema**
 
@@ -1761,6 +1975,69 @@ de gameplay.
 G3B-M02–M11, M15, M17 y M18 quedan asignadas a G3C-11, con calibración
 integrada en G3C-12. Esto no cierra ninguna fórmula de SC-02–SC-11 y DR-010
 permanece `BLOCKER_G3`.
+
+**Interfaz confirmada por G3C-9 (2026-08-01)**
+
+`SportingReputationUpdated`, `PublicReputationUpdated`,
+`PublicAttentionGenerated`, `FollowerCountUpdated` y `EngagementUpdated`
+quedan producibles/auditables de forma determinista. G3C-9 no decide PRL/PBR,
+no usa scoring values como impulses y no escribe ledger. La allowlist no
+cambia: attention no puntúa directamente y los tres updates públicos/sociales
+siguen siendo solo candidatos PBR. DR-010 permanece íntegramente en G3C-11.
+
+**Interfaz confirmada por G3C-10 (2026-08-01)**
+
+`RetirementOccurred` y `ComebackOccurred` no congelan ni puntúan. Solo
+`CareerFinalizationConfirmed` cierra el Domain Fact frontier; el pipeline
+FINALIZING puede proyectar un ledger/snapshot final idempotente y
+`CareerCompleted` confirma el terminal normal. Ranking requiere `COMPLETED`,
+integridad, compatibilidad y final ScoreSnapshot. G3C-10 no decide PRI, PRL,
+PBR, CC, caps, anti-duplicación o rounding de G3C-11.
+
+**Interfaz confirmada por G3C-4 (2026-07-29)**
+
+Performance publica counts enteros y summaries cuantizados con evidence,
+pressure y splits; no calcula PRI, CC, awards equivalence ni puntos. Raw
+production no usa IJL. Estos facts enriquecen los inputs futuros de SC-02/SC-07,
+pero no cierran ninguna fórmula de DR-010 y Scoring continúa sin RNG.
+
+**Interfaz confirmada por G3C-8 (2026-08-01)**
+
+Selection/Awards producen outcomes mediante gameplay math propia y nunca leen
+CareerScore. Multiple awards permanecen en history; equivalence, stacking y
+anti-duplicación siguen exclusivamente en G3C-11/Scoring. Los fields no usan
+IJL ni puntos. DR-010 no se cierra ni cambia valores por G3C-8.
+
+**Resolución G3C-11 (2026-08-01)**
+
+[ADR-080](adr/080-exact-scoring-mathematics.md) y
+[`SCORING_MATH_SPEC.md`](SCORING_MATH_SPEC.md) cierran:
+
+- racionales exactos y `ROUND_HALF_UP` una vez por cálculo lógico;
+- PRI por cinco componentes, cohortes posicionales y segmentos de exposición;
+- CC continuo por competición, cuantizado en `[0,1.10]`;
+- PTC/PSN por base × outcome × CC y PPI por equivalence groups data-driven;
+- records/longevidad como entitlement/delta y popularidad mediante cohortes;
+- `priorSportingPoints = PRI+PTC_CLUB+PPI+PSN` y orden exacto de PBR/caps;
+- ledger idempotente, reversals, recompute incremental/completo y snapshots;
+- configuración/calibration hash separada de `EngineParameterSet`;
+- compatibility key conservadora y lifecycle final de ADR-079.
+
+Las trece decisiones asignadas ya no tienen familias matemáticas pendientes:
+M11/M17 son `RESOLVED_MATH`; M02/M07/M09/M18 son
+`PARTIAL_CALIBRATION`; M03/M04/M05/M06/M08/M10/M15 son `DATA_REQUIRED`.
+No se inventaron valores dentro de rangos del master.
+
+**Gates restantes de publicación/implementación**
+
+- publicar `ScoringConfiguration` y `ScoringCalibrationData` iniciales;
+- completar competition/award/record/milestone catalogs del slice;
+- resolver los facts productores de DR-066/067 para atribución cuando aplique;
+- publicar cohorts con provenance, target ranges y expected golden outputs;
+- aceptar Monte Carlo end-to-end y crear schemas/implementación autorizada.
+
+DR-010 ya no debe citarse como falta de fórmula. Sigue siendo un gate de
+publicación mientras falten esos artefactos.
 
 **Restricción**
 
@@ -1923,6 +2200,15 @@ refinamientos G3B anteriores se conservan como historia; donde dicen “fórmula
 pendiente”, prevalece el cierre G3C-2. La implementación oficial sigue
 bloqueada únicamente por ParameterSet/targets/goldens y por las señales
 upstream que aún deben cerrar G3C-3/G3C-5/G3C-6.
+
+**Interfaz Health cerrada por G3C-5 (2026-07-29)**
+
+ADR-074 fija `developmentLoadSignal`, `inactivitySignal`, `healthBurden` y
+`sequelaBurden[i,q]`. La última combina burden activo con affinity versionado
+`InjuryFamily→capabilityFamily`; entra en el predictor de wear ya aprobado por
+ADR-071. Health no aplica `deltaZ`. DR-053 permanece `PARTIAL_CALIBRATION`
+porque faltan valores/targets conjuntos, no por una ecuación de secuela
+upstream.
 
 ### DR-054 — Rol, competencia de plantel y distribución de minutos
 
@@ -2134,11 +2420,35 @@ Todos residen en `EngineParameterSet.roleMinutes`.
 - properties de monotonicidad de expectativa;
 - Monte Carlo `RM-C01–C12`.
 
+**Reconciliación G3C-4 (2026-07-29)**
+
+`previousPerformanceSignal` se deriva de `PerformanceSurprise` y
+`evidenceStrength` de una ventana cerrada, no de goals/assists aislados. Para
+GK, `AppearanceSummaryRecorded` puede transportar eligibility agregada de clean
+sheets. Ninguno de estos contratos altera softmax, minute share, role o minutos
+ya cerrados por ADR-072.
+
+**Reconciliación G3C-5 (2026-07-29)**
+
+ADR-074 cierra el producer médico: cada episodio activo genera una asignación
+ordinal prefix por competición y Health entrega exact union más share y
+restrictions coherentes. El `AvailabilityAggregator` de ADR-072 sigue siendo
+owner de combinar MEDICAL/DISCIPLINARY/OTHER. DR-054 no incorpora hazard,
+traits médicos ni composición por suma de shares.
+
+**Reconciliación G3C-6 (2026-07-29)**
+
+ADR-075 cierra los producers de `TacticalFit`, `PositionCompetition` y
+`TeamMinutesOpportunity`. Los contextos canónicos de difficulty/congestion
+están en `[0,1]` y los adapters firmados usan `center01`. Una fase no alcanzada
+no aporta oportunidad y un progression checkpoint solo modifica Q futuras.
+
 ### DR-055 — Calidad efectiva, rendimiento y producción por posición
 
-**Clasificación:** `BLOCKER_G3`.
-**Estado de resolución:** Parcialmente resuelta; estructura aceptada el
-2026-07-28, matemática ejecutable pendiente.
+**Clasificación:** `BLOCKER_G3` hasta publicar calibración y producers
+upstream.
+**Estado de resolución:** `PARTIAL_CALIBRATION`; estructura aceptada el
+2026-07-28 y familias matemáticas aceptadas el 2026-07-29.
 
 **Origen**
 
@@ -2243,24 +2553,42 @@ latentes verdaderos.
 - schemas concretos conformes a facts/allowlist de DR-063/ADR-010;
 - parámetros, precisión, streams, golden fixtures y Monte Carlo versionados.
 
+**Cierre matemático G3C-4 — 2026-07-29**
+
+ADR-073 acepta:
+
+- features de capability en logit seguro y task predictors;
+- expectativa Logit-Normal/realización multidimensional;
+- factores Normal common/domain/specific/pressure;
+- consistency exponencial sobre dispersión;
+- `NegativeBinomial2(mu,kappa)` y Binomial con inverse-CDF log-space;
+- ST con opportunity/chance/conversion y counts correlacionados;
+- CM con cuatro impactos y counts correlacionados;
+- GK con `shotsFaced→saves→goalsConceded→cleanSheets`;
+- evidence/surprise y agregación por exposure;
+- Form AR(1) en logit y streams estables.
+
+G3B-D02–D09 quedan `PARTIAL_CALIBRATION`; ninguna conserva familia o sampler
+abierto.
+
 **Pendiente para cerrar DR-055**
 
-Forma funcional de EffectiveCapabilities y UnderlyingPerformance; dominios,
-escalas y precisión; familias exactas de conteo/conversión; sobredispersión,
-matriz/cópula de correlación y jerarquía de shocks; definiciones ejecutables de
-oportunidades; parámetros posicionales; agregación y evidence strength;
-contexts de streams; parámetros iniciales; targets, tolerancias y fixtures.
-También deben cerrarse los inputs de DR-021/022 y DR-057; los facts ya están
-cerrados por DR-063/ADR-010.
-DR-055 conserva estado `BLOCKER_G3`; ADR-055 no autoriza implementar gameplay.
+- valores iniciales completos de `EngineParameterSet.performance`;
+- CalibrationTargets/tolerancias y evidencia externa;
+- expected outputs de goldens cross-runtime;
+- valores y goldens conjuntos de los adapters Health cerrados por G3C-5;
+- context/pressure/eligibility producers de G3C-6;
+- schemas cuantitativos concretos conformes a DR-063.
+
+DR-055 no autoriza implementar gameplay hasta superar esos gates.
 
 **Alcance adicional detectado**
 
-`MASTER_SPEC` también enumera disciplina y, para GK, errores, penales y
-distribución. Los mínimos de ADR-055 no los eliminan, pero todavía no está
-decidido cuáles deben persistirse en el vertical slice, cuál es su owner y qué
-consumidor justifica cada contador. Esta decisión permanece dentro de
-DR-055/DR-063; no se completa por inferencia.
+`MASTER_SPEC` también enumera disciplina y, para GK, errors, penalties y
+distribution. ADR-073 conserva distribution como dimensión subyacente sin
+inventar count; errors/penalties quedan diferidos porque no tienen consumer
+necesario en el slice. Añadirlos exige decisión, modelo, facts, targets y
+fixtures.
 
 **Refinamiento de interfaz — G3B Bloque 5 (2026-07-28)**
 
@@ -2269,6 +2597,14 @@ inicio de Q. Entrega exposición/minutos e intensidad física contextual
 realizados a Health después de cerrar producción. Un rating, la producción
 observada o una mala actuación no son proxies automáticos de carga y no generan
 lesión. La función que traduce estas señales sigue en DR-055/DR-057.
+
+**Cierre de interfaz — G3C-5 (2026-07-29)**
+
+Health consume `actualMinutes` y `physicalIntensitySignal ∈ [0,1]`, nunca un
+rating, y devuelve `fitness`, `fatigue` y
+`physicalRestrictionByTask ∈ [0,1]` desde el checkpoint anterior. Dose/load y
+restrictions quedan matemáticamente definidos por ADR-074; Performance no
+recalcula esos valores ni cambia su propia producción ya cerrada.
 
 **Refinamiento de interfaz — G3B Bloque 6 (2026-07-28)**
 
@@ -2292,11 +2628,27 @@ ST, CM y GK conservan señales propias. Errores, penales y métricas adicionales
 de distribución GK siguen pendientes de DR-055/063; no se crean para llenar un
 premio. Fórmulas, escalas, precisión y facts continúan abiertos.
 
+**Reconciliación G3C-6 (2026-07-29)**
+
+ADR-075 produce attack/defense/control environment, opponent/field context,
+difficulty, competition strength, pressure y tactical fit en `[0,1]`, sin IJL.
+Performance entrega un summary segmentado que G3C-6 proyecta a
+`PlayerCompetitiveContribution`; no se recalculan task abilities o production.
+
+**Confirmación G3C-8 (2026-08-01)**
+
+Selection y Awards consumen signals purpose-scoped y matrices GK/CM/ST de
+ADR-073. No se crean stats para completar un premio: distribution GK puede
+usarse como UnderlyingPerformance comparativa; errors/penalties permanecen
+fuera mientras no exista Definition/consumer. DR-055 sigue
+`PARTIAL_CALIBRATION` por values, targets, goldens y adapters.
+
 ### DR-056 — Dinámica de forma, confianza y feedback temporal
 
 **Clasificación:** `BLOCKER_G3`.
-**Estado de resolución:** Parcialmente resuelta; ownership y dinámica
-conceptual aceptados el 2026-07-28, matemática ejecutable pendiente.
+**Estado de resolución:** Parcialmente resuelta; ownership aceptado el
+2026-07-28. Form y las señales desde Performance quedan
+`PARTIAL_CALIBRATION` desde 2026-07-29; otras dinámicas continúan pendientes.
 
 **Origen**
 
@@ -2372,11 +2724,38 @@ contexto; no añade otro trait/estado con dinámica duplicada. DR-056 conserva
 dominios y ecuaciones de morale, mientras DR-061/062 poseen reputación y
 motivation/retirement.
 
+**Cierre parcial G3C-4 — 2026-07-29**
+
+Form persiste como entero `0..10000` y usa AR(1) mean-reverting en logit:
+persistencia `0 <= phi < 1`, surprise×evidence, presión y shock Normal. No hay
+reset estacional. Performance define señales signed exactas hacia confidence,
+managerTrust y morale, pero no aplica sus updates.
+
+Quedan pendientes en DR-056 las ecuaciones completas y calibración de
+confidence, managerTrust, morale e incumbency internacional cuando sus owners
+combinen señales adicionales. No queda abierta la familia matemática de Form.
+
+**Cierre de incumbency nacional G3C-8 (2026-08-01)**
+
+Selection adopta AR(1) mean-reverting en logit con call-up/omission,
+international minutes evidence, Performance evidence, selector continuity y
+shock Normal. Ya no falta matemática de incumbency; quedan values/targets. Las
+dinámicas completas de confidence, managerTrust de club y morale siguen
+pendientes en sus owners, por lo que DR-056 no se cierra globalmente.
+
+**Aclaración G3C-9 (2026-08-01)**
+
+Public Attention y Reputation son states de su propio owner y no se agregan a
+Form/confidence/morale. Performance surprise solo se transforma en attention
+cuando existe una señal publicable. G3C-9 no actualiza ni cierra confidence,
+managerTrust o morale; DR-056 conserva su estado.
+
 ### DR-057 — Hazard de salud, lesión, recuperación y recaída
 
-**Clasificación:** `BLOCKER_G3`.
-**Estado de resolución:** Parcialmente resuelta; estructura aceptada el
-2026-07-28, matemática ejecutable y catálogo pendientes.
+**Clasificación:** `BLOCKER_G3` hasta publicar catálogo, ParameterSet, goldens
+y calibración.
+**Estado de resolución:** `PARTIAL_CALIBRATION`; estructura aceptada el
+2026-07-28 y familias matemáticas aceptadas el 2026-07-29.
 
 **Origen**
 
@@ -2494,14 +2873,14 @@ B02/B04/B05, C04–C06, D02/D05–D09, F01/F04, L02/L04 y DR-063.
 - parámetros, precisión, orden y streams versionados;
 - golden/property tests y Monte Carlo contra targets aprobados.
 
-**Pendiente para cerrar DR-057**
+**Pendiente histórico antes de G3C-5**
 
 Forma funcional del hazard y su conversión a probabilidad; proceso exacto de
 oportunidades; familias/distribuciones de severidad, duración, recuperación,
 recaída y secuela; dominios/transiciones de fitness/fatigue; composición médica
 de condiciones; precisión/cuantización; orden canónico y contextos de streams;
 taxonomía/seis lesiones; parámetros iniciales; targets, tolerancias y fixtures.
-DR-057 conserva estado `BLOCKER_G3`; ADR-057 no autoriza gameplay.
+El cierre G3C-5 siguiente sustituye la parte matemática de esta lista.
 
 **Refinamiento de interfaz — G3B Bloque 6 (2026-07-28)**
 
@@ -2512,16 +2891,90 @@ elimina riesgo. La traducción cuantitativa continúa en DR-057/022.
 
 **Refinamiento de interfaz — G3C-3 (2026-07-29)**
 
-Para integrarse con la composición resuelta por DR-064/ADR-072, G3C-5 deberá
+En el checkpoint de G3C-3, para integrarse con la composición resuelta por
+DR-064/ADR-072, G3C-5 debía
 entregar, por competición/Q, una asignación médica de intervalos sobre
 ordinales de oportunidad además de share/restrictions. Health sigue sin asignar
 minutos ni poseer disciplina. La asignación debe ser consistente con el
 `MedicalAvailabilityEnvelope`; su generación matemática permanece en DR-057.
 
+**Contrato entrante confirmado por G3C-4 (2026-07-29)**
+
+Performance consume `fitness`, `fatigue` y
+`physicalRestrictionByTask ∈ [0,1]` ya resueltos. No deriva Health desde rating
+o production. Entrega minutos/exposición e intensidad contextual cerrados para
+G3C-5; esto no elige hazard, recovery o load dynamics de DR-057.
+
+**Cierre matemático G3C-5 (2026-07-29)**
+
+- Responsable: G3C-5 — Health, Injury, Recovery, Fatigue & Fitness.
+- ADR:
+  [ADR-074](adr/074-health-injury-recovery-mathematics.md).
+- Especificación:
+  [`HEALTH_INJURY_RECOVERY_MATH_SPEC.md`](HEALTH_INJURY_RECOVERY_MATH_SPEC.md).
+
+**Decisión matemática aceptada**
+
+- exposición competitiva/training genera dose rates positivas con
+  `softplus`; load usa `-expm1(-dose)`;
+- acute/chronic load usan EWMAs con
+  `0 <= rhoAcute < rhoChronic < 1`;
+- fatigue y fitness usan dos AR(1) independientes en espacio logit;
+- lesión nueva usa competing cumulative hazards
+  `H[j,o]=exposure[o]×exp(logRate[j,o])`;
+- el count usa `PoissonInverseCdfV1(H_total)` sin máximo;
+- family/origin usan categoricals ponderados por hazard;
+- severity usa Normal en logit;
+- recovery requirement usa LogNormal y progreso positivo con `softplus`;
+- disponibilidad usa readiness continuo, prefijos ordinales y exact union;
+- relapse usa hazard Poisson separado con parent causal y memoria exponencial;
+- sequela usa logistic/Bernoulli para existencia/tipo, Normal en logit para
+  burden y decay exponencial cuando es temporal;
+- Health solo emite signals por capability family; Development aplica wear;
+- LogNormal reutiliza `StandardNormalInverseCdfV1`; count/Bernoulli/categorical
+  reutilizan samplers ADR-073;
+- todos los purposes poseen streams/contexts separados y outcomes lógicos no
+  consumen RNG.
+
+**Alternativas rechazadas en G3C-5**
+
+Fitness `=1-fatigue`, minutos como única carga, ratio acute/chronic inestable,
+Bernoulli anual, count limitado, duration lookup, `injuredUntil`, suma de
+shares, cooldown de relapse, secuela que edita capabilities, hazard deportivo
+para evento externo y sampler local/rejection.
+
+**Estado de decisiones**
+
+G3B-E02, E03 y E05–E07 pasan a `PARTIAL_CALIBRATION`; ninguna conserva una
+familia o sampler abierto. G3B-E04 sigue `CONTENT_LATER` para las seis
+`InjuryFamilyDefinition` y E08 mantiene valores/targets externalizados.
+
+**Pendiente para cerrar DR-057**
+
+- valores completos de `EngineParameterSet.health`;
+- seis definitions mecánicas del slice con provenance;
+- producers de `medicalQuality`, training/preparation/recovery opportunity,
+  congestion y schedule de G3C-6;
+- schemas cuantitativos conformes a DR-063;
+- expected outputs/hashes de goldens;
+- CalibrationTargets/tolerancias y evidencia;
+- suites SMOKE/CALIBRATION/DEEP y replay cross-runtime aprobados.
+
+DR-057 permanece blocker de implementación por calibración/data, no por falta
+de matemática.
+
+**Reconciliación G3C-6 (2026-07-29)**
+
+ADR-075 cierra los producers agregados de medicalQuality, training exposure,
+training intensity, preparation, recovery opportunity, congestion y schedule
+difficulty. DR-057 ya no espera una familia matemática upstream, pero sí sus
+valores/calibración y el catálogo médico.
+
 ### DR-058 — Interés, ofertas, transferencias y valor de mercado
 
-**Estado:** Parcialmente resuelta — estructura aceptada el 2026-07-28;
-matemática, tiempo, moneda/calibración, elegibilidad y fixtures pendientes.  
+**Estado:** `PARTIAL_CALIBRATION` — estructura aceptada el 2026-07-28 y
+familias matemáticas cerradas el 2026-07-29; valores, data/policies,
+moneda/calibración, elegibilidad y fixtures pendientes.
 **Clasificación:** `BLOCKER_G3` para el flujo del slice; calibración monetaria
 vinculada a DR-027.
 
@@ -2587,7 +3040,8 @@ siguen abiertas en matemática y calibración.
 
 - el pipeline canónico es
   `MarketPerception → ClubNeed → TransferInterest → TransferOffer →
-  TransferNegotiation → PlayerDecision → TransferOutcome → ContractState`;
+  SellerResponse → ContractProposal → TransferNegotiation → PlayerDecision →
+  TransferOutcome → ContractState`;
 - percepción/valor son observer-specific, compatibles con `PlayerKnowledge` y
   usan Performance, exposición, contexto e incertidumbre, no latentes
   verdaderos;
@@ -2656,7 +3110,7 @@ Transfers produce facts públicos/deportivos autorizados. Reputation/Social los
 convierte en `PublicAttentionSignal`/updates mediante evidence keys; un fee,
 traslado o fracaso no impone directamente followers/reputation.
 
-**Pendiente para cerrar DR-058**
+**Pendiente al cierre de G3B**
 
 Funciones/distribuciones de percepción, need/fit, candidatos, interés, oferta,
 viabilidad, valoración, fee, salary, renovación, negociación y preferencias;
@@ -2664,13 +3118,64 @@ correlaciones; precisión/cuantización; streams; parámetros y targets; fixture
 tiempo/calendario de DR-021/067; moneda/conversión/calibración de DR-027; facts
 de DR-063; continuidad de DR-065; elegibilidad de DR-066.
 
-DR-058 conserva estado `BLOCKER_G3`; ADR-058 no autoriza gameplay.
+En ese checkpoint DR-058 conservaba estado `BLOCKER_G3`; ADR-058 por sí solo
+no autorizaba gameplay. G3C-7 refina este estado más abajo.
+
+**Interfaz recibida de G3C-6 (2026-07-29)**
+
+Club/World entrega sporting strengths, prestige, financialPower,
+PositionCompetition, tactical/league/world contexts y factor references.
+Ninguna es MarketValue, fee o salary. DR-065 sigue bloqueando candidatos y
+continuidad fuera del tier; G3C-6 no cierra la matemática de Transfers.
+
+**Cierre matemático G3C-7 (2026-07-29)**
+
+[ADR-076](adr/076-transfer-market-contract-mathematics.md) y
+[`TRANSFER_MARKET_CONTRACT_MATH_SPEC.md`](TRANSFER_MARKET_CONTRACT_MATH_SPEC.md)
+cierran:
+
+- enumeración canónica del universo autorizado y adapter reducido para clubes
+  externos sin elegir la policy DR-065;
+- `ClubNeed` logistic-Normal, `PlayerClubFit` derivado y proyección determinista
+  de oportunidad;
+- transición persistente de Interest y propensión de Offer con
+  logistic/Bernoulli, más stable softmax para operation;
+- valuation observer-specific y fee/salary separados en log-space;
+- `MarketReferenceValue` como weighted median canónica del panel versionado;
+- seller reservation/response, ContractExpectation/duration y negociación
+  agregada de una sola etapa;
+- renewal/loan, decisión automática futura y `WAITING_DECISION` sin resampling;
+- jerarquía market/region/club/specific, streams, invariantes, goldens y targets.
+
+La propuesta económica/de movimiento (`TransferOffer`) queda separada de
+`ContractProposal`; esta última se congela solo tras una respuesta compatible
+del seller. La negociación V1 es una única resolución agregada sobre términos
+congelados, no un loop ni una revisión implícita. La elección controlada por el
+usuario no consume RNG.
+
+No queda ecuación, familia de distribución o sampler abierto en
+G3B-G01–G04/G07. Siguen bloqueando implementación los valores publicados de
+`EngineParameterSet.transfers`, Definitions/catálogos/targets, DR-027
+(moneda/conversión/rango), DR-065 (scope externo), DR-066 (registration) y
+DR-067 (cursor/boundary efectivo). DR-058 permanece `BLOCKER_G3` de
+implementación por esas dependencias, no por ambigüedad matemática.
+
+**Adapter Reputation/Social G3C-9 (2026-08-01)**
+
+Cada Market occurrence congela Sporting Reputation/evidence purpose-scoped del
+último batch confirmado. Public awareness/followers no entran por defecto.
+Interest, fee, salary, MarketValue y transfer outcome actuales no realimentan
+su propia occurrence. Market solo emite facts/signals tipados; el batch de
+`SEASON_CLOSE` puede convertir visibility/reach de una transferencia en
+attention futura, nunca usar fee como mérito deportivo. DR-058 permanece
+`PARTIAL_CALIBRATION`/bloqueada por las policies ya enumeradas.
 
 ### DR-059 — Campo de competencia de selección nacional
 
 **Clasificación:** `BLOCKER_G3`.
-**Estado de resolución:** Parcialmente resuelta; estructura aceptada el
-2026-07-28, matemática, elegibilidad y calendario/cursor pendientes.
+**Estado de resolución:** `PARTIAL_CALIBRATION`; estructura aceptada el
+2026-07-28 y matemática cerrada por ADR-077 el 2026-08-01. Valores,
+elegibilidad, data y calendario/cursor permanecen pendientes.
 
 **Origen**
 
@@ -2778,19 +3283,45 @@ suboperaciones, cursor y boundaries y versionar cualquier cambio.
 
 **Pendiente para cerrar DR-059**
 
-Funciones/distribuciones de field, candidate signal, call-up, squad, role,
-minute share, support/contribution y outcome; dominios, precisión,
-correlaciones, stream contexts, parámetros, fixtures y targets; calendario,
-torneos y cursor de DR-021; schemas conformes a facts DR-063/ADR-010;
-eligibility DR-068 y catálogo real DR-025.
+Values de `EngineParameterSet.nationalTeam`, Definitions/torneos/cupos y
+sources de DR-025, calendario/cursor de DR-021, eligibility DR-068, evidence
+mappings, schemas finales, expected goldens, targets y Monte Carlo.
 
-DR-059 conserva estado `BLOCKER_G3`; ADR-059 no autoriza gameplay.
+Ese era el estado estructural previo a G3C-8; ADR-077 lo refina abajo.
+
+**Contrato entrante confirmado por G3C-4 (2026-07-29)**
+
+El resolver de Performance acepta `ParticipationContext = NATIONAL_TEAM` con
+streams, minutos y summaries separados. National Team recibirá task/summary
+projections, production y evidence; G3C-4 no elige candidate signal, call-up,
+role, international outcome o calendario.
+
+**Cierre matemático G3C-8 (2026-08-01)**
+
+ADR-077 y
+[`NATIONAL_TEAM_AWARDS_MATH_SPEC.md`](NATIONAL_TEAM_AWARDS_MATH_SPEC.md)
+cierran candidate merit, mixture Gaussian core/elite, moments/relative signal,
+logistic call-up y squad, incumbency AR(1), adapter softmax/Logit-Normal/GH10,
+generation/team strength AR(1), support/contribution, group rank, knockout
+Bernoulli, streams, invariantes, goldens y targets.
+
+No queda fórmula, distribución o sampler abierto en H01–H04. DR-059 pasa a
+`PARTIAL_CALIBRATION`: siguen bloqueando implementación los values de
+`EngineParameterSet.nationalTeam`, Definitions/sources de DR-025, calendario y
+cursor de DR-021, eligibility DR-068, evidence mappings, goldens y Monte Carlo.
+
+**Adapter G3C-9 (2026-08-01):** Selection consume Sporting Reputation lagged
+del snapshot confirmado anterior a candidate evaluation. Call-up/debut/
+achievement actuales producen evidence para el batch posterior; no cambian su
+propia convocatoria, role o minutes. Followers, MarketValue y CareerScore
+permanecen excluidos.
 
 ### DR-060 — `AwardCompetitionField` y resolución de premios
 
 **Clasificación:** `BLOCKER_G3`.
-**Estado de resolución:** Parcialmente resuelta; estructura aceptada el
-2026-07-28, matemática, posición, catálogo y fixtures pendientes.
+**Estado de resolución:** `PARTIAL_CALIBRATION`; estructura aceptada el
+2026-07-28 y matemática cerrada por ADR-077 el 2026-08-01. Valores, catálogo,
+evidencia y fixtures permanecen pendientes.
 
 **Origen**
 
@@ -2902,18 +3433,45 @@ DR-060; permanecen field, matemática, posición, catálogo y fixtures.
 
 **Pendiente para cerrar DR-060**
 
-Distribuciones de fields, candidate signal, judging, placement y empate;
-parámetros por Definition; posición dominante DR-049; scope DR-048; métricas GK
-DR-055; catálogo real DR-025; schemas conformes a facts DR-063/ADR-010;
-precisión, stream contexts, fixtures y targets.
+Values de `EngineParameterSet.awards`, AwardDefinitions/field sizes/allowed
+features del catálogo DR-025, evidence mappings, expected goldens, targets y
+Monte Carlo. Métricas GK adicionales solo se requieren cuando una Definition
+con consumer real las autorice; DR-049 ya resuelve dominancia.
 
-DR-060 conserva estado `BLOCKER_G3`; ADR-060 no autoriza gameplay.
+Ese era el estado estructural previo a G3C-8; ADR-077 lo refina abajo.
+
+**Contrato entrante confirmado por G3C-4 (2026-07-29)**
+
+Awards podrá consumir summaries purpose-scoped por posición, pressure
+breakdown, production y evidence. CM usa cuatro impactos y GK separa
+shot-stopping/command/distribution del entorno. Performance no elige field,
+weights, placement o ganador; goals/assists no son métrica universal.
+
+**Cierre matemático G3C-8 (2026-08-01)**
+
+ADR-077 cierra utility parametrizada por profile/posición, comparative Normal
+field, statistical NB2 field, exact indexed draws, judging noise, un único rank
+ordinal, tie policies sin RNG, streams, invariantes, goldens y targets.
+DR-049 ya aporta dominancia por exposición efectiva del período.
+
+No queda fórmula, distribución, sampler o tie algorithm abierto en I02–I04.
+DR-060 pasa a `PARTIAL_CALIBRATION`: faltan values de
+`EngineParameterSet.awards`, AwardDefinitions/field sizes de DR-025, evidence
+mappings, targets, goldens y únicamente las métricas GK con consumer real.
+Awards sigue sin aplicar score o anti-duplicación.
+
+**Adapter G3C-9 (2026-08-01):** cada AwardDefinition solo puede consumir el
+snapshot lagged de Sporting/Public Reputation expresamente autorizado. El
+outcome actual entra al `ReputationSocialUpdateBatch` posterior; jamás vuelve a
+la utility, field, placement o tie de su propia edición. Award visibility usa
+Definition/context de gameplay, no puntos de Scoring.
 
 ### DR-061 — Reputación deportiva, reputación pública y seguidores
 
-**Clasificación:** `BLOCKER_G3` para estados/fórmulas; regiones y textos pueden ser `CONTENT_LATER`.
-**Estado de resolución:** Parcialmente resuelta; estructura aceptada el
-2026-07-28, matemática ejecutable pendiente.
+**Clasificación:** `PARTIAL_CALIBRATION`; regions/definitions continúan en
+data/content y los values bloquean gameplay oficial.
+**Estado de resolución:** `PARTIAL_CALIBRATION` — estructura aceptada el
+2026-07-28 y matemática cerrada el 2026-08-01 por ADR-078.
 
 **Origen**
 
@@ -2980,18 +3538,37 @@ world cycles, pero prestigio del club no se copia como reputación del jugador.
 Una misma señal colectiva se referencia una vez. Fórmulas y estados regionales
 siguen en DR-061.
 
-**Pendiente para cerrar DR-061**
+**Cierre matemático G3C-9 (2026-08-01)**
 
-- dominios, escalas, precisión, cuantización y serialización;
-- ecuaciones de memoria/decay/actualización;
-- familia de cambios enteros de followers, churn, overdispersion y colas;
-- dinámica de Public Attention/Engagement;
-- regional diffusion, agregación y audiencias superpuestas;
-- correlaciones y shared-shock loadings;
-- contexts de streams, parámetros iniciales, golden fixtures y targets;
-- mercados concretos, fuentes y topología del slice junto con DR-025;
-- schemas concretos conformes a facts, aliases e idempotencia de
-  DR-063/ADR-010.
+[ADR-078](adr/078-reputation-public-attention-social-mathematics.md) y
+[`REPUTATION_SOCIAL_MATH_SPEC.md`](REPUTATION_SOCIAL_MATH_SPEC.md) fijan:
+
+- estados unitarios `0..10000`, sentiment signed `-10000..10000`, followers
+  exactos `uint64` y `ROUND_HALF_EVEN`;
+- AR(1) logit separado para Sporting, awareness, sentiment, attention y
+  engagement;
+- impulses feature-based, evidence gating, `EvidenceKey`, watermark y
+  `CanonicalPairwiseSumV1`;
+- evidence memory exponencial por source family;
+- mercados data-driven, audience partitions no superpuestas, difusión regional
+  lagged de un paso y global derivado;
+- acquisition/churn `softplus` en `log1p(followers)` y cola viral Bernoulli;
+- shocks global/regional/causal/específicos con streams aislados;
+- batches atómicos en `CONSEQUENCES(Qn)` y `SEASON_CLOSE`, sin fase nueva;
+- facts, invariants, CalibrationTargets, tail diagnostics y golden requirements.
+
+No queda ecuación, distribución, sampler, quantization, order o stream family
+abierta para G3B-K01/K02/K05.
+
+**Pendiente para completar calibración/publicación**
+
+- todos los values `INITIAL_CALIBRATION_REQUIRED`;
+- mercados, audience partitions, reach y public profiles concretos del slice
+  junto con DR-025/data/content;
+- evidence datasets/provenance y tolerancias de targets;
+- expected outputs/hashes de golden fixtures y Monte Carlo aprobado;
+- schemas concretos conformes a DR-063/ADR-010;
+- Scoring PBR en DR-010 y Retirement/finalization en DR-062/069.
 
 **Tests/gates requeridos**
 
@@ -3004,13 +3581,47 @@ siguen en DR-061.
 - contenido no escribe followers/reputation por bypass;
 - ningún output crea ScoreLedger.
 
-DR-061 conserva estado `BLOCKER_G3`; ADR-061 no autoriza gameplay.
+DR-061 queda `PARTIAL_CALIBRATION`; ADR-061/078 no autorizan gameplay con
+values provisionales.
+
+**Contrato entrante confirmado por G3C-4 (2026-07-29)**
+
+Reputation consume facts observables/summaries mediante `EvidenceKey`;
+Performance no emite una segunda reputation signal automática ni expone
+capabilities/latentes. Esto evita contar la misma actuación mediante production,
+rating y reputation, y no cierra ecuaciones de DR-061.
+
+**Interfaz con Market confirmada por G3C-7 (2026-07-29)**
+
+Transfers consume únicamente el snapshot autorizado de
+`SportingReputationState` por observador/mercado y su evidence context. No usa
+Public Reputation, Followers o CareerScore como sustitutos de calidad. Los
+movimientos y contratos producen facts/evidence para el owner de Reputation;
+no escriben reputation, attention o followers directamente. G3C-9 fija el
+snapshot lagged y procesa esos facts solo en el batch posterior.
+
+**Interfaz con Selection/Awards confirmada por G3C-8 (2026-08-01)**
+
+Selection consume solo SportingReputation lagged/autorizada. Una
+AwardDefinition puede autorizar Sporting/Public Reputation lagged; la edición
+actual nunca consume reputación generada por su propio outcome. Call-ups,
+international achievements y AwardWon son evidence downstream futura. G3C-8
+no define updates, followers o feedback y DR-061 sigue abierta para G3C-9.
+
+**Interfaz cerrada por G3C-9 (2026-08-01)**
+
+Performance entrega evidence purpose-scoped; Market, Selection y Awards
+consumen snapshots confirmados lagged. Public facts actuales entran una vez al
+batch posterior. Followers nunca alimenta awareness del mismo batch y un Award
+no consume reputación generada por su propio outcome. Content solo emite
+profiles/signals autorizados; no deltas. DR-010 conserva PBR y DR-062/069
+Retirement/finalization.
 
 ### DR-062 — Hazard y proceso de retiro
 
-**Clasificación:** `BLOCKER_G3`.
-**Estado de resolución:** Parcialmente resuelta; estructura aceptada el
-2026-07-28, matemática, cursor y finalización pendientes.
+**Clasificación:** `PARTIAL_CALIBRATION`; sin blocker de familia matemática.
+**Estado de resolución:** Matemática, cursor y finalización cerrados por
+ADR-079 el 2026-08-01; values/targets/golden outputs pendientes.
 
 **Origen**
 
@@ -3064,12 +3675,29 @@ traits ocultos salvo contrato autoritativo ni transforma una lesión en retiro
 automático. Health no calcula el hazard de retiro. Cadencia, motivación,
 contratos, función, streams y fixtures permanecen en DR-062.
 
+**Interfaz Health cerrada por G3C-5 (2026-07-29)**
+
+Retirement podrá consumir `activeHealthBurden`,
+`historyBurdenByFamily`, `persistentSequelaBurden` y
+`recoveryStatusSummary`, todos derivados por ADR-074. Ninguno es outcome de
+retiro ni expone `injuryFragility`/`recoveryCapacity` por defecto. DR-062
+conserva íntegramente hazard, motivation, comeback y finalization pendientes.
+
+**Interfaz Reputation/Social cerrada por G3C-9 (2026-08-01)**
+
+Retirement puede consumir snapshots confirmados de Sporting Reputation,
+awareness y Public Attention, junto con history/evidence refs. Followers y
+engagement no se convierten en motivation ni immunity por defecto. Estos inputs
+son contexto lagged; G3C-9 no define hazard, causes, decisions o comeback y no
+cambia el estado de DR-062.
+
 **Conflicto y dependencia nueva**
 
 ADR-013/043 no contiene una fase mecánica Retirement, mientras `MASTER_SPEC`
 permite comeback pero también declara que el MVP termina con retiro/resumen.
-DR-069 debe decidir cursor posretiro, boundary irreversible, freeze de scoring,
-ranking, perfil y terminación práctica sin edad máxima.
+Este conflicto queda resuelto posteriormente por ADR-079: cursor posretiro,
+boundary irreversible, freeze de facts/scoring, ranking, perfil y terminación
+tooling sin edad máxima.
 
 **Pendiente para cerrar DR-062**
 
@@ -3092,7 +3720,19 @@ ranking, perfil y terminación práctica sin edad máxima.
 - `CareerStatus.RETIRED` sigue irreversible;
 - parámetros/golden fixtures/Monte Carlo aprobados.
 
-DR-062 conserva estado `BLOCKER_G3`; ADR-062 no autoriza gameplay.
+**Cierre matemático G3C-10 (2026-08-01)**
+
+ADR-079 y la spec G3C-10 seleccionan Motivation sigmoid, age sigmoid suave,
+decline EWMA, competing risks log-lineales integrados, Bernoulli inverse-CDF y
+categorical canónico. Comeback/FinalizationOpportunity usan hazards separados;
+user/manual decisions no consumen RNG; no existen threshold, edad máxima,
+cooldown o forced retirement. Quarters/seasons continúan durante retiro abierto
+y multiple cycles son válidos.
+
+La lista histórica “Pendiente para cerrar DR-062” queda superseded. Restan
+únicamente coefficients/sigmas, data definitions, targets, expected goldens y
+schemas ejecutables. DR-062 queda `PARTIAL_CALIBRATION`; no autoriza gameplay
+hasta publicar esos artefactos.
 
 ### DR-063 — Catálogo de hechos matemáticos y allowlist de scoring
 
@@ -3150,6 +3790,15 @@ Se adopta:
 - migraciones preservan procedencia y no duplican ocurrencias;
 - los tests detallados de
   [`SCORING_FACTS_SPEC.md`, §16](SCORING_FACTS_SPEC.md#16-tests-y-evidencia-requerida).
+
+**Refinamiento de payload G3C-9 (2026-08-01)**
+
+Sin crear tipos nuevos, `SportingReputationUpdated` conserva standing/evidence
+before-after, accepted EvidenceKeys y causal refs; `PublicReputationUpdated`,
+awareness/sentiment; `FollowerCountUpdated`, breakdown/total `uint64` y delta
+signed decimal canónico; `EngagementUpdated`, rates por partition. `PublicAttentionGenerated`
+identifica profile/decay family pero nunca impone un state delta. La allowlist
+no cambia y la matemática PBR continúa en DR-010.
 
 **Origen**
 
@@ -3242,6 +3891,15 @@ ni UUID aleatorio. Ningún fact de Health crea `ScoreLedgerEntry`. La
 clasificación, nombres, aliases, identidad, idempotencia y allowlist quedaron
 cerrados posteriormente por DR-063/ADR-010; precisión y schema cuantitativo
 siguen en DR-057.
+
+**Reconciliación G3C-5 (2026-07-29)**
+
+ADR-074 no añade aliases: `InjuryOccurred`, `RelapseOccurred` y
+`SequelaRecorded` siguen siendo facts canónicos; recovery/return/resolution
+usan `HealthConditionTransitioned`, fitness/fatigue usan
+`PlayerDynamicStateChanged`, `MedicalAvailabilityCalculated` es summary y
+`LoadRecorded` signal interno. Hazard components/draws permanecen trace. Ningún
+fact de Health entra al allowlist directo de Scoring.
 
 **Refinamiento parcial de G3B — Bloque 6 (2026-07-28)**
 
@@ -3338,6 +3996,16 @@ evidence/causal references y versiones. Ninguno crea ScoreLedger.
 DR-063/ADR-010 ya cierran nombres, clasificación, idempotencia, aliases y
 allowlist; precisión y schemas cuantitativos permanecen en DR-061/062.
 
+**Refinamiento lifecycle G3C-10 (2026-08-01)**
+
+`RetirementOpportunityGenerated`, `ComebackOpportunityGenerated` y
+`FinalizationOpportunityGenerated` quedan como `INTERNAL_SIGNAL`; una elección
+se persiste mediante `DecisionRequested/DecisionResolved`. Se añade
+`CareerFinalizationConfirmed` como `PERSISTED_DOMAIN_FACT` único que cierra el
+terminal cursor/fact frontier. `CareerFinalizationRequested` permanece comando/
+internal signal y `CareerCompleted` referencia el boundary, final snapshot,
+integridad y consolidación. No se crea ScoreLedger desde lifecycle.
+
 **Resolución final G3B — Bloque 10 (2026-07-28)**
 
 El catálogo provisional anterior queda reconciliado por
@@ -3361,6 +4029,32 @@ El catálogo provisional anterior queda reconciliado por
 
 Esta resolución cierra DR-063. El schema TypeScript/Zod y la implementación
 pertenecen a una fase posterior y deberán satisfacer esta semántica.
+
+**Confirmación G3C-4 (2026-07-29)**
+
+`ObservedProductionRecorded` conserva counts enteros y scopes;
+`PerformanceSummaryRecorded`/`SeasonPerformanceSummaryRecorded` conservan
+dimensiones cuantizadas, evidence, uncertainty, pressure y splits.
+`EffectiveCapabilitiesResolved`/`UnderlyingPerformanceRecorded` siguen siendo
+internal signals y no se crea `PressurePerformanceRecorded` duplicado. La
+matemática no reabre el catálogo ni la allowlist.
+
+**Confirmación G3C-7 (2026-07-29)**
+
+La matemática de Market reutiliza el catálogo cerrado: Interest, Offer,
+Negotiation, Contract, Transfer y Loan conservan identidades causales distintas;
+`TransferCompleted.movementType` cubre free transfer y no se crea un fact
+paralelo para `ContractProposal`. Perception, need, valuation y términos
+propuestos permanecen state/summary/trace salvo un consumidor explícito. Ningún
+fact monetario entra al allowlist de Scoring.
+
+**Confirmación G3C-8 (2026-08-01)**
+
+Se preserva el catálogo: call-up, squad e InternationalRole usan sus facts
+canónicos; minutos/Performance/Competition reutilizan facts genéricos con
+`contextType=NATIONAL_TEAM`; Awards usa `AwardNominated`,
+`AwardPlacementRecorded` y `AwardWon`. Eligibility, candidates y fields son
+signals/summaries. No se crean aliases ni `ScoreLedgerEntry`.
 
 ### DR-064 — Disponibilidad no médica y agregación autoritativa
 
@@ -3446,9 +4140,10 @@ facts causales de disciplina/salud conservan su propio catálogo.
 
 **Impacto**
 
-DR-054 puede consumir `availableMinutes` sin ambigüedad. G3C-5 debe producir la
-asignación médica compatible; G3C-6 produce el dominio de oportunidad. Esto no
-implementa tarjetas ni disciplina y no cierra DR-021/057.
+DR-054 puede consumir `availableMinutes` sin ambigüedad. ADR-074/G3C-5 cierra
+la asignación médica compatible; G3C-6 produce el dominio de oportunidad. Esto
+no implementa tarjetas ni disciplina y no cierra DR-021 ni la calibración/data
+de DR-057.
 
 **Tests y gates**
 
@@ -3463,8 +4158,9 @@ implementa tarjetas ni disciplina y no cierra DR-021/057.
 
 ### DR-021 — Calendario, fecha inicial y evolución de formatos
 
-**Estado:** Parcialmente resuelta — `BLOCKER_G3` para generación/formato del
-calendario e integración temporal restante.
+**Estado:** `PARTIAL / DATA_REQUIRED` — G3D-2 cierra el boundary post-season y
+el contrato stage-to-Q; generación, formatos, ventanas internacionales y datos
+temporales siguen siendo `BLOCKER_G3`.
 
 **Problema**
 
@@ -3562,10 +4258,51 @@ contra un input. DR-021 permanece parcial por fecha/label visible inicial,
 generación de oportunidad, formatos/fases/cupos, extrapolación futura,
 calendario internacional y boundaries de Market/DR-067.
 
+**Contrato requerido por G3C-5 (2026-07-29)**
+
+Calendar/Club debe producir, por Q y contexto:
+
+- `trainingExposure ∈ [0,1]`;
+- `trainingIntensitySignal ∈ [0,1]`;
+- `preparationSignal ∈ [0,1]`;
+- `recoveryOpportunity ∈ [0,1]`;
+- `congestionSignal ∈ [0,1]`;
+- `scheduleDifficulty ∈ [0,1]`.
+
+Health consume esos inputs para load/recovery, pero no los genera. No implican
+sesiones o fechas diarias. DR-021 sigue parcial hasta que G3C-6 cierre sus
+producers junto con oportunidad/formato/calendario.
+
+**Resolución parcial G3C-6 (2026-07-29)**
+
+ADR-075 cierra para club competitions:
+
+- phase graphs asignados a Q;
+- match equivalents y `TeamMinutesOpportunity` enteros;
+- difficulty, congestion, pressure, training, preparation y recovery
+  producers;
+- oportunidad solo para phases garantizadas o previamente alcanzadas;
+- `CompetitionProgressionCheckpoint` dentro de `CONSEQUENCES(Qn)` para
+  habilitar Q futuras sin añadir una fase al cursor;
+- consolidación en `COMPETITIONS` sin volver a samplear.
+
+DR-021 permanece parcial por fecha/label visible inicial, mappings de calendario
+real, extrapolación de formatos, calendar internacional y boundaries de
+Market/DR-067. Las Definitions concretas del slice siguen en DR-025/065.
+
+**Confirmación G3C-7 (2026-07-29)**
+
+Market consume un `MarketWindowContext` ya producido, identificado y congelado.
+Sus señales de heat/urgency/legality pueden modificar need, interest, offer y
+completion, pero la matemática de Transfers no inventa fechas, no abre una
+ventana y no añade una operación al cursor. La resolución es válida en cualquier
+boundary futuro autorizado; DR-067 sigue decidiendo si existe uno entre Qs.
+
 ### DR-022 — Modelo agregado de competiciones y mundo
 
-**Estado:** Parcialmente resuelta — estructura aceptada el 2026-07-28;
-matemática, calendario, datos, scope y fixtures pendientes.
+**Estado:** `PARTIAL_CALIBRATION` — estructura aceptada el 2026-07-28 y
+familias matemáticas cerradas el 2026-07-29; valores, datos, scope, policy,
+schemas, targets y fixtures pendientes.
 
 **Problema**
 
@@ -3719,6 +4456,47 @@ Selection/Awards/Market.
 
 DR-022 conserva estado `BLOCKER_G3`; ADR-022 no autoriza gameplay.
 
+**Resolución matemática parcial G3C-6 (2026-07-29)**
+
+[ADR-075](adr/075-club-competition-world-mathematics.md) y
+[`CLUB_COMPETITION_WORLD_MATH_SPEC.md`](CLUB_COMPETITION_WORLD_MATH_SPEC.md)
+cierran:
+
+- dominios acotados, logit seguro y `ROUND_HALF_EVEN`;
+- AR(1) separados de sporting strength, prestige, finance, stability,
+  institutional qualities y league strength;
+- cumulative hazard de manager turnover y factor model de manager/táctica;
+- predictor de TacticalFit y AR(1) de PositionCompetition;
+- phase graph, match equivalents, opportunity y context producers;
+- support field, contribution y competition outcomes;
+- Normal hierarchy/cycles, streams y atomic world update;
+- boundary matemático de promotion/relegation.
+
+G3B-F05/F06/J02–J04 pasan a `PARTIAL_CALIBRATION`. No queda una ecuación,
+familia o sampler abierto en esas filas.
+
+**Pendiente después de G3C-6**
+
+- valores y targets de `EngineParameterSet.clubWorld/competitions`;
+
+- CompetitionDefinitions, baselines, participants y sources de DR-025;
+- fecha/formatos/boundaries restantes de DR-021;
+- scope, pool, materialización y continuidad de DR-065;
+- schemas concretos conformes a DR-063;
+- expected outputs y hashes de goldens;
+- calibración Monte Carlo y adapters downstream G3C-7/G3C-8.
+
+DR-022 sigue `BLOCKER_G3` por calibración/data/policy, no por falta de familia
+matemática local.
+
+**Interfaz hacia Market confirmada por G3C-7 (2026-07-29)**
+
+Club/World es owner de `PositionCompetition`, PositionScarcity,
+`TacticalIdentity`, financialPower, prestige, strength, wage/spending context y
+factores market/region. Transfers consume snapshots por ID y no los recalcula.
+El adapter reducido para un eventual club externo está especificado, pero no
+autoriza el pool ni cierra DR-065.
+
 **Refinamiento de interfaz — G3B Bloque 7 (2026-07-28)**
 
 Club/World es owner de `ClubNeed`, `PositionScarcity`, `financialPower`,
@@ -3742,7 +4520,9 @@ distribuciones, correlaciones, streams y fixtures continúan en DR-022/059/060.
 
 ### DR-065 — Scope competitivo, pools externos y continuidad fuera del tier
 
-**Clasificación:** `BLOCKER_G3` para Club/Competitions del vertical slice.
+**Clasificación:** `RESOLVED_POLICY / DATA_REQUIRED` para Club/Competitions del
+vertical slice. Arquitectura cerrada por ADR-081; implementación bloqueada por
+catálogo, fields, reglas y goldens.
 
 **Origen**
 
@@ -3812,12 +4592,42 @@ persisten aunque el club salga del tier detallado. No se fuerza transferencia,
 rescisión, agente libre ni retiro. Market solo puede generar need, candidatos,
 interés u oferta para ese contexto si el scope/pool aporta identidades,
 finanzas, calendario y conocimiento autorizados. No se resuelve Performance o
-mercado fuera del tier por inferencia. DR-065 permanece abierta.
+mercado fuera del tier por inferencia. Este era el estado previo a la resolución
+G3D-2/ADR-081 registrada más abajo.
+
+**Refinamiento matemático G3C-6 (2026-07-29)**
+
+El canonical ranking y los slots declarados pueden determinar exactamente
+`MobilityTransitionRequest`. Ese request no materializa un club promovido, no
+actualiza membership y no emite `PromotionOccurred`/`RelegationOccurred`.
+
+La aplicación sigue requiriendo la policy de esta DR. El math spec declara el
+input mínimo que una eventual continuidad abstracta debe producir para Role,
+Performance, Health, Development, Market y Scoring, pero no elige pool,
+identidades, sources, calendario o eligibility. DR-065 continúa abierta y
+bloqueante.
+
+**Adapter requerido por G3C-7 (2026-07-29)**
+
+Un candidato fuera del tier solo puede entrar al field de Market cuando una
+policy futura entregue identidad autorizada, sporting context, prestige,
+financialPower, league/region, PositionCompetition/need, tactical context y
+monetary/wage capacity references. La enumeración de candidatos es canónica
+sobre ese scope; no samplea ni inventa identidades. Este contrato no eligió en
+G3C el pool, materialización, calendario o continuity.
+
+**Resolución de política G3D-2 (2026-08-07)**
+
+Se acepta la opción híbrida de ADR-081: identidades nominales reales y
+versionadas, fields no identificables para contexto y materialización
+determinista al requerir club contractual, champion u otro fact nominal. La
+policy está cerrada; catálogo, participantes, movilidad, adapters y expected
+goldens permanecen `DATA_REQUIRED`.
 
 ### DR-066 — Elegibilidad e inscripción después de movimientos
 
-**Clasificación:** `BLOCKER_G3` para movimientos mid-season y participación
-posterior; no bloquea el contrato/afiliación aislados.
+**Clasificación:** `RESOLVED_POLICY / DATA_REQUIRED` para el slice post-season.
+Mid-season continúa fuera de alcance y no queda habilitado.
 
 **Origen**
 
@@ -3862,9 +4672,25 @@ temporada, agregación competitiva, awards/selection/scoring por scope y golden
 fixtures de loans/transfers. El engine puede modelar la frontera, pero no
 conceder o denegar inscripción por inferencia.
 
+**Confirmación G3C-7 (2026-07-29)**
+
+`TransferCompleted`, `LoanStarted`, `LoanEnded` y la afiliación/contrato
+resultante son independientes de `RegistrationEligibility`. El resolver exige
+legalidad de la ventana y acuerdos aplicables, pero no infiere elegibilidad por
+competición ni fecha efectiva de registro.
+
+**Resolución de política G3D-2 (2026-08-07)**
+
+La inscripción V1 se evalúa para la temporada siguiente cuando el movimiento
+post-season se hace efectivo. Requiere holder, sporting club, ventana,
+membresía, CompetitionDefinition y policy explícita por scope. Una ausencia de
+regla produce `PENDING_DATA`; nunca elegibilidad universal. Falta publicar las
+policies/data y sus fixtures.
+
 ### DR-067 — Cadencia de mercado y movimientos entre Qs
 
-**Clasificación:** `BLOCKER_G3` para transferencias mid-season.
+**Clasificación:** `RESOLVED_POLICY / DATA_REQUIRED` para V1; mid-season queda
+diferido explícitamente.
 
 **Origen**
 
@@ -3914,9 +4740,25 @@ vigente al inicio de la Q. Un cambio posterior no reabre minutos cerrados.
 G3C-3 no introduce un boundary de mercado ni resuelve DR-067; cualquier
 movimiento mid-season sigue requiriendo la decisión de cursor aquí registrada.
 
+**Confirmación G3C-7 (2026-07-29)**
+
+Interest, Offer, seller response, ContractProposal y negociación pueden
+resolverse de forma determinista dentro de un `MarketWindowContext` autorizado.
+Antes de `WAITING_DECISION` quedan congelados términos, respuestas, IDs y
+random-progress; reanudar no resamplea. G3C-7 no decidió dónde aparece ese
+boundary en el cursor ni habilitó movimientos mid-season.
+
+**Resolución de política G3D-2 (2026-08-07)**
+
+V1 utiliza exclusivamente la fase `MARKET` post-season existente. No se añade
+una fase ni cursor entre Qs. Los términos previos a `WAITING_DECISION` quedan
+congelados y el movement se aplica atómicamente antes de la temporada siguiente
+después de validar DR-066. Falta publicar el calendar/window dataset y goldens.
+
 ### DR-068 — Nacionalidad deportiva y elegibilidad internacional del vertical slice
 
-**Clasificación:** `BLOCKER_G3` para la selección nacional del vertical slice.
+**Clasificación:** `RESOLVED_POLICY / DATA_REQUIRED` para V1. ADR-082 cierra la
+nacionalidad deportiva; falta el manifest/dato autoritativo.
 
 **Origen**
 
@@ -3965,10 +4807,26 @@ de cambio de elegibilidad. La estructura de `NationalTeamState`,
 `SelectionCompetitionField` y Awards puede diseñarse sin resolverlo; no puede
 implementarse una carrera internacional end-to-end por inferencia.
 
+**Confirmación G3C-8 (2026-08-01)**
+
+El resolver matemático acepta únicamente el output tipado de
+`NationalTeamEligibility`. Un status distinto de `ELIGIBLE` fuerza call-up
+cero y consume cero RNG; ausencia/ambigüedad produce error/pending policy, no
+inelegibilidad inferida. Esta frontera permitió cerrar Selection math sin elegir
+en G3C una nacionalidad, transición o regla.
+
+**Resolución de política G3D-2 (2026-08-07)**
+
+Argentina es la nacionalidad deportiva inicial y única del protagonista V1.
+Jugar en España no otorga elegibilidad. Segundas nacionalidades, ascendencia,
+naturalización y cambio de asociación quedan fuera del slice. La policy está
+cerrada por ADR-082; faltan `NationalTeamDefinition`, campo autoritativo,
+provenance y goldens.
+
 ### DR-069 — Finalización tras retiro y ventana de regreso
 
-**Clasificación:** `BLOCKER_G3` para Retirement, cursor terminal, scoring final
-y vertical slice end-to-end.
+**Clasificación:** `RESOLVED` — cursor, boundary y terminación definidos por
+ADR-079; implementación depende de G3C-11 y gates de calibración.
 
 **Origen**
 
@@ -4043,21 +4901,26 @@ Sin decidir el orden atómico exacto, queda fijado que:
   existentes;
 - el ledger final referencia la `scoringVersion` y el fact set cerrado.
 
-DR-069 continúa pendiente por cursor posretiro, confirmación irreversible,
-atomicidad exacta, terminación práctica y policy del slice.
+Este era el estado anterior a G3C-10; la resolución normativa al final de esta
+sección supersede la apertura de cursor, atomicidad y policy.
+
+**No cierre por G3C-9 (2026-08-01):** Reputation/Social puede continuar
+evolucionando mientras la Career permanezca abierta y entrega snapshots a
+Retirement. Sus batches Q/season-close no crean un cursor posretiro, no
+confirman `CareerStatus.RETIRED`, no congelan Scoring y no resuelven ninguna
+pregunta de esta DR.
 
 **Dependencias**
 
 ADR-013, ADR-016, ADR-017, ADR-043, ADR-062; DR-008, DR-010, DR-021, DR-062,
 DR-063 y las reglas de scoring/profile/ranking aplicables.
 
-**Impacto y gate**
+**Impacto histórico y gate vigente**
 
-Bloquea G3B-L01/L04, runner posretiro, comeback end-to-end, transición
-irreversible, scoring final, `CareerCompleted`, tarjeta final, ranking y golden
-fixtures terminales. La estructura de Reputation/Social, hazard y episodios
-puede especificarse sin resolverla; no se implementa finalización por
-inferencia.
+Antes de G3C-10 bloqueaba G3B-L01/L04, runner posretiro, comeback end-to-end y
+la transición irreversible. ADR-079 levanta ese blocker normativo. La
+implementación sigue esperando G3C-11, schemas, ParameterSet, goldens e
+integración de ranking; no se implementa finalización parcial.
 
 **Tests/evidencia requeridos**
 
@@ -4073,6 +4936,38 @@ inferencia.
   cap de edad o tiempo;
 - golden fixtures cubren cierre normal, comeback, segundo retiro, abandono e
   invalidación.
+
+**Resolución G3C-10 (2026-08-01)**
+
+Se adopta la policy C para `CareerStatus.RETIRED`: se reserva exclusivamente a
+la etapa irreversible **FINALIZING**. El retiro deportivo reversible sigue en
+`PlayerPlayingStatus.RETIRED` con Career `ACTIVE/WAITING_DECISION`.
+
+El cursor no crea otra timeline. Al inicio de `AVAILABILITY(Qn)` ejecuta
+`.lifecycle.retirement`, `.lifecycle.comeback` y `.lifecycle.finalization`.
+Quarters/seasons siguen durante retiro abierto; módulos on-field y National
+Team quedan lógicamente en cero, Health/Development/World/Market adapter/
+Reputation/Social continúan conforme a sus contracts.
+
+`FinishCareer`, manual o ante una `FinalizationOpportunity`, solo se confirma
+en boundary seguro con playing retirado. La confirmación:
+
+1. emite `CareerFinalizationConfirmed` con terminal cursor y último gameplay
+   fact ordinal;
+2. calcula el closed fact set hash incluyendo ese boundary;
+3. entra en `CareerStatus.RETIRED`/FINALIZING;
+4. prohíbe nuevos gameplay/comeback/score-affecting facts;
+5. ejecuta ledger/snapshot/integrity/profile de forma idempotente;
+6. emite `CareerCompleted` y entra en `COMPLETED` al commit final.
+
+Solo `COMPLETED` íntegra/compatible y con final ScoreSnapshot puede rankear. No
+hay reopening, edad máxima, forced finalization ni conversión de
+`ABANDONED`/`INVALIDATED` en completion. Monte Carlo usa automation versionada
+fuera del gameplay; un guard devuelve `INCONCLUSIVE_GUARD_REACHED` como
+right-censored y no muta facts/status/score.
+
+No queda policy de producto abierta en DR-069. Restan implementación posterior
+a G3C-11, values/calibration y schemas, pero no reabren esta decisión.
 
 ### DR-045 — Parámetros y validación del Creation Budget
 
@@ -4237,6 +5132,12 @@ logistic/softmax, sin threshold ni cambio de capabilities. Los coeficientes
 permanecen en DR-053 como calibración; el scope preguntado por DR-048 queda
 cerrado.
 
+**Confirmación G3C-7**
+
+Market calcula scarcity, need y fit únicamente sobre posiciones ya válidas para
+el scope. Una oferta o transferencia no modifica primary/effective position ni
+habilita una posición `CONTENT_DISABLED`; DR-048 no se reabre.
+
 **Impacto**
 
 DR-008, datos, contenido, golden seeds, premios, rankings y alcance real del vertical slice.
@@ -4320,6 +5221,19 @@ Esta función es determinista, no usa RNG y queda ligada a la versión
 participante. DR-049 deja de bloquear SC-11 por la función posicional; Scoring
 conserva sus propios parámetros/cohortes en DR-010.
 
+**Confirmación G3C-7**
+
+Valuation/need/fit pueden consumir el breakdown de minutos por posición, pero
+fee, salario, club de destino y ContractExpectation nunca aportan peso a la
+cohorte. La resolución de DR-049 no se reabre.
+
+**Confirmación G3C-8**
+
+Cada AwardDefinition aplica la función resuelta al mismo evaluation period.
+El PositionGroup dominante selecciona la cohorte y la Position dominante
+secundaria selecciona un profile específico cuando corresponda. No se pondera
+por award utility, club, league, reputation o stats; DR-049 no se reabre.
+
 **Impacto**
 
 DR-010, premios, scoring, cohortes, ranking interno, leaderboard y golden seeds.
@@ -4332,7 +5246,22 @@ Definir si el MVP incluye fútbol masculino, femenino o ambos; catálogos, regla
 
 ### DR-025 — Mercados y fuentes del MVP
 
+**Estado:** `DATA_REQUIRED` — scope y contratos congelados por G3D-2; faltan
+identidades, fuentes/licencias, valores y manifests publicados.
+
 Definir ligas, países, clubes, snapshot inicial, fuentes, fecha de corte, licencias y responsable de revisión.
+
+**Dependencia confirmada por G3C-8 (2026-08-01):** debe publicar
+`NationalTeamDefinition`, InternationalCompetitionDefinition y
+`AwardDefinition` del slice, incluidos IDs, scope, field sizes, ordinal/tie
+policies y provenance. ADR-077 no inventa esos datos; DR-025 permanece abierta.
+
+**Scope congelado por G3D-2 (2026-08-07):** Argentina y España; ocho clubes
+reales detallados por liga; liga/copa doméstica de cada contexto; Libertadores,
+Champions y contratos mínimos de selección; seis InjuryFamily candidates; un
+premio global, uno juvenil y tres premios posicionales/de competición. El
+scope ya no está abierto, pero los IDs, valores, fuentes/licencias y manifests
+siguen `DATA_REQUIRED`.
 
 ### DR-026 — Assets y denominaciones protegidas
 
@@ -4340,9 +5269,9 @@ Definir qué nombres, logos, escudos, trofeos, fotografías y marcas pueden usar
 
 ### DR-027 — Valor de mercado y monedas
 
-**Estado:** Parcialmente resuelta — representación exacta aceptada el
-2026-07-28; fuente, moneda de referencia, conversión, calibración, presentación
-y fixtures pendientes.
+**Estado:** `RESOLVED_POLICY / DATA_REQUIRED` — representación exacta y política
+dual nativa/normalizada aceptadas; fuentes, observaciones, conversion artifacts,
+calibración, presentación y fixtures pendientes.
 
 Definir:
 
@@ -4383,6 +5312,29 @@ Catálogo/fuente de monedas, rango interoperable del schema, moneda de referenci
 por contexto, unidades menores definitivas, rates/snapshot de conversión,
 calibración, presentación, disclaimer y fixtures. DR-027 queda parcialmente
 resuelta, no cerrada.
+
+**Cierre matemático parcial G3C-7 (2026-07-29)**
+
+ADR-076 fija valoración observer-specific, fee y salary como procesos separados
+en log-space; `MarketReferenceValue` usa weighted median canónica del panel
+versionado y toda persistencia monetaria se cuantiza con
+`ROUND_HALF_EVEN` a unidades menores enteras exactas. Los log-values se validan
+antes de `exp`; overflow/underflow de representación produce error tipado, nunca
+clipping o cap editorial. Una free transfer tiene fee cero sin draw.
+
+Esto no elige moneda de cálculo, source/rates de conversión, límites
+interoperables del schema, catálogo, calibración, presentación o disclaimer.
+DR-027 permanece parcialmente abierta.
+
+**Resolución de política G3D-2 (2026-08-07)**
+
+Los observables se conservan como `Money` exacto en moneda nativa (`ARS` o
+`EUR` para los contextos iniciales) y fecha/snapshot. La calibración cross-market
+usa un contexto normalizado de poder adquisitivo derivado, versionado y con
+provenance; no reemplaza ni muta el importe nativo. No existe conversión
+implícita. Faltan datasets monetarios, unidades, rates/inflación, rango técnico,
+disclaimer y fixtures, por lo que el estado es `DATA_REQUIRED`, no matemática o
+policy abierta.
 
 **Tests/gates requeridos**
 
@@ -4474,6 +5426,9 @@ Una limitación competitiva de envíos no debe alterar el motor, la semilla ni l
 
 ### DR-035 — Percentiles y frecuencias públicas
 
+**Estado:** `PARTIAL / DATA_PRODUCT_REQUIRED` — G3D-2 prohíbe derivar claims
+públicos desde targets internos; faltan cohortes, N mínimo, privacidad y wording.
+
 Definir tamaños mínimos de muestra, cohortes, intervalo de confianza, actualización, privacidad y texto cuando no hay datos suficientes.
 
 **Refinamiento G3B — Bloque 10 (2026-07-28)**
@@ -4484,6 +5439,10 @@ frecuencias públicas, cohortes y sample-size policy; no bloquea SC-13 inicial.
 
 ### DR-036 — Comparabilidad entre versiones
 
+**Estado:** `RESOLVED_POLICY_V1 / PRIVACY_DATA_REQUIRED` — V1 conserva
+exact-match y adopta best-run por user + exact compatibility key; no se habilita
+compatibilidad cross-version. Falta congelar identity/privacy/submission data.
+
 Definir cuándo dos `scoringVersion` o presets pueden compartir tabla, cómo funciona el Salón de la Fama y qué ocurre con correcciones críticas.
 
 **Refinamiento G3B — Bloque 10 (2026-07-28)**
@@ -4492,6 +5451,17 @@ Definir cuándo dos `scoringVersion` o presets pueden compartir tabla, cómo fun
 Coincidencia de esa versión es necesaria, pero no se declara suficiente.
 Presets, automatización, Creation Budget, engine/data y correcciones siguen
 pendientes de la policy de DR-036. No se mezclan tablas por inferencia.
+
+**Resolución V1 G3D-3A (2026-08-07)**
+
+La tabla principal proyecta, por `LeaderboardUserKey` y exact
+`LeaderboardCompatibilityKey`, la mejor Career `COMPLETED` elegible. Conserva
+todas las Careers en profile/audit; no limita intentos ni altera seed/gameplay.
+Los empates se resuelven canónicamente por logical finalization order y
+`careerId`, sin RNG. No se mezclan versiones/presets. DR-036 queda cerrada para
+la policy competitiva V1; DR-030/034/037/041 deben definir user identity,
+guest/account merge, visibility, deletion, submission y appeal antes de
+publicar leaderboard. Véase [ADR-084](adr/084-main-leaderboard-best-career-projection.md).
 
 ### DR-037 — Privacidad pública
 
@@ -4541,20 +5511,193 @@ Los SLO de la sección 49 son “sugeridos”. Confirmar cuáles serán objetivo
 
 Definir umbrales de replay, congelamiento temporal, revisión manual, apelación y revocación de ranking. Una carrera no puede sancionarse únicamente por ser muy afortunada.
 
-## 10. Matriz de cierre
+## 10. Reconciliación G3D-1 — Calibration Registry & Dataset Contracts
+
+G3D-1 no reabre matemáticas ni cierra policies por inferencia. Los cuatro
+registros normativos son:
+
+- [Calibration Parameter Registry](CALIBRATION_PARAMETER_REGISTRY.md);
+- [Calibration Target Registry](CALIBRATION_TARGET_REGISTRY.md);
+- [Calibration Dataset Registry](CALIBRATION_DATASET_REGISTRY.md);
+- [Golden Vector Registry](GOLDEN_VECTOR_REGISTRY.md).
+
+| DR | Estado tras G3D-1 | Bloqueo/artefacto concreto |
+|---|---|---|
+| DR-008 | `PARTIAL_CALIBRATION` | La matemática está cerrada. Falta asignar, calibrar, validar y publicar `EngineParameterSet V1`, datasets, targets, goldens y acceptance reports; ya no es una decisión de familia matemática. |
+| DR-010 | `RESOLVED_MATH` con gates de publicación | Falta publicar `ScoringConfiguration V1`, `ScoringCalibrationData V1`, catálogos completos, expected goldens y Gate 6/7. No se reabre la fórmula. |
+| DR-021 | `PARTIAL` policy/data | `DS-CALENDAR-SLICE`, `DS-COMPETITION-CATALOG` y `DS-NATIONAL-COMPETITION-CATALOG` deben fijar Q allocations, international/market windows y formatos; fecha/label visible y boundaries aún requieren policy. |
+| DR-025 | `DATA_REQUIRED` | Deben publicarse CompetitionDefinitions, NationalCompetitionDefinitions, AwardDefinitions, IDs, sources/licencias, field sizes, eligibility, timing y mappings gameplay/scoring separados. |
+| DR-027 | `PARTIAL` policy/data | Requiere `DS-CURRENCY-INFLATION`, monetary contexts, unidad/conversion policy, representation range y fixtures. Ningún amount puede publicarse sin moneda, fecha y provenance. |
+| DR-035 | `PARTIAL` data/product | Requiere cohortes/percentiles publicados y decidir qué frecuencias son públicas. Los targets internos no autorizan UI ni claims públicos. |
+| DR-036 | `PARTIAL` policy | V1 mantiene exact-match compatibility de ADR-080. Cualquier equivalencia cross-version requiere policy y evidencia separadas; no se infiere de targets similares. |
+| DR-065 | `PARTIAL` policy/data | Requiere scope, `ExternalClubPool`/adapter, participants, continuity y datasets de clubes externos. El registry solo define inputs mínimos. |
+| DR-066 | `PARTIAL` policy/data | Requiere eligibility/registration facts, competition binding y effective boundary; Market no completa un transfer sin esta resolución. |
+| DR-067 | `PARTIAL` policy/data | Requiere market-window mapping en `DS-CALENDAR-SLICE` y decisión de cursor/effective movement; G3D-1 no habilita mid-season. |
+
+### Decisiones de producto para calibración
+
+Estas elecciones se registran como `PRODUCT_DECISION`; no se disfrazan como
+evidencia externa ni generan una DR por cada tolerancia:
+
+- tolerancias Quick/Custom y coste/equivalencia de BOTH;
+- frecuencia deseada de tiers rare/historic/mythical;
+- balance de contribución Social a Scoring;
+- preferencia de comeback y finalization timing para campañas automáticas;
+- aceptación de outliers/tails coherentes;
+- scope final del vertical slice y fallback provisional permitido.
+
+Una elección que cambie state machine, versioning, causalidad o policy pública
+sí requiere actualizar la DR/ADR propietaria.
+
+## 11. Reconciliación G3D-2 — Vertical Slice Data Catalog & Product Policy
+
+G3D-2 congela el alcance y las policies necesarias para adquirir datos sin
+inventarlos. Las fuentes normativas nuevas son:
+
+- [Vertical Slice Data Catalog Spec](VERTICAL_SLICE_DATA_CATALOG_SPEC.md);
+- [G3D Product Decisions](G3D_PRODUCT_DECISIONS.md);
+- [G3D External Research Plan](G3D_EXTERNAL_RESEARCH_PLAN.md);
+- [ADR-081](adr/081-hybrid-external-club-pool.md);
+- [ADR-082](adr/082-vertical-slice-sporting-nationality.md).
+- [ADR-083](adr/083-native-money-and-calibration-normalization.md).
+
+`RESOLVED_POLICY / DATA_REQUIRED` significa que ya no falta elegir arquitectura
+o comportamiento V1, pero todavía no existe un dataset/catalog publicado capaz
+de ejecutar esa política.
+
+| DR | Estado tras G3D-2 | Decisión normativa | Gate pendiente |
+|---|---|---|---|
+| DR-008 | `PARTIAL_CALIBRATION` | Sin cambios matemáticos. Los 275 parameter-path templates se enlazan a datasets, targets y decisiones de producto por branch. | Valores, evidence, goldens y Gates 1–5/7. |
+| DR-010 | `RESOLVED_MATH / DATA_REQUIRED` | Scoring sigue determinista y separado de gameplay. El catálogo declara inputs de `ScoringCalibrationData`, no valores nuevos. | Catálogos, valores, expected goldens y Gates 6–7. |
+| DR-021 | `PARTIAL / DATA_REQUIRED` | Se fija el contrato stage-to-Q, exposure garantizada/condicional y una sola ventana `MARKET` post-season V1. No se inventan fechas. | Publicar formatos, stages, Q allocation, ventanas internacionales y labels. |
+| DR-025 | `DATA_REQUIRED` | El slice se congela en Argentina/España, 8 clubes reales detallados por liga, dos ligas, dos copas domésticas, Libertadores, Champions, contratos de selección y exactamente 5 AwardDefinitions funcionales. | IDs reales, corte, fuentes, licencias, campos y manifests congelados. |
+| DR-027 | `RESOLVED_POLICY / DATA_REQUIRED` | ADR-083 fija `Money` nativo exacto en ARS/EUR más contexto de poder adquisitivo normalizado derivado para calibración; no hay conversión implícita ni cap monetario. | Monedas/unidades, fechas, inflación/rates, rango de representación y goldens. |
+| DR-035 | `PARTIAL / DATA_PRODUCT_REQUIRED` | No se publican percentiles o frecuencias desde targets internos. Cohortes, N mínimo y wording requieren aprobación separada. | Dataset público/privacidad y product policy. |
+| DR-036 | `PARTIAL / PRODUCT_REQUIRED` | Compatibility competitiva V1 permanece exact-match. `best-run` se documenta como propuesta, no como leaderboard aprobado. | Aprobar o rechazar PD-G3D-015 y cualquier policy cross-version. |
+| DR-065 | `RESOLVED_POLICY / DATA_REQUIRED` | ADR-081 adopta pool externo híbrido: catálogo real para identidades nominales, fields no identificables para contexto y materialización determinista al necesitar facts/contratos. | Catálogo, participants, mobility rules, adapters y goldens. |
+| DR-066 | `RESOLVED_POLICY / DATA_REQUIRED` | V1 valida inscripción al hacerse efectivo el movimiento post-season para la temporada siguiente; chequea holder, sporting club, ventana, membresía, CompetitionDefinition y policy explícita. Missing policy = `PENDING_DATA`. | Publicar RegistrationEligibility y fixtures por competición. |
+| DR-067 | `RESOLVED_POLICY / DATA_REQUIRED` | Solo `MARKET` post-season V1; no hay mid-season. Proposal/agreements se congelan antes de `WAITING_DECISION` y el movimiento se aplica atómicamente al boundary autorizado. | Calendar/window data y goldens de cursor/resume. |
+| DR-068 | `RESOLVED_POLICY / DATA_REQUIRED` | ADR-082 fija Argentina como nacionalidad deportiva inicial y única del protagonista en V1. España no concede eligibility; segunda nacionalidad/naturalización/cambio de asociación quedan fuera del slice. | Campo/manifest autoritativo, NationalTeamDefinition y golden de ineligible-no-draw. |
+
+### Decisiones de producto G3D-2
+
+El registro canónico es [`G3D_PRODUCT_DECISIONS.md`](G3D_PRODUCT_DECISIONS.md).
+Quedan aprobadas como direction de calibración: equivalencia Quick/Custom por
+distribuciones, orden de rareza de tiers sin frecuencias inventadas, Social no
+dominante en el centro de PC, comeback raro pero visible, finalización manual en
+un safe boundary retirado y clasificación explícita de tails. Las tolerancias y
+frecuencias numéricas siguen sin asignar. `PD-G3D-015` (`best-run`) requiere
+aprobación y no modifica DR-036 mientras esté `PROPOSED_APPROVAL`.
+
+## 12. Reconciliación G3D-3A — Research governance y P0 readiness
+
+G3D-3A cierra los gates transversales de investigación sin adquirir datos ni
+asignar valores. La policy está en
+[Reference Snapshot Policy](G3D_REFERENCE_SNAPSHOT_POLICY.md), ownership,
+licencias y privacidad en [Data Governance](G3D_DATA_GOVERNANCE.md), y las
+nueve P0 en [P0 Acquisition Spec](G3D_P0_ACQUISITION_SPEC.md).
+
+| DR | Estado tras G3D-3A | Decisión/gate cerrado | Pendiente real |
+|---|---|---|---|
+| DR-008 | `RESOLVED_MATH / CALIBRATION_PUBLICATION_REQUIRED` | Ya no contiene familia matemática abierta; todos los values heredan evidence/owner/publication gates. | Datasets, candidates, targets, goldens y acceptance. |
+| DR-010 | `RESOLVED_MATH / DATA_CONFIG_REQUIRED` | Scoring research queda separado de gameplay; external evidence no puede inventar puntos. | `SCORING_CATALOG_EVIDENCE`, cohorts y Scoring bundle. |
+| DR-021 | `PARTIAL / DATA_REQUIRED` | Cutoff/season/edition policy y P0 format/calendar artifacts son inequívocos; post-season Market sigue congelado. | Elegir cutoff/ediciones por evidence y publicar Competition/Calendar definitions. |
+| DR-025 | `DATA_REQUIRED` | Scope, source hierarchy, license/privacy review, ownership y P0 catalog artifacts definidos. | Identidades/ediciones/fuentes y manifests reales validados. |
+| DR-027 | `RESOLVED_POLICY / DATA_REQUIRED` | Money dual no se reabre; P0 fija fields de unit/date/series/license/provenance. | Fuentes/series, normalization artifact, representation validation y goldens. |
+| DR-035 | `PARTIAL / DATA_PRODUCT_PRIVACY_REQUIRED` | Calibration observation privacy ya está gobernada; claims públicos no se derivan de targets internos. | Cohort/sample thresholds, wording, account/public privacy y product approval. |
+| DR-036 | `RESOLVED_POLICY_V1 / PRIVACY_DATA_REQUIRED` | ADR-084: exact-match + best-run B por user/key; todas las Careers auditables; cross-version no permitido. | `LeaderboardUserKey`, guest/account/delete/appeal/submission policy antes de publicación. |
+| DR-065 | `RESOLVED_POLICY / DATA_REQUIRED` | P0 external scope manifiesta real identities mínimas y fields no identificables bajo ADR-081. | Completar `EXTERNAL_CLUB_SCOPE_MANIFEST`, mobility data y goldens. |
+| DR-066 | `RESOLVED_POLICY / DATA_REQUIRED` | P0 Calendar/Format evidence debe contener registration next-season bindings; missing sigue `PENDING_DATA`. | Rules/fields por CompetitionDefinition y fixtures. |
+| DR-067 | `RESOLVED_POLICY / DATA_REQUIRED` | Solo post-season; P0 Calendar evidence identifica ventana/effective boundary sin reabrir mid-season. | Fechas/ediciones reales y goldens de cursor/resume. |
+| DR-068 | `RESOLVED_POLICY / DATA_REQUIRED` | National P0 exige fuente de definition/eligibility para Argentina-only; no infiere nacionalidad. | NationalTeam/eligibility manifest y golden oficial. |
+
+### Product decisions
+
+- Las trece direcciones G3D-2 mantienen freeze conforme a
+  `G3D_PRODUCT_DECISIONS.md`.
+- Tier rarity queda reducido a `CONSERVATIVE|BALANCED|GENERATIVE`, con
+  `BALANCED` recomendado; porcentajes se eligen en G3D-3D.
+- Quick/Custom, social, comeback y finalization conservan métricas cerradas y
+  tolerancias pendientes de `PRODUCT_OWNER`.
+- Best-run queda resuelto para V1 dentro de DR-036; no resuelve privacidad de
+  cuenta ni comparabilidad cross-version porque esta última no se habilita.
+
+### Readiness
+
+G3D-3B está `GO`: solo-project mode queda aceptado. Al abrir la campaña debe
+registrar approvers por rol, congelar la fecha concreta y revisar la license
+route antes de cada captura. Son controles de ejecución, no una invitación a
+calibrar.
+
+## 12.1 Reconciliación G3D-3B — P0 evidence acquisition
+
+La campaña `RSNAP-G3D3B-2026-08-07-C1` congeló
+`referenceCutoffDate=2026-08-07`, creó 81 `EvidenceRecord` y materializó los
+diez acquisition artifacts. No publicó Definitions, datasets normalizados,
+EngineParameterSet ni ScoringConfiguration. Evidencia y limitaciones:
+[P0 Evidence Index](P0_EVIDENCE_INDEX.md) y
+[G3D External Research Plan §12](G3D_EXTERNAL_RESEARCH_PLAN.md#12-resultado-de-la-campaña-g3d-3b).
+
+| DR | Estado tras G3D-3B | Evidencia adquirida | Gate restante |
+|---|---|---|---|
+| DR-021 | `PARTIAL / DATA_REQUIRED` | ediciones, formatos, stage periods, exposure y ventanas domésticas/continentales baseline | mapping canónico Q; cierre anual Argentina; ordinary international windows si se publican; `CompetitionDefinition`/`CalendarDefinition` validadas |
+| DR-025 | `DATA_REQUIRED` | seis competition identities/formats y cinco Award candidates reales | normalización/publicación; POTY LaLiga field/ballot/tie, scorer tie/alias oficial y continuidad de reglas 2025 de Ballon/Kopa/Yashin |
+| DR-027 | `RESOLVED_POLICY / DATA_REQUIRED` | minor units ARS/EUR; rutas oficiales INDEC/Eurostat/BCRA/ECB y PPP candidate | series versionadas, base dates, terms review, transform/rounding/hash y monetary goldens |
+| DR-035 | `PARTIAL / DATA_PRODUCT_PRIVACY_REQUIRED` | no cambió la policy; no se adquirieron cohortes públicas ni PII | cohorts, N mínimo, wording, privacidad y approval siguen pendientes |
+| DR-036 | `RESOLVED_POLICY_V1 / PRIVACY_DATA_REQUIRED` | no se descubrió cambio de best-run; artifacts usan approver roles pseudónimos, no account identity | `LeaderboardUserKey`, guest/account merge/delete/submission/appeal permanecen fuera de P0 |
+| DR-065 | `RESOLVED_POLICY / DATA_REQUIRED` | `EXTERNAL_CLUB_SCOPE_MANIFEST` fija classes y universo real mínimo sin world database | normalizar/materializar IDs reales y mobility bindings; no se reabre ADR-081 |
+| DR-066 | `RESOLVED_POLICY / DATA_REQUIRED` | format/calendar evidence conserva registration boundaries observables | publicar `RegistrationEligibility`/Competition bindings y fixtures/goldens autorizados |
+| DR-067 | `RESOLVED_POLICY / DATA_REQUIRED` | evidencia de ventana española y boundaries argentinas; V1 sigue post-season only | canonical market boundary por contexto y replay goldens; no se habilita mid-season |
+| DR-068 | `RESOLVED_POLICY / DATA_REQUIRED` | Argentina senior identity, FIFA eligibility reference y closed major-tournament context | NationalTeam/eligibility Definition publicada; ordinary-window data si queda en scope; no se reabre ADR-082 |
+
+### Readiness hacia G3D-3C
+
+Estado: **`CONDITIONAL_GO`**. Pueden normalizarse artifacts completos o
+explícitamente parciales, pero no congelarse las AwardDefinitions afectadas ni
+un bundle V1 atómico mientras sus fields materiales sigan ausentes. Si G3D-3C
+requiere publicación completa en una única transacción, el gate efectivo es
+`NO_GO`. Ninguna decisión arquitectónica resuelta fue reabierta.
+
+## 12.2 Reconciliación G3D-3C — P0 normalization
+
+El candidate `G3D3C-P0-CATALOG-CANDIDATE-C1` normaliza 114 IDs desde
+`RSNAP-G3D3B-2026-08-07-C1`; no publica `dataVersion` ni reabre policies.
+
+| DR | Estado después de G3D-3C | Candidate data cerrado | Falta exacta |
+|---|---|---|---|
+| `DR-021` | `PARTIAL / DATA_REQUIRED` | six format mappings, stage→Q candidate, guaranteed/conditional exposure, post-season boundary | ordinary Argentina international windows, exact partial stage/Q data, annual Argentina close/publication |
+| `DR-025` | `DATA_REQUIRED` | six club competition identities, World Cup context, 16 clubs, Argentina NT and five award identities | complete Award fields, remaining catalogs/baselines and atomic publication |
+| `DR-027` | `RESOLVED_POLICY / DATA_REQUIRED` | ARS/EUR currency definitions and INDEC/Eurostat/BCRA/ECB source bindings | series/vintages, terms, base-date/transform and validation |
+| `DR-035` | `PARTIAL / DATA_PRODUCT_REQUIRED` | candidate data snapshot/hash may enter future compatibility provenance | cohorts, sample-size/privacy and public wording; best-run remains closed by ADR-084 |
+| `DR-065` | `RESOLVED_POLICY / DATA_REQUIRED` | hybrid classes/materialization invariant and 16 detailed identities validated as candidate | materializable identities on demand and P1 causal fields |
+| `DR-066` | `RESOLVED_POLICY / DATA_REQUIRED` | next-season registration IDs and boundary candidate | detailed jurisdiction eligibility rules/publication |
+| `DR-067` | `RESOLVED_POLICY / DATA_REQUIRED` | Argentina/Spain `POST_SEASON_ONLY` candidate windows | final Calendar/Data publication; no mid-season scope |
+| `DR-068` | `RESOLVED_POLICY / DATA_REQUIRED` | `NT-ARG-SENIOR-MEN`, ADR-082 ref and World Cup context candidate | ordinary calendar/catalog publication; no policy inference |
+
+`DR-025` cannot close merely because five Award identities exist: their
+ballot/field/tie mechanics remain `GAP-P0-AWD-001..003`. `DR-027` cannot close
+by naming official source routes without acquiring and validating observations.
+`DR-035/036` consume candidate hashes only after a future data publication;
+ADR-084 best-run remains unchanged.
+
+Readiness: `GO_FOR_G3D_3D_WITH_PARALLEL_P0_GAP_CLOSURE` and
+`DATA_V1_NOT_PUBLISHED`. See
+[G3D-3C Data V1 Readiness Report](G3D_3C_DATA_V1_READINESS_REPORT.md).
+
+## 13. Matriz de cierre
 
 | Gate | Decisiones necesarias | Estado actual |
 |---|---|---|
-| Schemas estructurales del núcleo | DR-001 a DR-007, DR-011 a DR-016, DR-044, DR-052, DR-058, DR-061, DR-062, DR-063 y DR-070 | Base G1/G2, estructuras G3B, facts/ledger e identidad del ParameterSet resueltos; schemas pueden diseñarse. Dominios específicos y gameplay siguen bloqueados por DR-058/061/062/069 y decisiones matemáticas. |
-| G3C — gameplay matemático | DR-008, DR-010, DR-021, DR-022, DR-027, DR-048, DR-049 y DR-053 a DR-070 | G3C-1 cerró el contrato transversal; G3C-2/3 cerraron catorce familias: 2 `RESOLVED_MATH`, 12 `PARTIAL_CALIBRATION` y 49 `PARTIAL` para G3C-4–G3C-11. DR-048/049/064 están resueltas; DR-021/045/053/054 conservan pendientes explícitos. |
-| Motor de temporada | DR-002 a DR-008, DR-012 a DR-016, DR-042 a DR-044 y DR-053 a DR-069 según subsistema | Infraestructura determinista, estructuras Q y matemática de Role/Minutes están cerradas; faltan ParameterSet/targets, producers upstream, continuidad, inscripción y cursor mid-season/internacional/posretiro. |
-| Scoring/ledger | DR-007, DR-009, DR-010, DR-011, DR-015, DR-044, DR-049 y DR-063 | DR-049/063, SC-01, SC-12 y SC-13 están resueltos estructuralmente; faltan SC-02 a SC-11, scopes/atribución, caps y fixtures de DR-010. |
-| Contenido del vertical slice | DR-012, DR-014, DR-018, DR-022, DR-043, DR-047, DR-065 y decisiones de datos aplicables | DR-012, DR-014, DR-018 y DR-043 resueltas; DR-022 tiene estructura aceptada; faltan matemática, conteo, catálogo y scope/movilidad. |
-| Vertical slice completo | DR-008 a DR-023, DR-042 a DR-045, DR-047 a DR-049, DR-053 a DR-069 y decisiones previas aplicables | DR-048/049/064 están resueltas. Faltan DR-008, DR-010, DR-021, matemática de DR-022, calibración DR-045/053/054, DR-047 y las partes ejecutables restantes de DR-055 a DR-069. |
+| Schemas estructurales del núcleo | DR-001 a DR-007, DR-011 a DR-016, DR-044, DR-052, DR-058, DR-061, DR-062, DR-063, DR-069 y DR-070 | Base G1/G2, estructuras G3B, facts/ledger, lifecycle final e identidad del ParameterSet resueltos; schemas pueden diseñarse. Gameplay sigue bloqueado por values/data, Scoring y decisiones posteriores. |
+| G3C/G3D — matemática y publicación | DR-008, DR-010, DR-021, DR-022, DR-027, DR-048, DR-049 y DR-053 a DR-070 | G3C cerró 63/63 familias: 5 `RESOLVED_MATH`, 51 `PARTIAL_CALIBRATION`, 7 `DATA_REQUIRED`. G3D-1 inventaría 275 parameter-path templates, 186 targets, 40 datasets y 139 goldens. G3D-3B adquirió 81 EvidenceRecords P0: 4 datasets avanzan a `ACQUIRED`, 3 a `SOURCE_IDENTIFIED` y ninguno a `NORMALIZED`; faltan values, P1, product targets, complete award fields, expected outputs y gates. |
+| Motor de temporada | DR-002 a DR-008, DR-012 a DR-016, DR-042 a DR-044 y DR-053 a DR-069 según subsistema | Infraestructura determinista, estructuras Q y matemática hasta Retirement/Finalization están cerradas. ADR-081/082 y policies post-season/registration cierran alternativas V1; faltan ParameterSets, catálogos, calendar/eligibility data, targets y goldens. |
+| Scoring/ledger | DR-007, DR-009, DR-010, DR-011, DR-015, DR-044, DR-049 y DR-063 | ADR-080 cierra matemáticamente SC-01–SC-13, scopes, caps y exactitud. Faltan configuración/calibration data, catálogos, expected goldens y facts DR-066/067 aplicables. |
+| Contenido del vertical slice | DR-012, DR-014, DR-018, DR-022, DR-043, DR-047, DR-065 y decisiones de datos aplicables | Scope congelado: 8 clubes reales por liga ya identificados, competiciones baseline y ExternalClub scope adquiridos, 6 InjuryFamily candidates y 5 Award candidates. Faltan baselines, Award fields completos, series/licensing transforms, normalización/validación y publicación dataVersion. |
+| Vertical slice completo | DR-008 a DR-023, DR-042 a DR-045, DR-047 a DR-049, DR-053 a DR-069 y decisiones previas aplicables | Matemática y políticas estructurales G3D-2 completas para adquisición. Faltan datasets/catalogs, parámetros, tolerancias de producto, expected goldens y acceptance gates; no está implementable como gameplay. |
 | Servidor/ranking | DR-019, DR-020, DR-030 a DR-037, DR-045, DR-046 y DR-049 | DR-019, DR-020 y DR-049 resueltas; faltan DR-030 a DR-037, calibración DR-045 y DR-046. |
 | Publicación | DR-024 a DR-029 y DR-038 a DR-041 | Pendiente. |
 
-## 11. Plantilla de resolución
+## 14. Plantilla de resolución
 
 Cada decisión cerrada deberá registrar:
 

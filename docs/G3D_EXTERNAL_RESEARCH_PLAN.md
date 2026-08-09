@@ -244,3 +244,20 @@ fase siguiente exige publicar el bundle V1 completo de forma atómica, este
 resultado se interpreta como `NO_GO` hasta cerrar esos gaps; no se reduce ningún
 acceptance standard.
 
+## 13. Focused P0 gap closure after normalization
+
+G3D-3C replaces a general P0 repeat with an optional, bounded
+`G3D-3B2 — Focused P0 Gap Closure`:
+
+| Gap IDs | Exact scope | Stopping condition |
+|---|---|---|
+| `GAP-P0-AWD-001` | verify Ballon/Kopa/Yashin 2025 rule continuity | edition-applicable primary rule or explicit unresolved result |
+| `GAP-P0-AWD-002` | LaLiga POTY field/ballot/tie | primary rules or documented policy route for every field |
+| `GAP-P0-AWD-003` | official scorer/Pichichi alias and tie | organizer-level binding/tie or explicit unresolved state |
+| `GAP-P0-CAL-001` | ordinary Argentina senior windows | stage/Q-ready primary calendar facts |
+| `GAP-P0-MON-001` | acquire versioned INDEC/Eurostat/BCRA/ECB series | hashes, vintages, terms and units captured |
+| `GAP-P0-MON-002` | base date, missing-day/revision transform | reviewed deterministic transform specification |
+
+Scoring gaps `GAP-P0-SCR-001..003` belong to product/P2 calibration, not web
+P0 repetition. G3D-3B2 may run in parallel with G3D-3D; it does not calibrate,
+normalize a full Data V1 or broaden P1 research.
