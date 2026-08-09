@@ -1482,11 +1482,12 @@ no altera gameplay, lifecycle, facts ni score.
 
 ### DR-008 — Fórmulas faltantes del simulador
 
-**Estado:** `PARTIAL_CALIBRATION` — G3C-2 a G3C-11 cerraron todas las familias
-matemáticas asignadas; faltan valores iniciales, data/Definitions, expected
-goldens, aceptación Monte Carlo, schemas e implementación autorizada.
+**Estado:** `PARTIAL_CALIBRATION` — mathematics `CLOSED`; product numeric
+targets `CLOSED_G3D_3D`; external observed values `PENDING`;
+`EngineParameterSet UNPUBLISHED`; integrated calibration y expected goldens
+`PENDING`.
 
-**Problema**
+**Problema histórico — cerrado matemáticamente**
 
 La forma general está documentada, pero no existen fórmulas ejecutables completas para:
 
@@ -1834,7 +1835,30 @@ por falta de familia matemática. DR-008 no está bloqueada por matemática
 indefinida; conserva únicamente los gates de publicación/calibración listados
 a continuación.
 
-El cierre debe publicar:
+**Avance G3D-3D — Product Numeric Targets (2026-08-09)**
+
+[G3D Product Calibration Targets](G3D_PRODUCT_CALIBRATION_TARGETS.md) congela
+el perfil `BALANCED`, rareza de tiers, fairness por posición, equivalencia
+Quick/Custom, comeback/finalization, balance PBR/composición, tail classes y
+uncertainty policy. Son preferencias/acceptance tolerances, no parámetros ni
+observaciones.
+
+Estado explícito de DR-008:
+
+```text
+Mathematics: CLOSED
+Product numeric targets: CLOSED
+External observed values: PENDING
+EngineParameterSet: UNPUBLISHED
+Integrated calibration: PENDING
+Goldens: expected outputs PENDING
+Monte Carlo acceptance: PENDING_EXECUTION
+```
+
+La decisión ya no puede describirse como fórmula pendiente. Continúa abierta
+solo como gate integrado de data, values, candidates, validation y publicación.
+
+El cierre operativo debe publicar:
 
 - ecuaciones y orden de evaluación;
 - familias de distribución y parametrización exacta;
@@ -5684,16 +5708,37 @@ Readiness: `GO_FOR_G3D_3D_WITH_PARALLEL_P0_GAP_CLOSURE` and
 `DATA_V1_NOT_PUBLISHED`. See
 [G3D-3C Data V1 Readiness Report](G3D_3C_DATA_V1_READINESS_REPORT.md).
 
+## 12.3 Reconciliación G3D-3D — Product numeric targets
+
+G3D-3D publica 77 `PT-*` de producto sin asignar coefficients ni observed
+rates. Fuente:
+[G3D Product Calibration Targets](G3D_PRODUCT_CALIBRATION_TARGETS.md).
+
+| DR / policy | Estado después de G3D-3D | Cierre | Pendiente |
+|---|---|---|---|
+| `DR-008` | `PARTIAL_CALIBRATION` | mathematics y product numeric targets cerrados | P1 evidence, ParameterSet candidate, integrated runs, expected goldens y publication |
+| `DR-010` | `RESOLVED_MATH / DATA_CONFIG_REQUIRED` | tier/composition/PBR acceptance targets definidos sin cambiar fórmula | ScoringConfiguration/Data, catalogs/cohorts, Gate 6/7 |
+| `DR-035` | `PARTIAL / DATA_PRODUCT_REQUIRED` | internal acceptance sample precision definida | claims públicos, privacy, cohort wording y publication sample siguen pendientes |
+| `DR-036` | `RESOLVED_POLICY_V1 / PRIVACY_DATA_REQUIRED` | best-run solo se mide como diagnostic; ADR-084 no cambia | user key/account/deletion/appeal |
+
+`PD-G3D-008..011` pasan a `FROZEN_FOR_V1`. Manual finalization behavior,
+incidencia observada de injuries, real-world transfer/award/selection rates y
+social levels no se inventan. G3D-3B2 conserva únicamente sus gaps de
+Award/Calendar/Money.
+
+Readiness: `GO_FOR_P1_AND_INITIAL_CALIBRATION_PREPARATION`. Preparación no
+autoriza calibrar ni publicar un `EngineParameterSet`.
+
 ## 13. Matriz de cierre
 
 | Gate | Decisiones necesarias | Estado actual |
 |---|---|---|
 | Schemas estructurales del núcleo | DR-001 a DR-007, DR-011 a DR-016, DR-044, DR-052, DR-058, DR-061, DR-062, DR-063, DR-069 y DR-070 | Base G1/G2, estructuras G3B, facts/ledger, lifecycle final e identidad del ParameterSet resueltos; schemas pueden diseñarse. Gameplay sigue bloqueado por values/data, Scoring y decisiones posteriores. |
-| G3C/G3D — matemática y publicación | DR-008, DR-010, DR-021, DR-022, DR-027, DR-048, DR-049 y DR-053 a DR-070 | G3C cerró 63/63 familias: 5 `RESOLVED_MATH`, 51 `PARTIAL_CALIBRATION`, 7 `DATA_REQUIRED`. G3D-1 inventaría 275 parameter-path templates, 186 targets, 40 datasets y 139 goldens. G3D-3B adquirió 81 EvidenceRecords P0: 4 datasets avanzan a `ACQUIRED`, 3 a `SOURCE_IDENTIFIED` y ninguno a `NORMALIZED`; faltan values, P1, product targets, complete award fields, expected outputs y gates. |
+| G3C/G3D — matemática y publicación | DR-008, DR-010, DR-021, DR-022, DR-027, DR-048, DR-049 y DR-053 a DR-070 | G3C cerró 63/63 familias: 5 `RESOLVED_MATH`, 51 `PARTIAL_CALIBRATION`, 7 `DATA_REQUIRED`. G3D-1 inventarió 275 parameter-path templates, 186 targets, 40 datasets y 139 goldens. G3D-3B adquirió 81 EvidenceRecords y G3D-3C normalizó el candidate P0. G3D-3D cierra 77 product targets; faltan values, P1, complete award/money/calendar fields, expected outputs y gates. |
 | Motor de temporada | DR-002 a DR-008, DR-012 a DR-016, DR-042 a DR-044 y DR-053 a DR-069 según subsistema | Infraestructura determinista, estructuras Q y matemática hasta Retirement/Finalization están cerradas. ADR-081/082 y policies post-season/registration cierran alternativas V1; faltan ParameterSets, catálogos, calendar/eligibility data, targets y goldens. |
 | Scoring/ledger | DR-007, DR-009, DR-010, DR-011, DR-015, DR-044, DR-049 y DR-063 | ADR-080 cierra matemáticamente SC-01–SC-13, scopes, caps y exactitud. Faltan configuración/calibration data, catálogos, expected goldens y facts DR-066/067 aplicables. |
 | Contenido del vertical slice | DR-012, DR-014, DR-018, DR-022, DR-043, DR-047, DR-065 y decisiones de datos aplicables | Scope congelado: 8 clubes reales por liga ya identificados, competiciones baseline y ExternalClub scope adquiridos, 6 InjuryFamily candidates y 5 Award candidates. Faltan baselines, Award fields completos, series/licensing transforms, normalización/validación y publicación dataVersion. |
-| Vertical slice completo | DR-008 a DR-023, DR-042 a DR-045, DR-047 a DR-049, DR-053 a DR-069 y decisiones previas aplicables | Matemática y políticas estructurales G3D-2 completas para adquisición. Faltan datasets/catalogs, parámetros, tolerancias de producto, expected goldens y acceptance gates; no está implementable como gameplay. |
+| Vertical slice completo | DR-008 a DR-023, DR-042 a DR-045, DR-047 a DR-049, DR-053 a DR-069 y decisiones previas aplicables | Matemática, policies y product numeric tolerances están cerradas. Faltan datasets/catálogos completos, parámetros, expected goldens y ejecución de acceptance gates; no está implementable como gameplay. |
 | Servidor/ranking | DR-019, DR-020, DR-030 a DR-037, DR-045, DR-046 y DR-049 | DR-019, DR-020 y DR-049 resueltas; faltan DR-030 a DR-037, calibración DR-045 y DR-046. |
 | Publicación | DR-024 a DR-029 y DR-038 a DR-041 | Pendiente. |
 

@@ -1547,7 +1547,39 @@ Referencias G3D-2:
 - [ADR-082](adr/082-vertical-slice-sporting-nationality.md).
 - [ADR-083](adr/083-native-money-and-calibration-normalization.md).
 
-## 19. Referencias
+## 19. G3D-3D — ProductTargetSet y uncertainty gate
+
+G3D-3D añade una regla transversal sin cambiar ninguna ecuación:
+
+```text
+Product Target != Model Parameter != Observational Reference
+```
+
+Todo número de producto vive en un `ProductTargetSet` documental/hashable con
+metric, denominator, segmentación, target range, warning/failure bands, sample
+tier, owner y source `PRODUCT_DECISION`. Nunca se carga como coefficient del
+motor ni como scoring value.
+
+Acceptance usa tres resultados:
+
+- `PASS`: estimate dentro de target y precisión suficiente;
+- `PASS_WITH_WARNING`: warning band o más muestras requeridas, sin failure
+  material;
+- `FAIL`: salida demostrada de warning o invariant violation.
+
+No se decide por point estimate aislado. Proporciones usan intervalos
+binomiales, continuous summaries Monte Carlo error/bootstrap y comparisons el
+mismo `CalibrationSeedSet`. Rare-event approval exige sample size derivado del
+lower target, no un sample count pequeño reutilizado por conveniencia.
+
+Fuente normativa:
+[G3D Product Calibration Targets](G3D_PRODUCT_CALIBRATION_TARGETS.md).
+Cambiar estos targets no cambia retroactivamente un `EngineParameterSet` o
+Scoring bundle publicado; requiere revisión/version impact del acceptance
+bundle y, si provoca nuevos valores causales/competitivos, las versiones
+propietarias normales.
+
+## 20. Referencias
 
 - [G3B Mathematical Design Board](G3B_DESIGN_BOARD.md)
 - [Especificación matemática del motor](MATHEMATICAL_ENGINE_SPEC.md)
@@ -1576,3 +1608,4 @@ Referencias G3D-2:
 - [Reputation & Social Math](REPUTATION_SOCIAL_MATH_SPEC.md)
 - [Retirement, Comeback & Finalization Math](RETIREMENT_COMEBACK_FINALIZATION_MATH_SPEC.md)
 - [Scoring Math](SCORING_MATH_SPEC.md)
+- [G3D Product Calibration Targets](G3D_PRODUCT_CALIBRATION_TARGETS.md)

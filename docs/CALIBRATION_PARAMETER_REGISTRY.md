@@ -672,3 +672,41 @@ corresponding candidate hash. `competitions`, `roleMinutes`, `clubWorld`,
 `nationalTeam`, `awards`, `transfersMarket` and scoring templates inherit the
 limitations recorded in the readiness report. No aliases/deprecations were
 added to parameter paths.
+
+## 18. Product-target consumer overlay G3D-3D
+
+Los 275 templates conservan `currentValue`, publication status y classification
+sin cambios. Esta sección añade únicamente metadata heredable:
+
+```text
+productTargetConsumers[]
+acceptanceCritical: NONE | P1 | P0 | CROSS_SYSTEM
+potentialSensitivityGroup: LOW | MEDIUM | HIGH | CRITICAL
+multiOwnerTargetDependencies[]
+```
+
+| Parameter branch | Product targets consumidos | Acceptance critical | Sensitivity esperada | Multi-owner dependencies |
+|---|---|---|---|---|
+| `player.creation` | `PT-QC-*`, `PT-POS-FAIR-*` | P0 | HIGH | end-to-end mode/tier fairness |
+| `development` | `PT-CAREER-*`, `PT-RET-*`, `PT-SCORE-007` | CROSS_SYSTEM | HIGH | Health, exposure, Market, Retirement |
+| `roleMinutes` | `PT-QC-*`, `PT-CAREER-*`, `PT-NT-*` | CROSS_SYSTEM | HIGH | Performance, Health, Selection |
+| `performance` | `PT-QC-*`, `PT-SCORE-*`, `PT-TROPHY-*`, `PT-AWARD-*`, `PT-NT-*` | CROSS_SYSTEM | CRITICAL | Club/competition facts y Scoring cohorts |
+| `health` | `PT-CAREER-*`, `PT-RET-*`, `PT-CB-*`, `PT-HLT-*` | CROSS_SYSTEM | HIGH | Role exposure, Development, Retirement |
+| `clubWorld` | `PT-TROPHY-*`, `PT-AWARD-*`, `PT-MKT-*`, `PT-NT-*` | CROSS_SYSTEM | HIGH | Competitions, Performance, Market |
+| `competitions` | `PT-TROPHY-*`, `PT-AWARD-*`, `PT-NT-*`, `PT-QC-*` | CROSS_SYSTEM | CRITICAL | Calendar/exposure y scoring identities |
+| `transfersMarket` | `PT-MKT-*`, `PT-CAREER-*`, `PT-CB-*`, `PT-SCORE-007` | CROSS_SYSTEM | HIGH | ClubNeed, Money, Retirement |
+| `nationalTeam` | `PT-NT-*`, `PT-AWARD-*`, `PT-TIER-*` | CROSS_SYSTEM | HIGH | Performance, calendar, Scoring |
+| `awards` | `PT-AWARD-*`, `PT-SCORE-009`, `PT-TIER-*` | CROSS_SYSTEM | HIGH | Performance, achievements, Scoring |
+| `reputationSocial` | `PT-PBR-*`, `PT-VIRAL-*`, `PT-BESTRUN-*` | P0 | HIGH | PBR cohorts/config, no direct gameplay scoring write |
+| `retirementComeback` | `PT-CAREER-*`, `PT-RET-*`, `PT-CB-*`, `PT-FIN-*`, `PT-SCORE-011` | P0 | CRITICAL | Health, Market, Development, automation policy separada |
+| `scoringConfiguration` | `PT-TIER-*`, `PT-POS-FAIR-*`, `PT-SCORE-*`, `PT-AWARD-*`, `PT-TROPHY-*` | P0 | CRITICAL | todos los facts upstream; no EngineParameterSet |
+| `scoringCalibrationData` | `PT-PBR-*`, `PT-TIER-*`, `PT-SCORE-*`, `PT-POS-FAIR-*` | P0 | CRITICAL | cohorts/evidence y ScoringConfiguration |
+
+`potentialSensitivityGroup` es una expectativa de planificación, no un
+resultado de sensitivity analysis. No indica qué parámetro ajustar primero.
+Career length, tier rarity, Quick/Custom end-to-end y PC composition son
+multi-system targets y no pertenecen exclusivamente a Retirement, Creation o
+Scoring.
+
+No se añadió ningún value, default, alias ni path. Todo template calibrable
+permanece `UNASSIGNED`; G3D-3D no crea `EngineParameterSetCandidate`.

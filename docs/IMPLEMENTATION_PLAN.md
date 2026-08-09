@@ -2637,3 +2637,55 @@ Focused blockers:
 No se creó ADR: normalization aplica versioning/provenance/pool/money policies
 ya cubiertas por ADR-015/070/080–084. `Data V1`, EngineParameterSet,
 ScoringConfiguration y gameplay siguen bloqueados.
+
+### Cierre G3D-3D — Product Numeric Targets & Acceptance Tolerances
+
+**Resultado:** `GO_FOR_P1_AND_INITIAL_CALIBRATION_PREPARATION`.
+
+Fuente normativa:
+[G3D Product Calibration Targets](G3D_PRODUCT_CALIBRATION_TARGETS.md).
+
+Queda cerrado:
+
+- perfil de rareza `BALANCED` con bandas para los siete tiers y fairness
+  GK/CM/ST;
+- equivalencia Quick/Custom por SMD, mediana, P05/P25/P50/P75/P95/P99, W1,
+  KS y probability gaps, con `PASS|PASS_WITH_WARNING|FAIL`;
+- targets de career duration, retirement tails, comeback raro visible,
+  FinalizationOpportunity y non-termination;
+- balance PBR/PC, composición de categorías, farming diagnostics y viral tails;
+- guardrails de trophy/Award/National Team, Health y Market sin presentarlos
+  como observaciones;
+- `EXPECTED_RARE|REVIEW_REQUIRED|INVALID` y precision policy por suite;
+- clasificación exhaustiva de 186 targets, consumer overlay para 275 parameter
+  templates y acceptance-use de 139 goldens.
+
+No se asignan parameters, scoring values ni expected outputs. Data V1 sigue
+`DATA_V1_NOT_PUBLISHED`.
+
+#### Secuencia posterior reconciliada
+
+El roadmap ya usa `G3D-3..G3D-10` para calibración causal; no se renombran esas
+fases ni se introduce un alias `G3D-4/5` incompatible.
+
+| Track | Input | Output autorizado futuro | Gate | Boundary |
+|---|---|---|---|---|
+| `G3D-3B2` paralelo | gaps focused P0 | evidence/candidates superseding de Award, ordinary international calendar y Money | fields/licensing/transforms validados | no ParameterSet ni Data V1 parcial |
+| `G3D-P1` observational acquisition | 40 DatasetDefinitions + IDs candidate + target registry | datasets P1 acquired/normalized con provenance | coverage, units, censoring, privacy, license | no tuning de coefficients durante acquisition |
+| initial calibration preparation | product target set + registries | candidate manifests, sensitivity plan, harness/config skeleton permitidos por boundary vigente | upstream dataset readiness | sin publicar valores competitivos |
+| `G3D-3` causal roadmap existente | Creation/Development P1 ready | primer `EngineParameterSetCandidate` parcial y reports | Gates 1–2, autorización futura expresa | no gameplay implementation |
+| `G3D-4..G3D-10` existentes | upstream candidates aceptados | calibración causal, goldens, integrated MC y V1 publication | orden causal del plan | no saltar upstream gates |
+
+`G3D-P1` es un label de track de adquisición, no una sexta versión ni una
+renumeración competitiva. G3D-3D no inicia automáticamente ninguno de estos
+tracks.
+
+#### Blockers después de G3D-3D
+
+1. P1 observational evidence para Development, usage, Performance, Health,
+   Club, Market, National Team, Social y Retirement;
+2. focused G3D-3B2 Award/Calendar/Money gaps;
+3. scoring IJL/catalog/cohort resources;
+4. todos los candidate parameter values y sensitivity runs;
+5. 139 expected goldens, independent verification y acceptance reports;
+6. atomic Data V1 y Scoring bundle publication.

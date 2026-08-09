@@ -295,7 +295,7 @@ Estados generales: `PLANNED`, `MEASURABLE`, `EVIDENCE_READY`, `ACCEPTED`,
 | `CT-SCR-NAT-001` | national achievement mapping/composition | `CALIBRATION_TARGET` | `EVIDENCE_PENDING`; `DIST_Q`; DEEP | `DS-SCORING-CATALOG` | national catalog | sí + data/no/`PLANNED` |
 | `CT-SCR-AWD-001` | equivalence reduction, league formulas, stacking | `INVARIANT` | `DESIGN_EXACT`; `TRACE`; SMOKE | `DS-SCORING-CATALOG` | award catalog/equivalence | sí/no/`MEASURABLE` |
 | `CT-SCR-REC-001` | record repeat/upgrade/shared and longevity semantics | `INVARIANT` | `DESIGN_EXACT`; `TRACE`; SMOKE | `DS-SCORING-CATALOG` | record/longevity catalog | sí/no/`MEASURABLE` |
-| `CT-SCR-POP-001` | social-signal→PRL relation/distribution/persistence | `CALIBRATION_TARGET` | `PRODUCT_DECISION_PENDING`; `DIST_Q`; DEEP | `DS-SCORING-SOCIAL-COHORTS`, `DS-SOCIAL-AUDIENCE-REFERENCE` | popularity transforms | sí/sí/`PLANNED` |
+| `CT-SCR-POP-001` | social-signal→PBR relation/distribution/persistence | `CALIBRATION_TARGET` | `PRODUCT_DECISION_PENDING`; `DIST_Q`; DEEP | `DS-SCORING-SOCIAL-COHORTS`, `DS-SOCIAL-AUDIENCE-REFERENCE` | popularity transforms | sí/sí/`PLANNED` |
 | `CT-SCR-PBR-001` | subcaps and 5% cross-cap exact | `INVARIANT` | `DESIGN_EXACT`; `TRACE`; SMOKE | — | PBR caps/order | no/no/`MEASURABLE` |
 | `CT-SCR-PC-001` | total PC/category composition over Careers | `CALIBRATION_TARGET` | `PRODUCT_DECISION_PENDING`; `DIST_Q`; DEEP | all gameplay + scoring datasets | all Scoring + upstream | parcial/sí/`PLANNED` |
 | `CT-SCR-TIER-001` | narrative tier distribution/frequencies | `CALIBRATION_TARGET` | `PRODUCT_DECISION_PENDING`; `FREQ`; DEEP | — | tier boundaries + all scoring | no/sí/`PLANNED` |
@@ -459,3 +459,110 @@ tolerance ni observed value fue asignado.
 `OBSERVED_EVIDENCE_REQUIRED`, `PRODUCT_NUMERIC_DECISION_REQUIRED` or
 `EVIDENCE_AND_PRODUCT_REQUIRED`. G3D-3D remains owner of numeric product
 tolerances.
+
+## 12. Product numeric target overlay G3D-3D
+
+Fuente normativa:
+[G3D Product Calibration Targets](G3D_PRODUCT_CALIBRATION_TARGETS.md).
+Los 186 target IDs permanecen canónicos; `PT-*` son subtargets de producto y no
+duplican `CalibrationTargetDefinition`.
+
+### 12.1 Clasificación exhaustiva
+
+Se aplica una sola clase G3D-3D por target, con esta precedencia:
+
+1. `INVARIANT` → `INVARIANT_ONLY`;
+2. `DIAGNOSTIC` → `DIAGNOSTIC_DEFINED`, incluso si G3D-3D añade review bands;
+3. IDs de §12.2 → `PRODUCT_NUMERIC_DEFINED`;
+4. `CALIBRATION_TARGET` con `EVIDENCE_PENDING` restante →
+   `OBSERVATIONAL_PENDING`;
+5. `CALIBRATION_TARGET` con `PRODUCT_DECISION_PENDING` restante →
+   `CALIBRATION_PENDING_DATA`.
+
+| Clase G3D-3D | Count | Semántica actual |
+|---|---:|---|
+| `INVARIANT_ONLY` | 28 | exacto por spec; cero violaciones |
+| `DIAGNOSTIC_DEFINED` | 29 | métrica y review semantics definidas; no acceptance observado inventado |
+| `PRODUCT_NUMERIC_DEFINED` | 18 | consume uno o más `PT-*`; ejecución/calibración pendiente |
+| `OBSERVATIONAL_PENDING` | 89 | necesita P1/P2 evidence/transform antes de rango observado |
+| `CALIBRATION_PENDING_DATA` | 22 | direction/shape existe, pero un número aislado sin evidence/sensitivity sería falso |
+| **Total** | **186** | cero IDs nuevos o duplicados |
+
+### 12.2 Targets con números de producto
+
+```text
+CT-CRE-EQUIV-001
+CT-MKT-OFFER-001
+CT-MKT-TRANS-001
+CT-NT-CALL-001
+CT-NT-MIN-001
+CT-AWD-WIN-001
+CT-AWD-REPEAT-001
+CT-AWD-MULTI-001
+CT-REP-ATTN-001
+CT-SOC-FOLLOW-001
+CT-RET-AGE-001
+CT-CB-FREQ-001
+CT-CB-SUCCESS-001
+CT-FIN-TIME-001
+CT-SCR-POP-001
+CT-SCR-PC-001
+CT-SCR-TIER-001
+CT-E2E-CAREER-001
+```
+
+Sus métricas, denominadores, PASS/warning/failure bands, sample tier, owners y
+parameter-family consumers están en las filas `PT-*`. Si además requieren
+evidence, `PRODUCT_NUMERIC_DEFINED` no implica `EVIDENCE_READY`, `ACCEPTED` ni
+`FROZEN_V1` del CalibrationTarget.
+
+### 12.3 Mixed targets sin número aislado
+
+Los 22 siguientes dejan de significar “Producto debe inventar una cifra”. Se
+clasifican `CALIBRATION_PENDING_DATA`: P1 y sensitivity deben establecer una
+escala interpretable antes de que Product acepte una banda.
+
+```text
+CT-CRE-POS-001
+CT-CRE-POWER-001
+CT-DEV-RETRAIN-001
+CT-ROLE-SENS-001
+CT-MIN-SENS-001
+CT-PERF-CONS-001
+CT-PERF-EVID-001
+CT-PERF-FORM-001
+CT-HLT-FAT-001
+CT-HLT-FIT-001
+CT-TACTIC-001
+CT-CAL-PRESS-001
+CT-COMP-CONTRIB-001
+CT-WORLD-CYCLE-001
+CT-MKT-NEED-001
+CT-MKT-SELLER-001
+CT-CONTRACT-EXPECT-001
+CT-MKT-NEG-001
+CT-MKT-DECISION-001
+CT-REP-SPORT-001
+CT-REP-SENT-001
+CT-REP-REG-001
+```
+
+No son product gaps de G3D-3D: su gate correcto es data/sensitivity. Un futuro
+rango conserva source classification y no puede presentarse como observado si
+es finalmente sintético.
+
+### 12.4 Alias corregido
+
+La descripción histórica “social-signal→PRL” de `CT-SCR-POP-001` era un alias
+semántico incorrecto. La identidad canónica no cambia; la métrica correcta es
+social-signal→`PBR`, conforme a ADR-080 y `SCORING_MATH_SPEC.md`. No se crea
+otro target.
+
+### 12.5 Acceptance state
+
+- product ranges: `NUMERIC_TARGET_DEFINED`, no `ACCEPTED_V1`;
+- invariants: `MEASURABLE`, pendientes de ejecución;
+- observed targets: permanecen pendientes de datasets;
+- ningún target alcanza `VALIDATED`, `ACCEPTED` o `FROZEN_V1` sin run/report
+  hashes;
+- `PASS|PASS_WITH_WARNING|FAIL` y uncertainty policy se heredan del target set.

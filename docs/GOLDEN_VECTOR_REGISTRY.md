@@ -401,3 +401,26 @@ All other 47 catalog-dependent vectors are `CATALOG_INPUTS_PARTIAL`. In
 particular, Award tie/eligibility vectors remain blocked by definition fields,
 and `GV-CALENDAR-001` remains blocked by the partial Q/calendar candidate.
 No golden advances to `INPUTS_FROZEN` in this phase.
+
+## 13. Acceptance-use overlay G3D-3D
+
+Los 139 golden IDs permanecen `SPECIFIED`; no se calcula expected output. Cada
+ID recibe un `acceptanceUse` mediante precedencia cerrada:
+
+1. `SCORING_REGRESSION`;
+2. `INVARIANT_ACCEPTANCE`;
+3. `DISTRIBUTIONAL_REGRESSION`;
+4. `CALIBRATION_ACCEPTANCE` para cualquier ID actual no capturado antes.
+
+| Acceptance use | Golden IDs / closed pattern | Uso futuro |
+|---|---|---|
+| `SCORING_REGRESSION` | todos `GV-SCR-*` y `GV-FIN-COMPLETE-001` | aritmética exacta, ledger, snapshot, tiers y final score |
+| `INVARIANT_ACCEPTANCE` | todos `GV-MATH-*`; `GV-CRE-MATH-001`; `GV-DEV-DOMPOS-001`; `GV-AVAIL-UNION-001`; `GV-MIN-ZERO-001`; `GV-MIN-ALLOC-001`; `GV-MIN-CONTEXT-001`; `GV-HLT-CADENCE-001`; `GV-MOBILITY-BOUNDARY-001`; `GV-MONEY-ERROR-001`; `GV-NT-INELIGIBLE-001`; `GV-AWD-INELIGIBLE-001`; `GV-REP-LAG-001`; `GV-SOC-OVERFLOW-001`; `GV-RET-CURSOR-001`; `GV-FIN-NOREOPEN-001` | dominios, no-draw, identidad, orden, bounds y replay estructural |
+| `DISTRIBUTIONAL_REGRESSION` | `GV-CRE-GEN/TRAIT/POWER/CUSTOM-*`; `GV-ROLE-SOFTMAX-*`; `GV-MIN-SHARE-*`; `GV-APP-START-*`; `GV-PERF-FACTORS-*`; `GV-ST-*`; `GV-GK-PROD-*`; `GV-INJ-COUNT/SEVERITY-*`; `GV-REC-REQ-*`; `GV-RELAPSE-*`; `GV-SEQUELA-*`; `GV-CLUB-EVOL-*`; `GV-MGR-TURN/GEN-*`; `GV-TACTIC-*`; `GV-PCOMP-*`; `GV-LEAGUE-RANK-*`; `GV-KNOCKOUT-*`; `GV-WORLD-EVOL-*`; `GV-MKT-INTEREST/OFFER/FEE/SELLER/SALARY/RENEW/LOAN/NEG-*`; `GV-CONTRACT-EXPECT/DUR-*`; `GV-NT-FIELD/CALL/SQUAD/INC/MIN/OUTCOME-*`; `GV-AWD-CFIELD/PLACE/STAT/TIE/MULTI-*`; `GV-REP-SPORT/AWARE/SENT/ATTN/REGION-*`; `GV-SOC-FOLLOW-UP/FOLLOW-DOWN/ENG-*`; `GV-RET-HAZARD/DECISION/AUTO-*`; `GV-CB-*`; `GV-FIN-OPP-*` | exact draw→outcome fixtures que protegen distribución/sampler al cambiar candidates |
+| `CALIBRATION_ACCEPTANCE` | todos los restantes IDs existentes de §§5.2–5.10 | transiciones, predictors, summaries y adapters con candidate parameters/data |
+
+Los slash patterns representan la lista explícita de sufijos indicada, no una
+regla para IDs futuros. Un golden nuevo debe declarar `acceptanceUse` y no
+hereda el catch-all. Distributional regression no reemplaza Monte Carlo: fija
+draws e intermediates exactos, mientras los 77 `PT-*` evalúan frecuencias y
+distancias agregadas.

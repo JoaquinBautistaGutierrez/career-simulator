@@ -3,8 +3,10 @@
 ## 1. Propósito
 
 Este registro contiene únicamente elecciones de producto: preferencias que no
-deben presentarse como hechos observados. Las tolerancias numéricas se
-publicarán posteriormente; no se crea una DR por cada valor.
+deben presentarse como hechos observados. G3D-3D publica sus tolerancias
+numéricas en
+[G3D Product Calibration Targets](G3D_PRODUCT_CALIBRATION_TARGETS.md); no se
+crea una DR por cada valor.
 
 Niveles de freeze G3D-3A:
 
@@ -29,10 +31,10 @@ mapean abajo; no se confunde dirección aprobada con tolerancia calibrada.
 | `PD-G3D-005` | Cadencia Market V1 | mid-season; post-season; ambas | **Post-season only**, usando cursor existente. Reduce policy/registration sin impedir transferencia. | Calendar/Market; `CT-MKT-TRANS-*` | Product + Architecture | `FROZEN_FOR_V1`; DR-067 V1 |
 | `PD-G3D-006` | Registration V1 | reglamento completo; subset; universal | Subset next-season; ausencia de regla = pending, nunca universal. | Market/Competitions/Scoring | Product + Data | `FROZEN_FOR_V1`; bindings pendientes |
 | `PD-G3D-007` | Sporting nationality V1 | Argentina-only; multi-eligibility | **Argentina-only** en V1; no transition. Es el menor scope coherente con país inicial. | Creation/National Team | Product | `FROZEN_FOR_V1`; ADR-082 |
-| `PD-G3D-008` | Equivalencia Quick/Custom | igualdad individual; media; distribución | Misma distribución competitiva por GK/CM/ST: SMD de media, mediana, quantiles principales, W1, KS y probabilidad de tier. Todas las métricas obligatorias deben pasar. | Creation; `CT-CRE-EQUIV-*` | `PRODUCT_OWNER`, informado por `CALIBRATION_OWNER` | `APPROVED_DIRECTION` + `NUMERIC_TARGET_REQUIRED`; G3D-3D |
-| `PD-G3D-009` | Rareza de tiers altos | `CONSERVATIVE`, `BALANCED`, `GENERATIVE` | Recomendada **BALANCED**: tiers altos raros pero observables en Monte Carlo DEEP; conserva validabilidad sin hacerlos ordinarios. | Scoring; `CT-SCR-TIER-*` | `PRODUCT_OWNER` + `SCORING_OWNER` | `PROPOSED` + `NUMERIC_TARGET_REQUIRED`; G3D-3D/Gate 6 |
-| `PD-G3D-010` | Balance social en PBR | indiferente; dominante; subordinado | En zona central social no debe dominar sporting; cult/viral tails siguen válidas. No cambia caps/fórmula. | Reputation/Scoring; `CT-SCR-POP/PC` | Product + Scoring | `APPROVED_DIRECTION` + `NUMERIC_TARGET_REQUIRED`; G3D-3D |
-| `PD-G3D-011` | Frecuencia de comeback | muy raro; raro visible; frecuente | **Raro pero visible**; múltiples comebacks son excepcionalísimos, nunca imposibles. | Retirement; `CT-CB-FREQ/CYCLE` | Product | `APPROVED_DIRECTION` + `NUMERIC_TARGET_REQUIRED`; G3D-3D/G3D-7 |
+| `PD-G3D-008` | Equivalencia Quick/Custom | igualdad individual; media; distribución | Misma distribución competitiva por GK/CM/ST: SMD de media, mediana, quantiles principales, W1, KS y probabilidad de tier. Todas las métricas obligatorias deben pasar. | Creation; `CT-CRE-EQUIV-*`, `PT-QC-*` | `PRODUCT_OWNER`, informado por `CALIBRATION_OWNER` | `FROZEN_FOR_V1`; numeric targets definidos por G3D-3D |
+| `PD-G3D-009` | Rareza de tiers altos | `CONSERVATIVE`, `BALANCED`, `GENERATIVE` | **BALANCED**: tiers altos raros pero observables en Monte Carlo DEEP; conserva validabilidad sin hacerlos ordinarios. | Scoring; `CT-SCR-TIER-*`, `PT-TIER-*` | `PRODUCT_OWNER` + `SCORING_OWNER` | `FROZEN_FOR_V1`; Gate 6 pendiente de ejecución |
+| `PD-G3D-010` | Balance social en PBR | indiferente; dominante; subordinado | En zona central social no debe dominar sporting; cult/viral tails siguen válidas. No cambia caps/fórmula. | Reputation/Scoring; `CT-SCR-POP/PC`, `PT-PBR-*` | Product + Scoring | `FROZEN_FOR_V1`; numeric targets definidos |
+| `PD-G3D-011` | Frecuencia de comeback | muy raro; raro visible; frecuente | **Raro pero visible**; múltiples comebacks son excepcionalísimos, nunca imposibles. | Retirement; `CT-CB-FREQ/CYCLE`, `PT-CB-*` | Product | `FROZEN_FOR_V1`; numeric targets definidos |
 | `PD-G3D-012` | Finish Career posretiro | solo oportunidad; manual; automático | Mostrar opportunity cuando ocurra y permitir Finish manual en todo safe boundary retirado; doble confirmación irreversible. No auto-finish oficial. | Lifecycle/Profile/Scoring; `CT-FIN-TIME` | Product | `FROZEN_FOR_V1`; frequency target separado |
 | `PD-G3D-013` | Outlier acceptance | rechazar por rareza; revisar; categorías | `EXPECTED_RARE`, `REVIEW_REQUIRED`, `INVALID`; rareza sola nunca invalida. | todos; tail targets | Product + QA | `FROZEN_FOR_V1` |
 | `PD-G3D-014` | Claims públicos de percentiles/frecuencias | siempre; con sample gate; ninguno | No publicar hasta cohort/sample/privacy policy validada; test leaderboard puede ser interno. | Profile/Leaderboard; DR-035 | Product + Data/Privacy | `FROZEN_FOR_V1`; operational ranges pending |
@@ -52,7 +54,9 @@ el mismo `CalibrationSeedSet`, por posición y modo:
 - probabilidad end-to-end de tiers, como gate tardío y no ajuste directo de
   Creation.
 
-Las tolerancias son product settings separados; no se rellenan en G3D-2.
+Las tolerancias son product settings separados. G3D-3D fija SMD, mediana,
+P05/P25/P50/P75/P95/P99, W1, KS y gaps de tier con bandas
+`PASS|PASS_WITH_WARNING|FAIL` en `PT-QC-*`.
 
 ## 4. Tier y social balance
 
@@ -100,9 +104,8 @@ No se introducen caps para mover un outcome de una clase a otra.
 
 ## 8. Tier-rarity profiles
 
-No se asignan porcentajes en G3D-3A. Los perfiles definen únicamente la
-dirección que `PRODUCT_OWNER` y `SCORING_OWNER` convertirán en tolerancias en
-G3D-3D:
+G3D-3A no asignó porcentajes. Los perfiles definieron la dirección que
+`PRODUCT_OWNER` y `SCORING_OWNER` convirtieron en tolerancias en G3D-3D:
 
 | Perfil | Consecuencia de producto | Riesgo de calibración |
 |---|---|---|
@@ -110,9 +113,10 @@ G3D-3D:
 | `BALANCED` | Son raros, ordenados y observables en campañas DEEP sin volverse expectativa ordinaria. | Requiere cohortes grandes y acceptance por intervalos; preserva utilidad diagnóstica. |
 | `GENERATIVE` | Carreras extraordinarias aparecen con mayor frecuencia. | Riesgo de comprimir diferenciación, saturar leaderboard y compensar upstream con Scoring. |
 
-**Recomendación:** `BALANCED`. G3D-3D debe fijar, por tier y compatibility key,
-intervalos de frecuencia, tamaño mínimo DEEP, tolerancia de posición/oportunidad,
-zero-observation handling y tail confidence. No se fija cap ni probability floor.
+**Decisión V1:** `BALANCED`. `PT-TIER-001..007` fija, por exact compatibility
+key, intervalos de frecuencia; `PT-POS-FAIR-*` fija fairness; `PT-MC-003`
+define precisión/zero-observation handling. No se fija cap ni probability
+floor.
 
 ## 9. Best-run policy
 
@@ -138,7 +142,7 @@ comparabilidad cross-version: la compatibility key sigue siendo exacta.
   `CalibrationSeedSet`; no aprueba la intención de producto.
 - `TECHNICAL_VALIDATOR` confirma aggregation y reproducibilidad.
 - Las tolerancias se congelan en G3D-3D antes del acceptance competitivo de
-  Creation; G3D-3A no asigna números.
+  Creation. Su ejecución y validación todavía están pendientes.
 
 El mismo patrón aplica a tier rarity, social balance, comeback y finalization
 frequency. Una tolerance es `PRODUCT_DEFINED`, no external observation.
@@ -148,21 +152,34 @@ frequency. Una tolerance es `PRODUCT_DEFINED`, no external observation.
 | Freeze level G3D-3A | Decisions |
 |---|---|
 | `FROZEN_FOR_V1` | `PD-G3D-001..007`, `PD-G3D-012..015` |
-| `APPROVED_DIRECTION` + `NUMERIC_TARGET_REQUIRED` | `PD-G3D-008`, `PD-G3D-010`, `PD-G3D-011` |
-| `PROPOSED` + `NUMERIC_TARGET_REQUIRED` | `PD-G3D-009` (`BALANCED` recomendado) |
+| `FROZEN_FOR_V1` + numeric targets definidos | `PD-G3D-008..011` |
 
-Las trece direcciones aprobadas en G3D-2 son 001–008 y 010–014. G3D-3A no
-reabre ninguna; solo distingue direction freeze de numeric acceptance. 009 y
-015 pertenecían al track nuevo; 015 queda congelada por ADR-084 y 009 conserva
-aprobación numérica pendiente.
+Las trece direcciones aprobadas en G3D-2 son 001–008 y 010–014. G3D-3D no
+reabre ninguna. 009 queda congelada como `BALANCED` y 015 permanece congelada
+por ADR-084.
 
-## 12. Referencias
+## 12. Freeze numérico G3D-3D
+
+| Decisión | Numeric binding | Estado |
+|---|---|---|
+| Quick/Custom | `PT-QC-001..010` | `FROZEN_FOR_V1`; validation pending |
+| Tier rarity y position fairness | `PT-TIER-*`, `PT-POS-FAIR-*` | `FROZEN_FOR_V1`; DEEP/Gate 6 pending |
+| Social/PBR | `PT-PBR-*`, `PT-VIRAL-*` | `FROZEN_FOR_V1`; upstream/scoring calibration pending |
+| Comeback/finalization | `PT-CB-*`, `PT-FIN-*` | `FROZEN_FOR_V1`; user manual choice remains observational |
+| Tail acceptance | §12 del target set | `FROZEN_FOR_V1`; INVALID solo por invariants |
+
+Los números son `PRODUCT_DECISION`, no evidence ni parámetros. Targets de
+incidencia real conservan `OBSERVATIONAL_REFERENCE_REQUIRED` y pasan al track
+P1 sin bloquear el freeze de preferencias.
+
+## 13. Referencias
 
 - [Vertical Slice Data Catalog](VERTICAL_SLICE_DATA_CATALOG_SPEC.md)
 - [Calibration Target Registry](CALIBRATION_TARGET_REGISTRY.md)
 - [Reference Snapshot Policy](G3D_REFERENCE_SNAPSHOT_POLICY.md)
 - [G3D Data Governance](G3D_DATA_GOVERNANCE.md)
 - [G3D P0 Acquisition Spec](G3D_P0_ACQUISITION_SPEC.md)
+- [G3D Product Calibration Targets](G3D_PRODUCT_CALIBRATION_TARGETS.md)
 - [ADR-081](adr/081-hybrid-external-club-pool.md)
 - [ADR-082](adr/082-vertical-slice-sporting-nationality.md)
 - [ADR-083](adr/083-native-money-and-calibration-normalization.md)
