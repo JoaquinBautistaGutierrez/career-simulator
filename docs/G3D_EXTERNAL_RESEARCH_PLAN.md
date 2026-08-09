@@ -181,3 +181,66 @@ indefinidamente una fuente perfecta.
 - [G3D P0 Acquisition Spec](G3D_P0_ACQUISITION_SPEC.md)
 - [Calibration Dataset Registry](CALIBRATION_DATASET_REGISTRY.md)
 
+## 12. Resultado de la campaña G3D-3B
+
+La campaña `RSNAP-G3D3B-2026-08-07-C1` congeló
+`referenceCutoffDate=2026-08-07` antes del primer `EvidenceRecord`. La evidencia
+atómica está en [P0 Evidence Index](P0_EVIDENCE_INDEX.md) y la clasificación de
+uso/licencia en [Source License Manifest](SOURCE_LICENSE_MANIFEST.md). No se
+retuvieron raw externos, no se normalizó ningún dataset y no se asignaron
+parámetros.
+
+### 12.1 P0 completeness matrix
+
+| Research task | Required-field coverage | Strongest tier | License route | Material conflicts | Artifact | State |
+|---|---|---|---|---|---|---|
+| `RS-P0-BASELINE` | cutoff y ediciones baseline identificados; la fase anual argentina permanece parcial al cutoff | A | manual public facts/reference-only | none | `REFERENCE_EDITION_MANIFEST` | `COMPLETE_WITH_LIMITATIONS` |
+| `RS-P0-COMP-FORMAT` | formatos, participantes, progresión y outputs principales cubiertos; algunos bindings de qualification quedan para data publication | A | manual public facts/reference-only | none | `COMPETITION_FORMAT_EVIDENCE` | `COMPLETE_WITH_LIMITATIONS` |
+| `RS-P0-CALENDAR` | periods, exposure y solapamientos cubiertos; mapping Q, ventanas internacionales ordinarias y cierre anual ARG aún no publicados | A | manual public facts/reference-only | none | `CALENDAR_EVIDENCE` | `COMPLETE_WITH_LIMITATIONS` |
+| `RS-P0-CLUB-IDENTITY` | 8 ARG + 8 ESP, membresía, alias y rationale de cobertura | A + D product selection | manual public facts/product-defined | none | `DETAILED_CLUB_SELECTION_REPORT` | `COMPLETE` |
+| `RS-P0-EXTERNAL-POOL` | universo mínimo y límites nominales por clase | A + D policy | manual public facts/product-defined | none | `EXTERNAL_CLUB_SCOPE_MANIFEST` | `COMPLETE` |
+| `RS-P0-NATIONAL-CATALOG` | Argentina senior, FIFA eligibility y World Cup baseline; regular-window calendar/reach remain acquisition gaps | A + D policy | manual public facts/product-defined | none | `NATIONAL_TEAM_REFERENCE_EVIDENCE` | `COMPLETE_WITH_LIMITATIONS` |
+| `RS-P0-AWARD-CATALOG` | cinco candidates concretos; LaLiga POTY field/ballot/tie y scorer tie/official alias no verificables en las fuentes primarias adquiridas; continuidad 2025 de reglas UEFA requiere validación | A/B | manual public facts/reference-only | none; fields missing, not contradicted | `AWARD_CATALOG_EVIDENCE` | `RESEARCH_INCOMPLETE` |
+| `RS-P0-MONEY-POLICY-DATA` | minor units y rutas oficiales CPI/HICP/FX/PPP identificadas; values/series no adquiridos | A | reference-only; terms review before derived publication | none | `MONETARY_REFERENCE_EVIDENCE` | `COMPLETE_WITH_LIMITATIONS` |
+| `RS-P0-SCORING-NORMATIVE` | normativa existente inventariada y gaps separados sin inferir puntos | A normative | product-defined/internal normative | none | `SCORING_CATALOG_EVIDENCE` | `COMPLETE_WITH_GAPS` |
+
+### 12.2 Artifact status
+
+| Contractual artifact | State | Blocks |
+|---|---|---|
+| `REFERENCE_EDITION_MANIFEST` | `EVIDENCE_COMPLETE_WITH_LIMITATIONS` | annual Argentina snapshot remains partial by policy |
+| `COMPETITION_FORMAT_EVIDENCE` | `EVIDENCE_COMPLETE_WITH_LIMITATIONS` | final data bindings/normalization |
+| `CALENDAR_EVIDENCE` | `EVIDENCE_COMPLETE_WITH_LIMITATIONS` | canonical Q mapping and ordinary international windows |
+| `DETAILED_CLUB_SELECTION_REPORT` | `EVIDENCE_COMPLETE` | no P0 identity blocker |
+| `EXTERNAL_CLUB_SCOPE_MANIFEST` | `EVIDENCE_COMPLETE` | per-identity materialization occurs in G3D-3C/P1 |
+| `NATIONAL_TEAM_REFERENCE_EVIDENCE` | `EVIDENCE_COMPLETE_WITH_LIMITATIONS` | ordinary senior windows/reach source |
+| `AWARD_CATALOG_EVIDENCE` | `EVIDENCE_COMPLETE_WITH_LIMITATIONS` + `RESEARCH_INCOMPLETE` fields | two LaLiga definitions and UEFA rule-edition continuity cannot freeze |
+| `MONETARY_REFERENCE_EVIDENCE` | `SOURCE_ROUTES_IDENTIFIED` | series acquisition/normalization and terms review |
+| `SCORING_CATALOG_EVIDENCE` | `EVIDENCE_COMPLETE_WITH_GAPS` | IJL/catalog/product data listed in artifact |
+| `SOURCE_LICENSE_MANIFEST` | `EVIDENCE_COMPLETE_WITH_LIMITATIONS` | substantial derived redistribution remains review-required |
+
+### 12.3 Material gaps by priority
+
+| Priority | Gap | Effect |
+|---|---|---|
+| `BLOCKS_G3D_3C` | primary rules or approved product/data policy for `LALIGA_POTY-2025-26` field/ballot/tie | cannot publish that `AwardDefinition` |
+| `BLOCKS_G3D_3C` | official tie/alias semantics for `LALIGA_TOP_SCORER-2025-26` | cannot publish its final tie policy/identity |
+| `BLOCKS_G3D_3C` | verify that acquired Ballon/Kopa/Yashin mechanics apply to the 2025 edition | comparative award definitions remain candidate-only |
+| `BLOCKS_G3D_3C` | ordinary Argentina senior windows if the V1 `CalendarDefinition` publishes them beyond World Cup context | national calendar can only publish the closed major-tournament subset |
+| `BLOCKS_PARAMETER_CALIBRATION` | P1 player, exposure, performance, injury, club and market observations | no EngineParameterSet tuning |
+| `BLOCKS_SCORING` | IJL binding, complete definition catalogs, records/milestones/historic definitions and cohort transforms | no ScoringConfiguration/Data publication |
+| `NON_BLOCKING` | raw redistribution permission for official pages | atomic citations remain usable; raw was not stored |
+
+### 12.4 Readiness decision
+
+Resultado: **`CONDITIONAL_GO` para G3D-3C**.
+
+G3D-3C puede normalizar y validar el cutoff, competitions, closed-stage calendar,
+16 club identities, external-club scope, national major-tournament subset,
+monetary source routes y scoring gap catalog. No puede marcar como `FROZEN` ni
+publicar como Data V1 las AwardDefinitions incompletas, el calendario nacional
+ordinario no adquirido ni los monetary series todavía no normalizados. Si la
+fase siguiente exige publicar el bundle V1 completo de forma atómica, este
+resultado se interpreta como `NO_GO` hasta cerrar esos gaps; no se reduce ningún
+acceptance standard.
+

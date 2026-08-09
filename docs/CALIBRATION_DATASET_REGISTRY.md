@@ -544,3 +544,30 @@ No se crearon DatasetDefinitions nuevas. Conteo después de G3D-3A: **40**.
 - [G3D P0 Acquisition Spec](G3D_P0_ACQUISITION_SPEC.md)
 - [G3D External Research Plan](G3D_EXTERNAL_RESEARCH_PLAN.md)
 
+## 15. Acquisition overlay G3D-3B
+
+La campaña `RSNAP-G3D3B-2026-08-07-C1` actualiza únicamente estados de
+acquisition/provenance. No crea `datasetVersion`, no normaliza y no supera
+`ACQUIRED`. Los hashes corresponden a artifacts documentales de facts, no a raw
+externo (que no fue almacenado).
+
+| Dataset ID | State after G3D-3B | Acquired/source artifact | Remaining gate |
+|---|---|---|---|
+| `DS-COMPETITION-CATALOG` | `ACQUIRED` | `REFERENCE_EDITION_MANIFEST`, `COMPETITION_FORMAT_EVIDENCE`, EvidenceRecords | canonical IDs/schema, exact bindings, validation and freeze |
+| `DS-NATIONAL-COMPETITION-CATALOG` | `ACQUIRED` | `NATIONAL_TEAM_REFERENCE_EVIDENCE`, FIFA evidence | ordinary-window scope if published, normalization and validation |
+| `DS-CALENDAR-SLICE` | `ACQUIRED` | `CALENDAR_EVIDENCE` | phase→Q transform, Argentina annual boundary, ordinary international windows and overlap validation |
+| `DS-CLUB-VERTICAL-SLICE` | `SOURCE_IDENTIFIED` | `DETAILED_CLUB_SELECTION_REPORT` identifies the 16 clubs | P1 evidence for every required state dimension; identity subset alone does not complete the bundle |
+| `DS-AWARD-DEFINITION-CATALOG` | `SOURCE_IDENTIFIED` | `AWARD_CATALOG_EVIDENCE` identifies five candidates | LaLiga field/tie facts and 2025 UEFA-rule continuity before all five can be acquired |
+| `DS-CURRENCY-INFLATION` | `SOURCE_IDENTIFIED` | `MONETARY_REFERENCE_EVIDENCE` identifies official routes | retrieve versioned observations, decide exact base dates, terms review and transform spec |
+| `DS-SCORING-CATALOG` | `ACQUIRED` | internal normative extraction in `SCORING_CATALOG_EVIDENCE` | normalize exact defined values and keep every enumerated gap unresolved; no points inferred |
+
+The other 33 entries retain their G3D-3A state. Incidental source discovery did
+not promote P1/P2/P3 datasets. `SOURCE_IDENTIFIED` and `ACQUIRED` here never mean
+`NORMALIZED`, `VALIDATED` or `FROZEN`.
+
+Primary provenance:
+
+- [P0 Evidence Index](P0_EVIDENCE_INDEX.md);
+- [Source License Manifest](SOURCE_LICENSE_MANIFEST.md);
+- [G3D External Research Plan §12](G3D_EXTERNAL_RESEARCH_PLAN.md#12-resultado-de-la-campaña-g3d-3b).
+
