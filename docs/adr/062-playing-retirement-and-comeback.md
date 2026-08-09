@@ -1,10 +1,11 @@
 # ADR-062: Estado deportivo, retiro y regreso
 
-- Estado: Aceptado para estructura; matemática y finalización pendientes
+- Estado: Aceptado; matemática/finalización cerradas por ADR-079, calibración pendiente
 - Fecha: 2026-07-28
 - Decisión relacionada: DR-062
 - Aclara: ADR-016
 - Alcance: estado deportivo, motivación, retiro, comeback y frontera terminal
+- Complemento normativo: ADR-079
 
 ## Contexto
 
@@ -96,13 +97,12 @@ ACTIVE -> RETIRED -> ACTIVE -> RETIRED
 
 ### Finalización
 
-El primer retiro deportivo no completa la Career. `CareerStatus.RETIRED` se
-alcanza únicamente cuando una política todavía pendiente declara irreversible
-el cierre deportivo. DR-069 debe fijar ese boundary, el cursor posretiro, el
-freeze de scoring y la transición terminal.
-
-Hasta entonces no se altera la matriz de ADR-016 ni se implementa el runner
-terminal.
+El primer retiro deportivo no completa la Career. ADR-079 fija el boundary:
+`CareerFinalizationConfirmed` cierra el fact frontier y entra en
+`CareerStatus.RETIRED`, reservado a FINALIZING. Quarters/seasons continúan antes
+de ese boundary mientras playing está `RETIRED`; después no hay gameplay ni
+comeback. `COMPLETED` solo se confirma tras scoring final, integridad,
+compatibilidad y consolidación idempotentes.
 
 ## Consecuencias
 
@@ -111,8 +111,9 @@ terminal.
 - `UNATTACHED` puede coexistir con actividad y no fuerza retiro.
 - Retirement/Reputation/Social pueden seguir evolucionando antes del cierre.
 - Ranking permanece limitado a Careers `COMPLETED`, íntegras y elegibles.
-- DR-062 sigue abierta por hazard, outcomes, precisión, streams, parámetros y
-  fixtures; DR-069 bloquea finalización.
+- DR-062 queda `PARTIAL_CALIBRATION`: ADR-079 fija hazard, outcomes, precisión,
+  streams, cursor y fixtures requeridos; faltan values/targets/golden outputs.
+- DR-069 queda resuelta por ADR-079.
 
 ## Alternativas rechazadas
 
@@ -146,15 +147,12 @@ resuelve con política/validación, no con retiro obligatorio.
 
 ## Pendiente
 
-- Función/familia de hazard y competing risks.
-- Dominio/transformación de motivation.
-- Cadencia exacta y `operationKey`.
-- Política de decisión frente a cada cause.
-- Comeback hazard, contexts y fixtures.
-- DR-069: período posretiro, boundary irreversible, scoring final, ranking,
-  perfil y terminación práctica.
-- DR-063/ADR-010 ya fijan facts, idempotencia y aliases; faltan schemas
-  concretos conformes.
+- Values del `EngineParameterSet.retirementComeback`.
+- CalibrationTargets y expected golden outputs.
+- Schemas concretos conformes a DR-063/ADR-010/079.
+- DR-065/066/067 para external clubs, registration y timing real de rutas de
+  comeback; no reabren la matemática lifecycle.
+- Matemática de Scoring G3C-11; Retirement solo fija el freeze boundary.
 
 ## Pruebas y gates
 
@@ -174,6 +172,7 @@ resuelve con política/validación, no con retiro obligatorio.
 - [ADR-004: Oportunidades](./004-opportunity-semantics.md)
 - [ADR-013: State machine de temporada](./013-season-state-machine.md)
 - [ADR-016: Ciclo de vida de Career](./016-career-lifecycle.md)
+- [ADR-079: Matemática de Retirement, Comeback y finalización](./079-retirement-comeback-finalization-mathematics.md)
 - [ADR-017: Descubrimientos](./017-discoveries.md)
 - [Registro de decisiones — DR-062](../DECISIONS_REQUIRED.md#dr-062--hazard-y-proceso-de-retiro)
 - [Registro de decisiones — DR-069](../DECISIONS_REQUIRED.md#dr-069--finalización-tras-retiro-y-ventana-de-regreso)

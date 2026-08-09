@@ -348,13 +348,18 @@ maturation profile y maturation rate.
 Health entrega por Q:
 
 ```text
-loadSignal[q]       ∈ [0,1]
-healthBurden[q]     ∈ [0,1]
-sequelaBurden[i,q]  ∈ [0,1]
+loadSignal[q]       = developmentLoadSignal[q] ∈ [0,1]
+healthBurden[q]     = composed active-condition burden ∈ [0,1]
+sequelaBurden[i,q]  = composed affinity-weighted burden ∈ [0,1]
+inactivitySignal[q] = confirmed inactivity exposure ∈ [0,1]
 ```
 
-La derivación de estas señales pertenece a G3C-5. Development no infiere
-Health desde minutos o Performance.
+ADR-074/
+[`HEALTH_INJURY_RECOVERY_MATH_SPEC.md`](HEALTH_INJURY_RECOVERY_MATH_SPEC.md)
+fija las tres derivaciones. `sequelaBurden[i,q]` combina, mediante
+`1-product(1-burden*affinity)`, secuelas activas y el affinity de su
+`InjuryFamily` hacia la family de capability `i`. Health nunca aplica este
+wear; Development no infiere Health desde minutos o Performance.
 
 Para familia `f`:
 
@@ -369,6 +374,7 @@ wearPredictor[i,q] =
   + wearLoadWeight[f] * loadSignal[q]
   + wearHealthBurdenWeight[f] * healthBurden[q]
   + wearSequelaWeight[i] * sequelaBurden[i,q]
+  + wearInactivityWeight[f] * inactivitySignal[q]
   + wearDeclineSensitivityWeight[f]
       * safeLog(declineSensitivity[f])
   - wearLongevityWeight[f] * l
@@ -1208,7 +1214,7 @@ dimensiones canónicas.
 | Experience | `experienceMinuteUnit[f]`, `experienceSaturationRate[f]` |
 | Environment | tres environment weights simplex |
 | Acquired | base/offsets y seis weights/interacciones de §9 por familia |
-| Wear | age reference/scale, base/offsets y siete weights de §10 |
+| Wear | age reference/scale, base/offsets y ocho weights de §10, incluido `wearInactivityWeight[f]` |
 | Shocks | `developmentFamilySigma[f]`, `developmentCapabilitySigma[i]` |
 | Position/foot | utilities por position y foot |
 | Profiles | component IDs, utilities base/age |
@@ -1437,7 +1443,36 @@ No hay blocker estructural para comenzar G3C-3. G3C-3 debe entregar
 `actualMinutes`, oportunidad/calendario y breakdown posicional sin cambiar las
 ecuaciones aquí definidas.
 
-## 26. Referencias
+**Reconciliación G3C-6 (2026-07-29):** Club/World produce
+`developmentQuality`, `managerDevelopmentInfluence`, `trainingContextSignal`,
+calendar/load context y `TacticalFit` mediante
+[`CLUB_COMPETITION_WORLD_MATH_SPEC.md`](CLUB_COMPETITION_WORLD_MATH_SPEC.md).
+Development los consume en los dominios ya declarados y no recalcula state de
+club, manager o mundo.
+
+## 26. Adapter G3C-10 — Development durante retiro abierto
+
+Con playing `RETIRED` y Career abierta, Development no se congela:
+
+```text
+actualMinutes = 0
+experienceSignal = 0
+developmentEnvironment.club = 0
+developmentEnvironment.manager = 0
+developmentEnvironment.training = 0
+inactivitySignal = 1
+```
+
+Maturation cronológica, wear, shocks y cuantización continúan. Acquired
+development conserva su baseline positivo suave: cero minutos no lo vuelve
+lógicamente cero. El nuevo término
+`wearInactivityWeight[f] * inactivitySignal` hace explícita la inactividad sin
+duplicar load/Health; es `INITIAL_CALIBRATION_REQUIRED` y no introduce threshold
+ni forced decline. Comeback vuelve a entregar los inputs contextuales reales en
+la siguiente Q habilitada. Finalization impide nuevas evoluciones, pero no borra
+capabilities.
+
+## 27. Referencias
 
 - [Contrato matemático y de calibración](MATHEMATICAL_CALIBRATION_CONTRACT.md)
 - [Player Model](PLAYER_MODEL_SPEC.md)
@@ -1448,3 +1483,7 @@ ecuaciones aquí definidas.
 - [ADR-053](adr/053-development-and-aging-model.md)
 - [ADR-070](adr/070-mathematical-runtime-and-parameter-sets.md)
 - [ADR-071](adr/071-creation-development-mathematics.md)
+- [ADR-075](adr/075-club-competition-world-mathematics.md)
+- [Club/Competition/World Math](CLUB_COMPETITION_WORLD_MATH_SPEC.md)
+- [Retirement/Comeback/Finalization Math](RETIREMENT_COMEBACK_FINALIZATION_MATH_SPEC.md)
+- [ADR-079](adr/079-retirement-comeback-finalization-mathematics.md)

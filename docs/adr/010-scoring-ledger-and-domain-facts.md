@@ -106,7 +106,9 @@ Los caps aprobados limitan puntos, nunca ocurrencias, stats o eventos.
 
 Un snapshot competitivo final requiere Career `COMPLETED`, integridad válida,
 ledger verificado y contexto compatible. El primer `RetirementOccurred` no
-congela scoring ni habilita ranking. DR-069 conserva el boundary terminal.
+congela scoring ni habilita ranking. ADR-079 fija
+`CareerFinalizationConfirmed` como boundary terminal del fact set; `COMPLETED`
+sigue siendo requisito de ranking.
 
 Igualdad de `scoringVersion` es condición necesaria, no suficiente, para
 compartir leaderboard. DR-036 debe cerrar la compatibility key completa.
@@ -126,9 +128,12 @@ compartir leaderboard. DR-036 debe cerrar la compatibility key completa.
 
 - DR-010 sigue bloqueando implementación de scoring real;
 - SC-02 a SC-11 conservan matemática parcial según la matriz normativa;
-- DR-049, DR-066/067 y DR-069 siguen bloqueando scopes/finalización;
+- DR-049/069 están resueltas; DR-066/067 siguen bloqueando scopes/atribución;
 - cambiar catálogo/allowlist puede exigir bump de schema/engine/scoring;
 - no existe `engine -> scoring`.
+
+ADR-079 refina este ADR únicamente en lifecycle/freeze; no cierra las fórmulas
+de Scoring de DR-010.
 
 ## Alternativas rechazadas
 
@@ -164,6 +169,14 @@ función pura de facts y versión.
 Rechazado porque contradice la tabla canónica de `MASTER_SPEC`:
 popularidad/redes/eventos pertenecen a PBR.
 
+## Refinamiento G3C-11
+
+[ADR-080](./080-exact-scoring-mathematics.md) completa este ADR con racionales
+exactos, `ROUND_HALF_UP`, PRI, CC, PTC/PPI/PSN/PRL/PBR, cohortes, orden de
+equivalence/stacking/caps, recomputación y ScoreSnapshot. DR-010 queda
+`RESOLVED_MATH`; los gates siguientes son de publicación y datos, no de familia
+matemática.
+
 ## Gates y pruebas requeridos
 
 Antes de implementar scoring:
@@ -177,9 +190,10 @@ Antes de implementar scoring:
 7. reversals no mutan entries;
 8. suma PC coincide con las seis categorías;
 9. valores de `MASTER_SPEC` tienen fixtures;
-10. SC-02 a SC-11 pendientes están resueltas o parametrizadas con valores
+10. SC-02 a SC-11 usan la matemática de ADR-080 y tienen valores/cohortes
     iniciales aprobados;
-11. DR-049/066/067/069 están cerradas para sus scopes;
+11. DR-049/069 están cerradas; DR-066/067 producen los facts requeridos para
+    los scopes que se publiquen;
 12. toda modificación competitiva cambia `scoringVersion`.
 
 ## Referencias
@@ -190,6 +204,8 @@ Antes de implementar scoring:
 - [ADR-014: DSL de eventos](./014-event-dsl.md)
 - [ADR-015: Versionado](./015-version-taxonomy.md)
 - [ADR-016: Career lifecycle](./016-career-lifecycle.md)
+- [ADR-079: Retirement/Comeback/Finalization](./079-retirement-comeback-finalization-mathematics.md)
+- [ADR-080: Matemática exacta de Scoring](./080-exact-scoring-mathematics.md)
 - [ADR-050: Package boundaries](./050-foundation-package-boundaries.md)
 - [ADR-051: Contratos deterministas](./051-deterministic-core-byte-contracts.md)
 - [DR-010](../DECISIONS_REQUIRED.md#dr-010--scoring-incompleto)

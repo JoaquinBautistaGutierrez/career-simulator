@@ -1,6 +1,6 @@
 # ADR-057: Estructura de salud, lesiones y recuperación
 
-- **Estado:** Aceptado — alcance estructural; DR-057 permanece parcialmente abierta
+- **Estado:** Aceptado — alcance estructural; matemática refinada por ADR-074
 - **Fecha:** 2026-07-28
 - **Decisión relacionada:** DR-057
 - **Especificación normativa:** [`../HEALTH_INJURY_SPEC.md`](../HEALTH_INJURY_SPEC.md)
@@ -174,8 +174,8 @@ y su presentación cumple ADR-012.
 - DR-054 recibe un aggregate cuya composición continúa abierta.
 - DR-055 consume fitness/fatigue/restricciones y entrega señales físicas, no
   ratings como carga.
-- DR-057 permanece `BLOCKER_G3` por fórmulas, distribuciones, precisión,
-  parámetros, streams, taxonomía concreta y fixtures.
+- DR-057 queda `PARTIAL_CALIBRATION` por valores, targets, goldens, producers,
+  taxonomía concreta y fixtures; ADR-074 cierra su matemática.
 - DR-063/ADR-010 ya deciden qué conceptos son facts, summaries o señales.
 
 ## Gates y tests requeridos
@@ -207,4 +207,15 @@ debe producir una asignación médica agregada sobre los ordinales de oportunida
 definidos por ADR-072. Esa asignación permite componer overlaps con disciplina
 y otras causas sin doble descuento. Health no asigna minutos ni se convierte
 en owner de esas fuentes. La ecuación que genera la asignación médica permanece
-en DR-057/G3C-5.
+en ese checkpoint pendiente para DR-057/G3C-5.
+
+## Matemática refinada por G3C-5
+
+**Fecha:** 2026-07-29  
+**ADR relacionado:** [ADR-074](074-health-injury-recovery-mathematics.md)
+
+ADR-074 cierra load, fitness/fatigue, hazards, Poisson counts, severity,
+recovery, interval allocation, relapse y sequela. Sustituye toda referencia
+anterior a “matemática pendiente” sin cambiar el ownership ni la causalidad de
+este ADR. Las seis definitions y todos los valores siguen fuera de este
+documento.

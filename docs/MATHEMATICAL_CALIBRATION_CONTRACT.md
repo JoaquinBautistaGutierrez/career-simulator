@@ -244,6 +244,8 @@ mantiene una copia propia con extremos distintos.
 | `logSumExp(xs)` | vector finito no vacío | Resta el máximo antes de exponentiar; preserva escala logarítmica. |
 | `stableSoftmax(us)` | utilities finitas, vector no vacío | Normaliza mediante `logSumExp`; resultado categórico válido y orden canónico de categorías. |
 | `safeLog(x)` | `x > 0` | Rechaza cero/negativos; usa forma estable cerca de uno. |
+| `stableLog1p(x)` | `x > -1` | Evalúa `log(1+x)` preservando precisión cerca de cero; rechaza dominio inválido. |
+| `stableExpm1(x)` | finito y resultado finito | Evalúa `exp(x)-1` preservando precisión cerca de cero. |
 | `safeExp(x)` | finito y dominio declarado por caller | No aplica clamp global. Si el resultado desborda, el modelo debe permanecer en log-space o producir error. |
 | `log1mExp(x)` | `x <= 0` | Calcula `log(1-exp(x))` por ramas estables. |
 | `hazardToProbability(H)` | `H >= 0` finito | `-expm1(-H)` con semántica de posibilidad conservada. |
@@ -500,6 +502,81 @@ editorial.
 Nodos, pesos, orden, suma y caso `sigma=0` pertenecen al math profile, no al
 ParameterSet. Cambiarlos requiere `engineVersion` y golden vectors nuevos.
 
+### 7.9 Samplers discretos V1
+
+G3C-4 fija cuatro samplers transversales:
+
+- `PoissonInverseCdfV1(lambda)`;
+- `NegativeBinomial2InverseCdfV1(mu, kappa)`;
+- `BinomialInverseCdfV1(n, p)`;
+- `CategoricalCumulativeMidpointV1(probabilities, canonicalOrder)`.
+
+Los tres samplers de conteo:
+
+1. consumen un único uniforme midpoint de 53 bits cuando el outcome no está
+   determinado;
+2. acumulan la CDF en orden ascendente mediante recurrencias de log-PMF y
+   `logSumExp`;
+3. devuelven el primer entero cuya log-CDF alcanza `log(u)`;
+4. no consumen draws durante las iteraciones;
+5. no poseen cap de outcome o iteración de gameplay.
+
+La convención Negative Binomial es NB2:
+
+```text
+E[Y] = mu
+Var[Y] = mu + mu^2/kappa
+mu >= 0
+kappa > 0
+```
+
+`mu = 0`, `lambda = 0`, `n = 0` y los casos Binomial `p = 0/1` son
+determinados y no consumen azar. La especificación exacta de recurrencias,
+ordering y guards está en
+[PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md](PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md).
+
+### 7.10 LogNormal transform V1
+
+Un modelo que declare:
+
+```text
+log(X) ~ Normal(mu, sigma^2)
+```
+
+usa exactamente:
+
+```text
+Z = StandardNormalInverseCdfV1(nextMidpointUniform())
+X = safeExp(mu + sigma*Z)
+```
+
+con `mu` finito y `sigma >= 0`. Consume un solo draw Normal. Para `sigma=0`,
+el resultado es determinado, devuelve `safeExp(mu)` y no consume RNG.
+
+La media, mediana y quantiles derivados son:
+
+```text
+median = exp(mu)
+mean = exp(mu + 0.5*sigma^2)
+quantile(p) = exp(mu + sigma*StandardNormalQuantileV1(p))
+```
+
+No existe un segundo sampler LogNormal, Gamma o rejection path. Un overflow o
+input no finito es error numérico y no se corrige mediante clipping.
+
+El sampler categórico consume un uniforme midpoint, recorre probabilidades
+finitas no negativas en orden canónico y devuelve la primera categoría cuya
+CDF sea estrictamente mayor que `u`. La última categoría solo absorbe error
+residual dentro de `numericTolerance`; suma inválida, vector vacío o categorías
+duplicadas son errores.
+
+NB2 V1 no usa la representación Gamma-Poisson. Por tanto, G3C-4 no introduce
+un Gamma sampler ni rejection sampling. Un guard de infraestructura solo puede
+devolver `INCONCLUSIVE_GUARD_REACHED`; no puede truncar el count.
+
+Cambiar convención, acumulación, consumo o sampler requiere `engineVersion` y
+goldens nuevos.
+
 ## 8. Correlación y factores jerárquicos
 
 Para el vertical slice se priorizan factores latentes compartidos y shocks
@@ -574,10 +651,14 @@ draw, cambia `modelId`, `purpose` o `engineVersion`, no el orden accidental.
 Scoring no tiene namespace, stream ni sampler. La función es:
 
 ```text
-DomainFact[] + ScoringRuleSet(scoringVersion) → ScoreLedger → PC
+DomainFact[]
++ ScoringConfiguration(scoringVersion, configurationHash)
++ ScoringCalibrationData(calibrationDataHash)
+→ ScoreLedger → exact integer PC → ScoreSnapshot
 ```
 
-Mismos facts canónicos y misma `scoringVersion` producen el mismo ledger.
+Mismos facts canónicos y mismos recursos inmutables producen el mismo ledger.
+ADR-080 fija racionales exactos y `ROUND_HALF_UP`; Scoring no usa IEEE-754.
 
 ## 10. EngineParameterSet
 
@@ -604,7 +685,7 @@ EngineParameterSet
 ├── nationalTeam
 ├── awards
 ├── reputationSocial
-└── retirement
+└── retirementComeback
 ```
 
 Cada rama puede contener subárboles por fórmula, posición, contexto o release,
@@ -635,8 +716,9 @@ resultados exige al menos un nuevo patch de `engineVersion`. Una misma
 ParameterSets candidatos de calibración pueden compartir una build experimental
 solo fuera de Careers oficiales y se distinguen siempre por hash.
 
-Los parámetros de scoring viven en un `ScoringRuleSet`/configuración inmutable
-gobernada por `scoringVersion`; no son ramas de `EngineParameterSet`.
+Los parámetros de scoring viven en `ScoringConfiguration` y los cohortes en
+`ScoringCalibrationData`, ambos inmutables y gobernados por `scoringVersion`;
+no son ramas de `EngineParameterSet`.
 
 ### 10.3 Inmutabilidad y lifecycle del artefacto
 
@@ -686,7 +768,7 @@ Los candidatos de G3B se agrupan así:
 | `nationalTeam` | fields, candidatura, incumbency, rol, minutos, support y outcomes. |
 | `awards` | fields, señales, criterios, judging, placement y ties; nunca puntos. |
 | `reputationSocial` | memoria, difusión regional, atención, followers, engagement y feedback. |
-| `retirement` | motivation, hazard, competing risks, comeback y diagnósticos de terminación. |
+| `retirementComeback` | motivation, retirement competing risks, comeback, viability, finalization opportunity y post-retirement adapters. |
 
 Creation puede publicarse como subárbol `player.creation` sin añadir otra raíz.
 La configuración del DSL de contenido sigue `contentVersion`; definitions de
@@ -837,6 +919,13 @@ budget de worker es protección de infraestructura, no regla de gameplay:
 - obliga a reanudar, ampliar presupuesto o investigar;
 - nunca se interpreta como resultado calibrado.
 
+G3C-10 especifica además que la observación se registra como **right-censored**
+para survival/termination metrics. La `CalibrationAutomationPolicy` que toma
+decisiones de retiro/comeback/finalización pertenece a `CalibrationRunConfig`,
+no a `EngineParameterSet`, Difficulty o VersionSet competitivo. Sus decisiones
+usan las mismas APIs y cualquier RNG de tooling tiene namespace separado; el
+guard nunca emite un Domain Fact.
+
 ## 13. Evidencia externa y anti-overfitting
 
 Un dataset histórico futuro actúa como distribución de referencia, no como
@@ -938,46 +1027,67 @@ una familia matemática.
 
 ### G3C-4 — Performance, Form & Production
 
-| ID | Familia/fórmula requerida | Parámetros requeridos | Upstream | Targets | Fase |
+**Estado al 2026-07-29:** las ocho filas quedan `PARTIAL_CALIBRATION`; ninguna
+conserva una familia matemática o sampler abierto.
+
+| ID | Familia/fórmula cerrada | Parámetros aún requeridos | Upstream restante | Targets | Estado |
 |---|---|---|---|---|---|
-| G3B-D02 | Transform único True→Effective y predictor multidimensional. | sensitivities por family/context. | Player, DynamicStates, Role, Club. | dimensiones por posición/contexto. | G3C-4 |
-| G3B-D03 | Factores jerárquicos, dispersiones y colas. | loadings, variances, mixtures. | D02, RandomDrawKey. | correlaciones y quantiles. | G3C-4 |
-| G3B-D04 | Procesos temporales separados de form/confidence. | persistence, regression, response, noise. | D02–D03, prior summaries. | rachas, reversión y volatilidad. | G3C-4 |
-| G3B-D05 | Grafo GK de oportunidades, saves, conceded y clean sheets. | opportunity/count families, context, overdispersion. | D02–D04, club defense/opponents. | producción y colas GK. | G3C-4 |
-| G3B-D06 | Producción CM multidimensional y counts correlacionados. | weights, count/continuous families, covariance. | D02–D04, club control/attack. | producción e impactos CM. | G3C-4 |
-| G3B-D07 | Oportunidades, conversion y counts ST correlacionados. | opportunity/conversion/count parameters. | D02–D04, club attack/opponents. | goals/assists y colas ST. | G3C-4 |
-| G3B-D08 | Exposición y response bajo presión agregada. | pressure exposure/effect, shared shocks. | Competitions, D02–D07. | performance en contextos de presión. | G3C-4 |
-| G3B-D09 | Agregación Q→season/context y evidence strength. | exposure weighting, uncertainty, segment merge. | D02–D08. | summaries y small-sample behavior. | G3C-4 |
+| G3B-D02 | Task logits desde capabilities en logit seguro; expectativa/realización multidimensional. | weights, interactions, dynamic/context sensitivities. | DynamicStates, Health adapters y Club context. | dimensiones por posición/contexto. | `PARTIAL_CALIBRATION` |
+| G3B-D03 | Normal common/domain/specific/pressure; consistency exponencial; NB2/Binomial inverse-CDF. | loadings, sigmas, kappas. | RandomDrawKey cerrado; contexts upstream. | correlaciones, varianza y quantiles. | `PARTIAL_CALIBRATION` |
+| G3B-D04 | Form AR(1) en logit y señales exactas de surprise/evidence. | persistence, response, noise y signal weights. | Owners de confidence/trust/morale. | rachas, reversión y volatilidad. | `PARTIAL_CALIBRATION` |
+| G3B-D05 | Shots NB2 → saves Binomial → conceded → clean sheets derivadas. | rates, dispersion, save/context weights. | defense/opponent y eligibility G3C-6. | producción y colas GK. | `PARTIAL_CALIBRATION` |
+| G3B-D06 | Cuatro impactos CM Normal + goals/assists NB2 correlacionados. | task weights, rates, dispersion y loadings. | control/attack context G3C-6. | producción e impactos CM. | `PARTIAL_CALIBRATION` |
+| G3B-D07 | Oportunidad→chance quality/conversion; goals/assists NB2 con factor ofensivo. | rates, conversion, dispersion y loadings. | attack/opponent context G3C-6. | goals/assists y colas ST. | `PARTIAL_CALIBRATION` |
+| G3B-D08 | Split ordinary/high-pressure, response y shock compartido. | pressure effects, sigmas y weights. | pressureExposure G3C-6. | response y producción bajo presión. | `PARTIAL_CALIBRATION` |
+| G3B-D09 | Evidence `-expm1`, pesos minutes×evidence, sums y splits exactos. | taus, purpose weights y payload precision. | scopes/context IDs upstream. | summaries y sparse samples. | `PARTIAL_CALIBRATION` |
 
 ### G3C-5 — Health, Injuries & Recovery
 
-| ID | Familia/fórmula requerida | Parámetros requeridos | Upstream | Targets | Fase |
+**Estado al 2026-07-29:** las cinco filas quedan `PARTIAL_CALIBRATION`;
+[`HEALTH_INJURY_RECOVERY_MATH_SPEC.md`](HEALTH_INJURY_RECOVERY_MATH_SPEC.md) y
+ADR-074 cierran ecuaciones, samplers, orden y streams.
+
+| ID | Familia/fórmula cerrada | Parámetros aún requeridos | Upstream restante | Targets | Estado |
 |---|---|---|---|---|---|
-| G3B-E02 | Proceso de oportunidades por exposure/origin sin cupos. | exposure transforms, background rates. | Role minutes, calendar, load. | oportunidades por origen/Q. | G3C-5 |
-| G3B-E03 | Hazard acumulado contextual y competing causes. | baseline, fragility, fatigue, age, history. | E02, Player traits, Club medical. | injury frequency/conditional rates. | G3C-5 |
-| G3B-E05 | Severity categórica + duración y progreso probabilísticos. | family weights, severity, duration/recovery curves. | E03, recoveryCapacity, medicalQuality. | severity y duration distributions. | G3C-5 |
-| G3B-E06 | State process de rehabilitation/return y recurrent hazard. | completion, restrictions, relapse hazard. | E05, realized load. | return/relapse timing. | G3C-5 |
-| G3B-E07 | Outcome de secuela y mapping hacia Development. | temporary/persistent probabilities y effects. | E05–E06, B05. | sequela frequency/effect. | G3C-5 |
+| G3B-E02 | dose rates MATCH/TRAINING + compound Poisson por Q | load/exposure coefficients y rhos | calendar/training producers G3C-6 | oportunidades por origin/Q | `PARTIAL_CALIBRATION` |
+| G3B-E03 | competing cumulative hazards `exposure*exp(logRate)` | intercepts, covariates y family params | medical/context producers G3C-6 | injury/conditional rates | `PARTIAL_CALIBRATION` |
+| G3B-E05 | severity logistic-Normal + requirement LogNormal + progress softplus | severity/recovery/work values | six family definitions | severity/recovery distributions | `PARTIAL_CALIBRATION` |
+| G3B-E06 | readiness continuo + interval allocation + relapse Poisson | availability/relapse values | calendar opportunity | return/relapse timing | `PARTIAL_CALIBRATION` |
+| G3B-E07 | logistic occurrence/type + logistic-Normal burden + exponential decay | sequela values/affinities | six family definitions + Development consumer | frequency/effect | `PARTIAL_CALIBRATION` |
 
 ### G3C-6 — Club, Competitions & World
 
-| ID | Familia/fórmula requerida | Parámetros requeridos | Upstream | Targets | Fase |
+**Estado al 2026-07-29:** las cinco filas quedan `PARTIAL_CALIBRATION`;
+[`CLUB_COMPETITION_WORLD_MATH_SPEC.md`](CLUB_COMPETITION_WORLD_MATH_SPEC.md) y
+ADR-075 cierran ecuaciones, samplers, orden, streams y boundary de movilidad.
+F06 conserva DR-065 como blocker de data/policy.
+
+| ID | Familia/fórmula cerrada | Parámetros aún requeridos | Upstream restante | Targets | Estado |
 |---|---|---|---|---|---|
-| G3B-F05 | Outcome agregado por competición con support field y contribución. | baseline, contribution, variance, correlations. | Performance, ClubState, F03/F04. | standings/titles/rounds. | G3C-6 |
-| G3B-F06 | Transición de tier/pool y continuidad. | promotion/relegation probabilities, pool behavior. | F05, DR-065. | movilidad y permanencia. | G3C-6 |
-| G3B-J02 | Jerarquía de shocks club/league/region/world. | loadings, persistence, dispersion. | J01, RandomDrawKey. | cross-context correlations. | G3C-6 |
-| G3B-J03 | Evolución vectorial mean-reverting con shocks. | persistence, regression, outcome/context effects. | F05, J02. | strength/prestige/finance mobility. | G3C-6 |
-| G3B-J04 | Regímenes/ciclos latentes de largo plazo. | transitions, durations, amplitudes. | J02–J03. | eras, estabilidad y tails. | G3C-6 |
+| G3B-F05 | noisy utility/canonical rank para league; logistic/Bernoulli por knockout phase; support/contribution y shocks compartidos | utility weights, field profiles, contribution weights, sigmas | CompetitionDefinitions y data DR-025/065 | standings/titles/rounds | `PARTIAL_CALIBRATION` |
+| G3B-F06 | canonical rank/slots → `MobilityTransitionRequest` | rule bindings, materialization profiles | DR-065 para pool/aplicación/continuidad | movilidad y permanencia | `PARTIAL_CALIBRATION` |
+| G3B-J02 | factor hierarchy Normal global/regional/league/club/competition/residual | loadings, persistence, dispersion | parameter values | cross-context correlations | `PARTIAL_CALIBRATION` |
+| G3B-J03 | AR(1) mean-reverting en logit por Club/League/institutional state | means, persistence, outcome/context coefficients | parameter values/data baselines | strength/prestige/finance mobility | `PARTIAL_CALIBRATION` |
+| G3B-J04 | ciclos continuos jerárquicos AR(1), sin regime machine guionada | means, persistence, amplitudes, loadings | parameter values | eras, estabilidad y tails | `PARTIAL_CALIBRATION` |
 
 ### G3C-7 — Transfers, Market & Contracts
 
-| ID | Familia/fórmula requerida | Parámetros requeridos | Upstream | Targets | Fase |
+[`TRANSFER_MARKET_CONTRACT_MATH_SPEC.md`](TRANSFER_MARKET_CONTRACT_MATH_SPEC.md)
+y [ADR-076](adr/076-transfer-market-contract-mathematics.md) cierran ecuaciones,
+samplers, orden y streams.
+
+| ID | Familia/fórmula cerrada | Parámetros aún requeridos | Upstream restante | Targets | Estado |
 |---|---|---|---|---|---|
-| G3B-G01 | Candidate field agregado de clubes y needs. | field size/distribution, filters lógicos. | ClubWorld, position needs. | composición de candidatos. | G3C-7 |
-| G3B-G02 | Probabilidad/intensidad de interés por candidato. | signal transforms, context, reputation. | G01, Performance, Market perception. | interest frequency/segments. | G3C-7 |
-| G3B-G03 | Generación correlacionada de oferta económica/deportiva. | fee, salary, duration, role, variance. | G02, value, financial power. | fees/salary/contracts. | G3C-7 |
-| G3B-G04 | Negociación/decisión y timing entre Qs. | utilities, rounds/alternatives, timing. | G03, DR-067. | acceptance, failures, timing. | G3C-7 |
-| G3B-G07 | Estimación contextual de MarketValue y uncertainty. | age/position/context/perception transforms. | PlayerKnowledge, Performance, World. | value distributions/trajectories. | G3C-7 |
+| G3B-G01 | enumeración canónica del scope + ClubNeed logistic-Normal + fit derivado | coefficients, loadings y values | data/DR-065 | candidates/need/fit | `PARTIAL_CALIBRATION` |
+| G3B-G02 | transición Bernoulli logistic por club con factors jerárquicos | coefficients, sigmas y persistence values | Reputation snapshot G3C-9 para integración final | interest frequency/segments | `PARTIAL_CALIBRATION` |
+| G3B-G03 | Offer logistic; operation/expectation/duration softmax; fee/salary log-space | economic/contract values | DR-027 y policy catalogs | fees/salary/contracts | `PARTIAL_CALIBRATION` |
+| G3B-G04 | seller logistic + single-stage negotiation + frozen decision checkpoint | surplus/utility values | DR-066/067 | acceptance, failures, timing | `PARTIAL_CALIBRATION` |
+| G3B-G07 | valuation observer-specific log-space + reference weighted median | valuation values, monetary scales | DR-027 | value distributions/trajectories | `PARTIAL_CALIBRATION` |
+
+**Estado al 2026-07-29:** las cinco filas están `PARTIAL_CALIBRATION`; no
+conservan ecuación, distribución o sampler abierto. El acumulado es dos
+`RESOLVED_MATH`, treinta y cinco `PARTIAL_CALIBRATION` y veintiséis `PARTIAL`
+asignadas a G3C-8–G3C-11.
 
 ### G3C-8 — National Team & Awards
 
@@ -1001,34 +1111,44 @@ una familia matemática.
 
 ### G3C-10 — Retirement, Comeback & Finalization
 
+**Estado al 2026-08-01:** G3B-L01 queda `RESOLVED_MATH`; G3B-L02 y L04 quedan
+`PARTIAL_CALIBRATION`. ADR-079 y
+[`RETIREMENT_COMEBACK_FINALIZATION_MATH_SPEC.md`](RETIREMENT_COMEBACK_FINALIZATION_MATH_SPEC.md)
+cierran todas las ecuaciones, samplers, cursor y transiciones. DR-069 está
+resuelta; faltan coefficients, evidencia, targets y expected goldens.
+
 | ID | Familia/fórmula requerida | Parámetros requeridos | Upstream | Targets | Fase |
 |---|---|---|---|---|---|
-| G3B-L01 | Cadencia/operationKey de oportunidades de retiro/comeback. | evaluation windows y context identity. | ADR-013/043, DR-069. | invariant de consumo/replay. | G3C-10 |
-| G3B-L02 | Hazard/competing risks de retiro y comeback. | age, health, role, market, motivation, rates. | todos los estados deportivos upstream. | age, duration, comeback, tails. | G3C-10 |
-| G3B-L04 | Outcome, decisión, causas y boundary de finalización. | cause policies, return/finalization policy. | L01–L02, DR-069. | cycles y nontermination diagnostics. | G3C-10 |
+| G3B-L01 | Q cursor con retirement→comeback→finalization y no-ops posretiro. | ninguno de balance; operation keys son estructurales. | ADR-013/043/079. | RNG consumption/replay invariants. | `RESOLVED_MATH` |
+| G3B-L02 | Motivation sigmoid + decline EWMA + competing-risks retirement/comeback hazards. | age/health/role/market/motivation rates, loadings y sigmas. | todos los snapshots deportivos upstream. | age, duration, comeback y tails. | `PARTIAL_CALIBRATION` |
+| G3B-L04 | user/manual decisions, two comeback routes, viability, finalization hazard y irreversible fact frontier. | cause/context weights, automation fixtures y finalization targets. | L01–L02, ADR-079. | cycles, finalization y nontermination diagnostics. | `PARTIAL_CALIBRATION` |
 
 ### G3C-11 — Scoring
 
+**Estado al 2026-08-01:** todas las familias matemáticas están cerradas por
+[ADR-080](adr/080-exact-scoring-mathematics.md) y
+[`SCORING_MATH_SPEC.md`](SCORING_MATH_SPEC.md).
+
 | ID | Familia/fórmula requerida | Parámetros requeridos | Upstream | Targets | Fase |
 |---|---|---|---|---|---|
-| G3B-M02 | Fórmula CC por competición/logro. | participación, contribution, exceptional tail. | Facts de exposure/performance. | CC distribution/range. | G3C-11 |
-| G3B-M03 | Reglas domésticas y attribution. | catálogo, valores/rangos pendientes, CC. | Competition facts, DR-066/067. | composición PTC_CLUB. | G3C-11 |
-| G3B-M04 | Mapping internacional de club y stacking. | CompetitionScoringDefinitions. | Data/content decisions. | PTC_CLUB por competición. | G3C-11 |
-| G3B-M05 | Mapping PSN y contribution. | definitions, youth ranges, CC policy. | National Team facts. | composición PSN. | G3C-11 |
-| G3B-M06 | Equivalencias/stacking de awards. | groups, 100/60 policy generalizada. | Award facts/definitions. | PPI y duplicación evitada. | G3C-11 |
-| G3B-M07 | PRI components y contextual normalization. | transforms, weights internos, IJL context. | SeasonPerformance facts. | PRI/component distribution. | G3C-11 |
-| G3B-M08 | Records/longevidad autorizados. | catálogo, values, replacement. | Record facts/data. | PRL composition. | G3C-11 |
-| G3B-M09 | PBR, popularidad y bounded bonuses. | transforms, eligibility, cap calculation. | Public/social/achievement facts. | PBR/composition/caps. | G3C-11 |
-| G3B-M10 | Atribución multiclub/multicontexto. | exposure weighting, segment merge. | segment facts, DR-066/067. | no duplication y totals. | G3C-11 |
-| G3B-M11 | Posición dominante por scope y ties. | weights, scope, tie rules. | usageByPosition, DR-049. | cohort assignment. | G3C-11 |
-| G3B-M15 | Cohortes, poblaciones y percentiles. | compatibility key, population rules. | DR-035/036, ScoreSnapshots. | percentile stability. | G3C-11 |
-| G3B-M17 | Orden de caps/stacking/equivalencias. | cap groups y precedence. | M03–M11. | exact ledger fixtures. | G3C-11 |
-| G3B-M18 | Re-scoring, goldens y compatibilidad. | fixture corpus, retention, compatibility. | M02–M17, DR-036/069. | byte-identical ledger/PC. | G3C-11 |
+| G3B-M02 | CC exacto por competición. | weights/splines/cohorts. | exposure/performance facts. | CC distribution/range. | `PARTIAL_CALIBRATION` |
+| G3B-M03 | base doméstica × outcome × CC. | exactos dentro de rangos. | Competition facts, DR-066/067. | PTC composition. | `DATA_REQUIRED` |
+| G3B-M04 | outcome internacional terminal × CC. | definitions/fases. | competition data. | PTC by competition. | `DATA_REQUIRED` |
+| G3B-M05 | PSN outcome × CC, categorías exclusivas. | youth/outcome mappings. | National facts. | PSN composition. | `DATA_REQUIRED` |
+| G3B-M06 | equivalencia `1`, `3/5`, `0...` y group rounding. | catalog/group membership. | Award facts. | PPI/dedup. | `DATA_REQUIRED` |
+| G3B-M07 | PRI 5-component/cohort/segment math. | cohorts/transforms/weights. | SeasonPerformance facts. | PRI distribution. | `PARTIAL_CALIBRATION` |
+| G3B-M08 | record/longevity entitlement/delta. | record/milestone catalog. | authorized facts. | PRL composition. | `DATA_REQUIRED` |
+| G3B-M09 | cohort popularity + exact PBR caps. | social cohorts/transforms. | social/historic facts. | PBR composition. | `PARTIAL_CALIBRATION` |
+| G3B-M10 | segment/edition attribution. | registration facts. | DR-066/067. | no duplication. | `DATA_REQUIRED` |
+| G3B-M11 | DR-049 effective-minute dominance. | ninguno. | usageByPosition. | cohort assignment. | `RESOLVED_MATH` |
+| G3B-M15 | exact frozen CDF + shrinkage. | datasets/provenance/knots. | scoring calibration data. | percentile stability. | `DATA_REQUIRED` |
+| G3B-M17 | canonical equivalence/cap/round order. | ninguno. | M03–M11. | ledger fixtures. | `RESOLVED_MATH` |
+| G3B-M18 | exact recompute/goldens/compatibility. | expected vectors/hashes. | M02–M17, DR-036/069. | byte identity. | `PARTIAL_CALIBRATION` |
 
 **Reconciliación histórica:**
 `8 + 6 + 8 + 5 + 5 + 5 + 7 + 3 + 3 + 13 = 63`.
-Después de G3C-2 y G3C-3: doce filas están `PARTIAL_CALIBRATION`, dos
-`RESOLVED_MATH` y cuarenta y nueve continúan `PARTIAL` asignadas a G3C-4–11.
+Después de G3C-11: 51 filas están `PARTIAL_CALIBRATION`, cinco
+`RESOLVED_MATH`, siete `DATA_REQUIRED` y ninguna `PARTIAL` por matemática.
 
 ### G3C-12 — Calibración integrada
 
@@ -1086,6 +1206,111 @@ de Role & Minutes sigue bloqueada hasta:
 - recibir TacticalFit, PositionCompetition y TeamMinutesOpportunity de G3C-6;
 - completar formatos/generación de calendario pendientes en DR-021.
 
+### Gate hacia G3C-5
+
+G3C-4 cerró las ocho familias matemáticas asignadas:
+
+- task abilities sin Overall;
+- Underlying Performance Normal multidimensional y correlacionado;
+- consistency, presión, evidence y surprise;
+- counts NB2/Binomial con inverse-CDF determinista;
+- grafos ST/CM/GK;
+- Form AR(1) en logit;
+- agregación Q/season/multicontexto.
+
+No existe blocker de familia matemática para **especificar** G3C-5. Health
+recibe minutos/intensidad ya realizados y debe producir sus propios estados,
+hazards y adapters sin reabrir Performance.
+
+Implementar Performance oficial sigue bloqueado hasta:
+
+- publicar valores de `EngineParameterSet.performance`;
+- aprobar targets externos y goldens de ADR-073;
+- recibir fitness/fatigue/restricciones de G3C-5;
+- recibir contextos, pressure exposure y eligibility de G3C-6;
+- congelar payload schemas compatibles con DR-063.
+
+### Gate hacia G3C-6
+
+G3C-5 cerró:
+
+- dose/load, acute/chronic memory;
+- AR(1) independientes de fitness/fatigue;
+- competing cumulative hazards y counts Poisson;
+- severity logistic-Normal;
+- recovery LogNormal y progreso positivo;
+- medical interval allocation;
+- relapse relacionado;
+- secuela temporal/persistente.
+
+Club/World puede especificar sus producers usando los dominios cerrados de
+`medicalQuality`, training exposure, preparation, recovery opportunity,
+congestion y schedule difficulty. No puede reabrir ecuaciones Health.
+
+Implementar Health oficial sigue bloqueado hasta publicar:
+
+- valores de `EngineParameterSet.health`;
+- seis `InjuryFamilyDefinition`;
+- producers G3C-6;
+- goldens y targets de ADR-074;
+- schemas compatibles con DR-063.
+
+### Gate hacia G3C-7
+
+G3C-6 cerró:
+
+- AR(1) en logit para Club/League/World states;
+- factors Normal jerárquicos y ciclos continuos;
+- manager hazard/generation, TacticalFit y PositionCompetition;
+- TeamMinutesOpportunity y progression checkpoints causales;
+- noisy utility de league y logistic advancement de knockout;
+- TeamSupportField y PlayerCompetitiveContribution;
+- context producers de Performance/Health/Development;
+- boundary matemático de mobility request.
+
+Transfers puede especificar candidate fields, value, interest y offers usando
+financialPower, prestige, sporting strength, position context y world cycles.
+No puede aplicar un fallback fuera del tier. ADR-081 cierra la arquitectura
+híbrida, pero el catálogo/field/materialización deben estar publicados.
+
+Implementar Club/World oficial continúa bloqueado hasta:
+
+- publicar valores de `EngineParameterSet.clubWorld/competitions`;
+- aprobar CompetitionDefinitions, participants y sources;
+- publicar DR-065/ADR-081 para movilidad/continuidad;
+- aprobar goldens/targets de ADR-075;
+- congelar schemas compatibles con DR-063.
+
+### Gate hacia G3C-8
+
+G3C-7 cerró:
+
+- MarketPerception y valuation observer-specific en log-space;
+- ClubNeed, candidate field y PlayerClubFit;
+- Interest y Offer mediante Bernoulli logistic separados;
+- BidderCompetitionField y financial feasibility;
+- fee/salary Money exacto;
+- ContractExpectation/duration por stable softmax;
+- seller response y negociación agregada single-stage;
+- renewal/loan pathways;
+- PlayerDecision explícita sin RNG;
+- WAITING_DECISION sin resampling.
+
+National Team/Awards puede consumir Performance/World y sporting reputation
+sin usar MarketValue, fee o salary como mérito. G3C-8 no depende de cerrar
+DR-027/065/066/067 para elegir sus familias matemáticas, pero no puede inventar
+calendar, eligibility o external participants.
+
+Implementar Market oficial continúa bloqueado hasta:
+
+- publicar valores de `EngineParameterSet.transfers`;
+- publicar native Money, purchasing-power context y schema range de DR-027;
+- publicar DR-065/ADR-081 para candidates/continuidad externa;
+- publicar DR-066 para registration post-season;
+- publicar DR-067 para la ventana post-season; mid-season queda fuera de V1;
+- aprobar goldens/targets de ADR-076;
+- congelar schemas compatibles con DR-063.
+
 ### Gate antes de implementar matemática
 
 Sigue bloqueado hasta:
@@ -1096,10 +1321,233 @@ Sigue bloqueado hasta:
 - publicar un `EngineParameterSet` validado y hasheado;
 - aprobar CalibrationTargets y resultados del vertical slice;
 - resolver DR de scope/timing/data que afecten ejecución;
-- cerrar DR-069 antes de runner terminal y ranking;
-- cerrar DR-010 antes de scoring real.
+- materializar ADR-079 junto con Scoring una vez publicados los artefactos;
+- publicar ScoringConfiguration/CalibrationData/catálogos/goldens de ADR-080;
+- ejecutar y aceptar calibración integrada antes de gameplay real.
 
-## 17. Referencias
+## 17. G3D-1 — registries, campañas y publicación
+
+G3D-1 no cambia ninguna ecuación G3C. Introduce los contratos de control que
+permiten asignar valores y publicar artefactos sin perder causalidad,
+determinismo ni provenance.
+
+### 17.1 Registros normativos
+
+Son obligatorios y forman una unidad:
+
+- [`CALIBRATION_PARAMETER_REGISTRY.md`](CALIBRATION_PARAMETER_REGISTRY.md):
+  identidad y metadata de cada parameter-path de gameplay y Scoring;
+- [`CALIBRATION_TARGET_REGISTRY.md`](CALIBRATION_TARGET_REGISTRY.md): targets,
+  invariantes y diagnostics canónicos;
+- [`CALIBRATION_DATASET_REGISTRY.md`](CALIBRATION_DATASET_REGISTRY.md):
+  datasets, catálogos, mappings, transformations y provenance;
+- [`GOLDEN_VECTOR_REGISTRY.md`](GOLDEN_VECTOR_REGISTRY.md): fixtures exactos,
+  verificación independiente y estado de publicación.
+
+Un path parametrizado se expande únicamente sobre claves de catálogos
+versionados. La ausencia de una expansión requerida no significa cero ni
+default. Aliases son de migración/documentación y nunca aparecen junto con el
+path canónico en un payload publicado.
+
+### 17.2 Publication states y fuentes
+
+Los estados canónicos son:
+
+```text
+UNASSIGNED
+-> PROVISIONAL_DESIGN | ESTIMATED_FROM_DATA
+-> CALIBRATED
+-> VALIDATED
+-> FROZEN_V1
+```
+
+`TEMPORARY_PROVISIONAL` puede existir en candidatos, pero no llegar a
+`FROZEN_V1`. Cada valor declara exactamente un origen primario:
+`NORMATIVE`, `EXTERNAL_OBSERVATION`, `DERIVED_ESTIMATE`,
+`SYNTHETIC_CALIBRATION`, `PRODUCT_DECISION` o `TEMPORARY_PROVISIONAL`.
+
+### 17.3 `ParameterSetCandidateManifest`
+
+```text
+ParameterSetCandidateManifest {
+  candidateId
+  parentCandidateId?
+  engineVersionCandidate
+  parameterSetId
+  parameterSetHash
+  schemaVersion
+  changedParameterPaths[]
+  changeRationale
+  expectedTargetIds[]
+  sourceAndEstimateRefs[]
+  createdBy
+  logicalCreatedAt
+  resultRunIds[]
+  outcome: PENDING | ACCEPTED | REJECTED
+  outcomeRationale?
+}
+```
+
+`logicalCreatedAt` es metadata administrativa, no input causal ni identidad de
+gameplay. Los candidatos son append-only. Se comparan con el mismo
+`CalibrationSeedSet`; no se sobrescribe el parent.
+
+### 17.4 `MonteCarloRunManifest`
+
+```text
+MonteCarloRunManifest {
+  runId
+  parameterSetCandidateId
+  parameterSetHash
+  scoringConfigurationHash?
+  scoringCalibrationDataHash?
+  datasetVersionsAndHashes[]
+  calibrationSeedSetId
+  calibrationSeedSetHash
+  sampleTier: SMOKE | CALIBRATION | DEEP
+  scenarioId
+  scenarioParametersHash
+  futureCodeVersion
+  outputMetricTargetIds[]
+  resultArtifactHash
+  acceptanceReportId?
+  status: PLANNED | RUNNING | COMPLETED | INCONCLUSIVE_GUARD_REACHED | FAILED
+}
+```
+
+`INCONCLUSIVE_GUARD_REACHED` no cuenta como sample válido y no crea facts.
+Scoring no recibe streams ni draws: cuando participa en un run, proyecta de
+forma determinista los facts ya producidos.
+
+### 17.5 `CalibrationAcceptanceReport`
+
+```text
+CalibrationAcceptanceReport {
+  reportId
+  candidateOrScoringBundleIdentity
+  runIds[]
+  datasetAndTransformHashes[]
+  targetResults[]
+  invariantFailures[]
+  tailDiagnostics[]
+  goldenResults[]
+  gateResults[]
+  knownLimitations[]
+  productDecisionRefs[]
+  reviewerRefs[]
+  decision: ACCEPT | REJECT | MORE_EVIDENCE_REQUIRED
+  artifactHash
+}
+```
+
+### 17.6 Acceptance hierarchy
+
+Los gates se evalúan en orden; un gate crítico fallido bloquea publicación:
+
+1. **GATE 1 — mathematical validity:** domains, finitud, invariantes y sampler
+   conformance.
+2. **GATE 2 — subsystem targets:** cada bloque upstream cumple sus rangos por
+   segmento requerido.
+3. **GATE 3 — cross-system:** adapters y correlaciones causales no compensan
+   errores upstream.
+4. **GATE 4 — tails:** P90/P95/P99/P99.9, rare-event frequencies y ausencia de
+   caps editoriales correctivos.
+5. **GATE 5 — end-to-end Careers:** trayectorias, estabilidad, right-censoring
+   y termination diagnostics.
+6. **GATE 6 — scoring/tier:** ledger/category/PC/tier distributions con bundle
+   de Scoring separado.
+7. **GATE 7 — replay/golden stability:** expected outputs verificados,
+   deterministic replay, hashes e incremental/full recomputation.
+
+### 17.7 Política de tuning
+
+1. Calibrar Creation/Development antes de exposure; exposure antes de
+   Production; Production/Health/World antes de consumers downstream.
+2. No corregir una rate de goals alterando Awards, Market o Scoring.
+3. Cambiar pocos grupos causales por candidato y declarar targets esperados.
+4. Usar common random numbers mediante el mismo `CalibrationSeedSet`.
+5. Ejecutar regression targets completos, no solo el target buscado.
+6. No usar clipping, caps ni thresholds para ocultar tails.
+7. No overfit a una season, liga, proveedor o segmentación.
+8. Registrar candidatos rechazados y rationale.
+
+### 17.8 Bundle de publicación
+
+`EngineParameterSet V1` conserva ADR-070:
+
+```text
+VersionSet + parameterSetId + parameterSetHash
+```
+
+No existe `parameterVersion`. Un candidato no oficial puede cambiar solo de
+hash. Una publicación causal oficial requiere `engineVersion` nuevo como
+mínimo y una misma `engineVersion` resuelve a un único hash.
+
+Scoring conserva ADR-080:
+
+```text
+scoringVersion
++ ScoringConfigurationHash
++ ScoringCalibrationDataHash
+```
+
+Una misma `scoringVersion` oficial resuelve a un único par de hashes. Los
+parámetros de gameplay y Scoring no comparten root, loader ni publication
+bundle.
+
+### 17.9 Implementación permitida antes de calibración completa
+
+Una fase posterior puede implementar, sin valores de gameplay publicados:
+
+- primitives numéricas y samplers ya normativos;
+- schemas/canonicalization/hash validators;
+- loaders y validators de registries/artefactos;
+- golden harness;
+- skeleton de Monte Carlo que no contiene valores ni reglas adicionales.
+
+Siguen bloqueados: modelos de gameplay con valores no publicados, Scoring
+competitivo, outcomes del vertical slice y leaderboard. G3D-1 no implementa
+ninguno de estos elementos.
+
+## 18. G3D-2 — binding de catálogos y policies
+
+G3D-2 no cambia ecuaciones, distribuciones, samplers ni cuantización. Añade una
+regla transversal de aceptación: un candidate no puede asignar o validar un
+parámetro que dependa de data/catalog mientras la `DatasetDefinition` requerida
+no tenga artifact, transformación, schema y hash resolubles en el estado mínimo
+de publicación exigido por su target.
+
+La cadena normativa es:
+
+```text
+licensed/provenanced source artifact
+-> reproducible transform manifest
+-> normalized dataset/catalog candidate
+-> validation report
+-> frozen dataset/catalog hash
+-> parameter/scoring candidate binding
+-> acceptance report
+```
+
+`UNASSIGNED`, `PENDING_DATA` o missing Definition nunca se sustituyen por cero,
+media, club genérico, moneda implícita, elegibilidad permisiva o regla editorial.
+Los 40 DatasetDefinitions existentes conservan identidad y siguen `PLANNED` al
+cerrar esta tarea; G3D-2 solo fija scope, schemas, mappings, priorities y policy.
+
+Las decisiones producto se identifican como `PRODUCT_DECISION` y no adquieren
+evidence tier. Las tolerancias sin valor impiden `VALIDATED/FROZEN_V1`, pero no
+autorizan provisional defaults dentro de una Career competitiva.
+
+Referencias G3D-2:
+
+- [`VERTICAL_SLICE_DATA_CATALOG_SPEC.md`](VERTICAL_SLICE_DATA_CATALOG_SPEC.md);
+- [`G3D_PRODUCT_DECISIONS.md`](G3D_PRODUCT_DECISIONS.md);
+- [`G3D_EXTERNAL_RESEARCH_PLAN.md`](G3D_EXTERNAL_RESEARCH_PLAN.md);
+- [ADR-081](adr/081-hybrid-external-club-pool.md);
+- [ADR-082](adr/082-vertical-slice-sporting-nationality.md).
+- [ADR-083](adr/083-native-money-and-calibration-normalization.md).
+
+## 19. Referencias
 
 - [G3B Mathematical Design Board](G3B_DESIGN_BOARD.md)
 - [Especificación matemática del motor](MATHEMATICAL_ENGINE_SPEC.md)
@@ -1110,5 +1558,21 @@ Sigue bloqueado hasta:
 - [ADR-070](adr/070-mathematical-runtime-and-parameter-sets.md)
 - [ADR-071](adr/071-creation-development-mathematics.md)
 - [ADR-072](adr/072-role-minutes-and-availability-mathematics.md)
+- [ADR-073](adr/073-performance-production-form-mathematics.md)
+- [ADR-074](adr/074-health-injury-recovery-mathematics.md)
+- [ADR-075](adr/075-club-competition-world-mathematics.md)
+- [ADR-076](adr/076-transfer-market-contract-mathematics.md)
+- [ADR-077](adr/077-national-team-awards-mathematics.md)
+- [ADR-078](adr/078-reputation-public-attention-social-mathematics.md)
+- [ADR-079](adr/079-retirement-comeback-finalization-mathematics.md)
+- [ADR-080](adr/080-exact-scoring-mathematics.md)
 - [Creation & Development Math](CREATION_DEVELOPMENT_MATH_SPEC.md)
 - [Role & Minutes Math](ROLE_MINUTES_MATH_SPEC.md)
+- [Performance, Production & Form Math](PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md)
+- [Transfers, Market & Contracts Math](TRANSFER_MARKET_CONTRACT_MATH_SPEC.md)
+- [Health, Injury & Recovery Math](HEALTH_INJURY_RECOVERY_MATH_SPEC.md)
+- [Club, Competitions & World Math](CLUB_COMPETITION_WORLD_MATH_SPEC.md)
+- [National Team & Awards Math](NATIONAL_TEAM_AWARDS_MATH_SPEC.md)
+- [Reputation & Social Math](REPUTATION_SOCIAL_MATH_SPEC.md)
+- [Retirement, Comeback & Finalization Math](RETIREMENT_COMEBACK_FINALIZATION_MATH_SPEC.md)
+- [Scoring Math](SCORING_MATH_SPEC.md)

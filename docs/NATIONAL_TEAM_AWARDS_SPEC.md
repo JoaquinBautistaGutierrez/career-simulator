@@ -2,17 +2,19 @@
 
 ## 1. Estado, alcance y autoridad
 
-- Estado: **G3B — Bloque 8, especificación estructural**.
+- Estado: **G3B estructural + G3C-8 matemático; calibración/data/policies pendientes**.
 - Fecha: 2026-07-28.
 - Decisiones relacionadas: DR-008, DR-010, DR-018, DR-021, DR-022, DR-048,
   DR-049, DR-055, DR-056, DR-059, DR-060, DR-063 y DR-068.
 - ADR:
   [ADR-059](adr/059-national-team-model.md) y
-  [ADR-060](adr/060-awards-model.md).
-- Fuera de alcance: fórmulas, familias de distribución, coeficientes,
-  thresholds de balance, parámetros iniciales, fixtures ejecutables,
-  implementación de gameplay, reputación/social, scoring y catálogo real
-  definitivo.
+  [ADR-060](adr/060-awards-model.md), refinados por
+  [ADR-077](adr/077-national-team-awards-mathematics.md).
+- Matemática normativa:
+  [`NATIONAL_TEAM_AWARDS_MATH_SPEC.md`](NATIONAL_TEAM_AWARDS_MATH_SPEC.md).
+- Fuera de alcance de este documento estructural: los detalles matemáticos
+  normados por G3C-8, valores iniciales, fixtures ejecutables, implementación
+  de gameplay, reputación/social, scoring y catálogo real definitivo.
 
 Este documento define la estructura causal mínima de National Team y Awards.
 Refina:
@@ -734,8 +736,10 @@ Se aplican ADR-011/044:
   scope;
 - una reconversión posterior no reescribe el premio.
 
-DR-049 sigue bloqueando ponderación, scopes sin minutos y empates. DR-048 sigue
-bloqueando premios fuera de `GK`/`CM`/`ST` en el slice.
+ADR-071/DR-049 ya fijan ponderación por minutos efectivos, scope temporal y
+desempate determinista. El vertical slice conserva `GK`/`CM`/`ST`; ampliar el
+catálogo posicional requiere Definitions/data aprobadas, no una inferencia de
+Awards ni reabrir DR-048.
 
 ### 14.4 Youth
 
@@ -1284,57 +1288,51 @@ Ningún valor queda aprobado ni hardcoded por este documento.
 
 | ID | Estado tras Bloque 8 | Cierre estructural | Pendiente |
 |---|---|---|---|
-| G3B-H01 | Parcial | `SelectionCompetitionField` canónico por país/posición/generación y field mundial agregado. | Familia de distribución, parámetros, streams y calibración. |
-| G3B-H02 | Parcial | Eligibility lógica separada, evidence contract y comparación probabilística sin threshold. | Fórmula, DR-068 y timing de DR-059/021. |
-| G3B-H03 | Parcial | Rol/minutos/Performance reutilizan resolvers comunes con contexto nacional propio. | Distribuciones, parámetros, calendario/cursor y facts finales. |
-| G3B-H04 | Parcial | Estado/contexto/tournament abstractions y outcome colectivo quedan definidos sin fixtures. | Competencias/formatos, calendario y suboperaciones exactos. |
+| G3B-H01 | `PARTIAL_CALIBRATION` | Gaussian core/elite mixture, moments, relative signal, depth y streams. | Values, world/data fields, targets y goldens. |
+| G3B-H02 | `PARTIAL_CALIBRATION` | Candidate merit, logistic call-up/squad e incumbency AR(1). | Values, DR-068, DR-021, evidence y goldens. |
+| G3B-H03 | `PARTIAL_CALIBRATION` | Role/Minutes softmax/Logit-Normal/GH10 y Performance nacional reutilizados por adapter. | Adapter values, calendar/opportunity y targets conjuntos. |
+| G3B-H04 | `PARTIAL_CALIBRATION` | National strength/generation AR(1), support y outcomes rank/knockout. | Definitions, cursor/calendar, values y targets. |
 | G3B-H05 | Calibración externalizada | Registry y targets obligatorios. | Valores y fixtures aprobados. |
-| G3B-I01 | Resuelta estructuralmente | `AwardDefinition` data-driven posee eligibility, período, scope y evidence policy; no hay mínimo universal. | Catálogo concreto, DR-049 y schemas DR-063. |
-| G3B-I02 | Parcial | Fields comparativo y estadístico quedan separados y ligados a edición/era/contexto. | Distribuciones, parámetros, streams y calibración. |
-| G3B-I03 | Parcial | Signal, evidence keys, outcome ordinal y judging noise quedan estructurados. | Fórmula, empate cuantitativo, precisión y fixtures. |
-| G3B-I04 | Parcial | Definition declara position/group/agnostic y usa historia efectiva del período. | Función de dominancia DR-049 y alcance DR-048. |
+| G3B-I01 | Resuelta estructuralmente | `AwardDefinition` data-driven posee eligibility, período, scope y evidence policy; no hay mínimo universal. | Catálogo concreto, predicates y evidence policies versionadas. |
+| G3B-I02 | `PARTIAL_CALIBRATION` | Comparative Normal field y Statistical NB2 field con samplers deterministas. | AwardDefinitions/field sizes, values y evidencia. |
+| G3B-I03 | `PARTIAL_CALIBRATION` | Utility, judging noise, single ordinal rank y tie policy sin RNG. | Profile weights/sigmas, catálogo y goldens. |
+| G3B-I04 | `PARTIAL_CALIBRATION` | Matrices posicionales y dominancia por exposición del período conforme a DR-049. | Weights, catálogo/data y métricas GK opcionales. |
 | G3B-I05 | Calibración/contenido externalizado | Catálogo y matemática viven en releases/versiones. | IDs reales, cinco Definitions, criterios y valores aprobados. |
 
 ## 26. Decisiones todavía abiertas
 
 ### DR-059
 
-Permanece `BLOCKER_G3` por:
-
-- fórmula/distribución del field y candidate signal;
-- ubicación exacta de ventanas internacionales en el cursor;
-- calendario, roster/squad y torneos;
-- role/minute/performance parameters;
-- streams, precisión, fixtures y Monte Carlo;
-- schemas concretos conformes a facts DR-063/ADR-010;
-- elegibilidad DR-068.
+Pasa a `PARTIAL_CALIBRATION`: ADR-077 cierra field, candidate signal, call-up,
+squad, incumbency, role/minutes adapters, outcomes, samplers y streams. Siguen
+pendientes los valores, Definitions, calendario/cursor de DR-021, catálogo de
+DR-025, elegibilidad DR-068, goldens y Monte Carlo.
 
 ### DR-060
 
-Permanece `BLOCKER_G3` por:
-
-- distribuciones de fields;
-- fórmula de candidate signal y comparación;
-- judging noise, placement y empates;
-- parámetros por Definition;
-- posición dominante DR-049;
-- métricas GK adicionales DR-055/063;
-- catálogo real DR-025;
-- facts, streams, precisión, fixtures y Monte Carlo.
+Pasa a `PARTIAL_CALIBRATION`: ADR-077 cierra comparative Normal field,
+statistical NB2 field, candidate utility, judging noise, ordinal placement,
+ties, samplers y streams. Siguen pendientes los valores por Definition,
+catálogo real DR-025, métricas GK solo cuando tengan consumidor, goldens y
+Monte Carlo. DR-049 ya provee la dominancia por exposición efectiva.
 
 ### Otros gates
 
 - DR-008 integra matemática ejecutable;
 - DR-010 cierra PSN/PPI, equivalencias y anti-duplicación;
 - DR-021 cierra calendario/tiempo;
-- DR-022 cierra matemática de mundo, selection fields y support fields;
+- ADR-075/DR-022 ya cierran la familia matemática de mundo y support fields;
 - DR-025 cierra identidades, fuentes y licencias;
-- DR-048/049 cierran scope y dominancia posicional;
-- DR-055/056 cierran Performance/evidencia/dynamic states;
-- DR-063 cierra facts;
+- ADR-071/DR-048/049 ya cierran reconversión, scope y dominancia posicional;
+- ADR-073/DR-055 ya cierra Performance/evidencia; DR-056 conserva únicamente
+  dinámicas de estados cuyos owners pertenecen a otras fases;
+- ADR-010/DR-063 ya cierran catálogo y clasificación de facts;
 - ADR-072/DR-064 ya cierran disponibilidad no médica; Selection consume el
   aggregate;
-- DR-068 cierra nacionalidad y elegibilidad del slice.
+- ADR-082 cierra para V1 la nacionalidad deportiva inicial y única del
+  protagonista como Argentina. DR-068 queda `DATA_REQUIRED` para publicar el
+  campo/manifest autoritativo; segundas nacionalidades, naturalización y cambios
+  de asociación quedan fuera del slice y no se infieren.
 
 ## 27. Gates y evidencia requerida
 
@@ -1373,3 +1371,26 @@ Antes de implementar:
 30. golden/property tests y Monte Carlo cumplen targets;
 31. catálogo del slice contiene exactamente el alcance aprobado;
 32. no se implementa gameplay hasta cerrar los blockers aplicables.
+
+## 28. Cierre matemático G3C-8
+
+La matemática normativa se encuentra en
+[`NATIONAL_TEAM_AWARDS_MATH_SPEC.md`](NATIONAL_TEAM_AWARDS_MATH_SPEC.md) y
+[ADR-077](adr/077-national-team-awards-mathematics.md). Las siete decisiones
+H01–H04/I02–I04 ya no conservan fórmula, distribución, sampler, tie algorithm
+o stream abiertos; todas quedan `PARTIAL_CALIBRATION` por values, Definitions,
+evidencia, targets y goldens.
+
+Eligibility continúa siendo un boundary upstream. G3D-2 fija el policy V1 en
+[ADR-082](adr/082-vertical-slice-sporting-nationality.md): Argentina es la
+nacionalidad deportiva inicial y única del protagonista y jugar en España no
+otorga elegibilidad. La ejecución todavía necesita el dato/manifest
+autoritativo de DR-068. Tampoco se publican aquí IDs, field sizes, formats o
+award catalog faltantes (DR-025), ni fechas/cursor internacionales (DR-021).
+
+## 29. Consumo de Scoring tras G3C-11
+
+ADR-080 mantiene Awards separado de CareerScore: todos los `AwardWon` reales
+persisten y la equivalencia se aplica únicamente en PPI. National outcomes
+entran en PSN y performance internacional puede formar segmentos PRI. Selection
+y Awards no leen puntos ni aplican anti-duplicación.

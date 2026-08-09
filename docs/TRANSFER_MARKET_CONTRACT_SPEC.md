@@ -2,20 +2,26 @@
 
 ## 1. Estado, alcance y autoridad
 
-**Estado:** Normativa estructural para G3B — Bloque 7; matemática ejecutable,
-calendario de mercado, elegibilidad y calibración pendientes  
-**Fecha:** 2026-07-28  
+**Estado:** normativa estructural; matemática cerrada por G3C-7, valores,
+calendario de mercado, policies, schemas y calibración pendientes
+
+**Fecha:** 2026-07-29
+
 **Autoridad:** `MASTER_SPEC v0.8`, ADR-003 a ADR-007, ADR-013 a ADR-015,
-ADR-022, ADR-043, ADR-052, ADR-054, ADR-055, ADR-057 y
-[ADR-058](adr/058-transfer-market-contract-model.md)  
+ADR-022, ADR-043, ADR-052, ADR-054, ADR-055, ADR-057,
+[ADR-058](adr/058-transfer-market-contract-model.md) y
+[ADR-076](adr/076-transfer-market-contract-mathematics.md)
+
 **Decisiones relacionadas:** DR-008, DR-021, DR-022, DR-027, DR-048, DR-049,
 DR-058 a DR-060, DR-063, DR-065 a DR-068
 
-Este documento cierra la estructura causal de Transfers, Market & Contracts. No
-elige:
+Este documento cierra la estructura causal de Transfers, Market & Contracts.
+Las elecciones matemáticas posteriores se encuentran en
+[`TRANSFER_MARKET_CONTRACT_MATH_SPEC.md`](TRANSFER_MARKET_CONTRACT_MATH_SPEC.md).
+Este documento no fija:
 
-- fórmulas de valoración, interés, oferta, negociación o preferencias;
-- distribuciones, coeficientes, escalas de percepción o parámetros de balance;
+- valores de valoración, interés, oferta, negociación o preferencias;
+- coeficientes, escalas concretas o parámetros calibrados;
 - tasas de cambio, calibración monetaria o targets económicos;
 - calendario definitivo de ventanas de mercado;
 - reglas de inscripción por competición;
@@ -65,6 +71,8 @@ MarketPerception
 -> ClubNeed
 -> TransferInterest
 -> TransferOffer
+-> seller/holding-club response, cuando corresponda
+-> ContractProposal
 -> TransferNegotiation
 -> PlayerDecision, cuando corresponda
 -> TransferOutcome
@@ -87,6 +95,13 @@ terminar sin producir la siguiente:
 
 No existe una operación monolítica `tryTransfer()` que oculte estas fronteras.
 Cada transición conserva sus causas y referencias.
+
+**Reconciliación G3C-7:** `TransferOffer` representa la propuesta económica/de
+movimiento del comprador. `ContractProposal` es un objeto separado y se genera
+solo después de una respuesta compatible del seller/holding club. La evolución
+se registra mediante los facts existentes; no se crea un alias nuevo. Una
+decisión del jugador solo se abre cuando fee, seller response, contract/loan
+proposal y negociación agregada quedaron congelados.
 
 ## 4. Percepción de mercado y evidencia
 
@@ -215,7 +230,9 @@ debe:
 - no imponer un número máximo editorial de candidatos, intereses u ofertas;
 - usar orden y streams deterministas.
 
-La familia estadística y los parámetros siguen abiertos.
+G3C-7 fija enumeración canónica del scope autorizado y `ClubNeed`
+logistic-Normal. Quedan abiertos values, Definitions y la policy DR-065, no la
+familia matemática.
 
 ### 6.2 `TransferInterest`
 
@@ -236,8 +253,8 @@ La familia estadística y los parámetros siguen abiertos.
 Su probabilidad puede depender de calidad y potencial percibidos, evidencia
 reciente, edad, posición, necesidad, fit, liga, reputaciones, contrato, contexto
 de nacionalidad/pasaporte autorizado, finanzas, mercado y azar. Ningún factor
-usa un threshold rígido. La función, composición, correlaciones y streams quedan
-en DR-008/058.
+usa un threshold rígido. G3C-7 fija transición logistic/Bernoulli persistente,
+correlaciones jerárquicas y streams; quedan coefficients, sigmas y targets.
 
 ## 7. Viabilidad financiera
 
@@ -429,7 +446,7 @@ se inventa aquí.
 
 ### 10.1 `TransferOffer`
 
-Una oferta firme debe congelar al menos:
+Una oferta del comprador debe congelar al menos:
 
 - `offerId`;
 - `interestId` o causa equivalente;
@@ -438,22 +455,22 @@ Una oferta firme debe congelar al menos:
 - vendedor cuando corresponde;
 - tipo de operación;
 - propuesta de fee cuando corresponde;
-- propuesta contractual completa;
-- propuesta de préstamo cuando corresponde;
+- referencia a la futura propuesta contractual/préstamo cuando corresponda;
 - `marketWindowContextId`;
 - punto de creación y validez;
 - referencias de percepción, necesidad y viabilidad;
 - estado;
 - idempotency/causal key.
 
-Los términos se generan una sola vez. Abrir, mostrar o reanudar la decisión no
-los vuelve a sortear.
+Fee/operation terms se generan una sola vez. Tras una respuesta compatible del
+seller/holding club se genera una única `ContractProposal`/`LoanProposal`.
+Abrir, mostrar o reanudar la decisión no vuelve a sortear ninguno de ellos.
 
 ### 10.2 Relación interés→oferta
 
 Un interés puede no producir oferta por estrategia, viabilidad, vendedor,
-preferencia del jugador, contexto o azar. La función y distribución permanecen
-externalizadas.
+preferencia del jugador, contexto o azar. ADR-076 fija Bernoulli logistic
+separado para interest y offer, con factors/draws independientes.
 
 Una oferta rara o desproporcionada conserva probabilidad positiva, pero debe
 referenciar el contexto institucional/narrativo que modificó su oportunidad;
@@ -466,8 +483,9 @@ decisión comparativa cuando la política lo requiera.
 ### 10.3 Fee y contrato
 
 La propuesta de fee pertenece al acuerdo entre clubes. La propuesta contractual
-pertenece al acuerdo club-jugador. Pueden existir en el mismo payload sin
-convertirse en una sola aprobación.
+pertenece al acuerdo club-jugador. Conservan objetos/referencias diferentes y
+no se convierten en una sola aprobación. ADR-076 fija el orden
+offer→seller response→ContractProposal.
 
 - transferencia permanente con contrato activo: normalmente requiere fee y
   ambos acuerdos;
@@ -522,9 +540,10 @@ Una operación solo queda `AGREED` cuando todos los acuerdos materialmente
 requeridos están confirmados. `TransferOutcome=COMPLETED` exige además una
 frontera legal de ejecución y validación atómica.
 
-Con contrato activo, el vendedor puede aceptar, rechazar o proponer términos
-alternativos conforme al modelo futuro. El jugador no mueve unilateralmente el
-contrato. La aceptación del jugador tampoco obliga a comprador/vendedor.
+Con contrato activo, el vendedor puede aceptar o rechazar la propuesta
+agregada. V1 no modela términos alternativos dentro de la misma occurrence. El
+jugador no mueve unilateralmente el contrato. Su aceptación tampoco obliga a
+comprador/vendedor cuando las demás condiciones no están satisfechas.
 
 ### 11.3 Resolución agregada
 
@@ -538,10 +557,9 @@ No se simulan rondas ilimitadas. Cada operación de negociación:
   ADR-013;
 - no usa un número máximo editorial de rondas como cooldown encubierto.
 
-El catálogo de acciones permitidas puede incluir aceptar, rechazar, presentar
-términos alternativos, retirarse o esperar cuando exista una oportunidad
-posterior válida. La política cuantitativa y los tipos de contraoferta siguen
-pendientes.
+ADR-076 elige una sola resolución agregada y ninguna revisión dentro de la
+misma occurrence. Una oportunidad futura puede originar otra oferta con nueva
+identidad; no existe loop ni cooldown.
 
 ## 12. Decisión del jugador y `WAITING_DECISION`
 
@@ -675,7 +693,8 @@ Si alguna invariante falla, no se aplica ninguna parte.
 
 El fee puede depender de valoración, contrato restante, leverage del vendedor,
 necesidad del comprador, competencia entre compradores, voluntad del jugador,
-finanzas, mercado y azar. No se fija fórmula.
+finanzas, mercado y azar. G3C-7 fija un predictor en log-space y cuantización
+monetaria exacta; quedan sus valores y calibración.
 
 Invariantes:
 
@@ -689,7 +708,7 @@ Invariantes:
 ### 15.2 `Salary`
 
 Salary se resuelve de forma separada. Puede depender de percepción deportiva,
-valor, reputaciones, finanzas, expectativa contractual, competencia por la
+reputación deportiva autorizada, finanzas, expectativa contractual, competencia por la
 firma, liga y mundo.
 
 No se infiere mediante un porcentaje fijo de fee o MarketValue. La base
@@ -1010,7 +1029,7 @@ Un resultado terminal conserva el motivo aunque no haya movimiento.
 | `TransferOfferWithdrawn` | Oferta retirada con causa. |
 | `RenewalOffered` | Propuesta de continuidad contractual. |
 | `NegotiationStarted` | Proceso agregado identificado. |
-| `NegotiationUpdated` | Cambio de propuesta/acuerdos sin outcome final. |
+| `NegotiationUpdated` | Transición de acuerdos/estado sobre propuesta congelada, sin revisar términos. |
 | `NegotiationFailed` | Resultado terminal sin movimiento. |
 | `PlayerTransferDecisionRequested` | Interrupción mecánica con opciones congeladas. |
 | `ContractAgreed` | Acuerdo contractual validado; puede estar pendiente de vigencia. |
@@ -1069,7 +1088,7 @@ Ningún fact financiero o de movimiento está allowlisted para score.
 - incertidumbre por observador;
 - peso de potencial percibido;
 - percepción de riesgo;
-- función/familia de `MarketValueEstimate`;
+- coefficients/loadings de `MarketValueEstimate` en log-space;
 - sensibilidad a edad, posición, demanda, contrato y contexto;
 - persistencia, reversión y shocks de valoración;
 - precisión/cuantización.
@@ -1080,7 +1099,7 @@ Ningún fact financiero o de movimiento está allowlisted para score.
 - urgencia y horizonte;
 - perfiles deseados;
 - `PositionScarcity`;
-- función de `PlayerClubFit`;
+- weights/interactions de `PlayerClubFit`;
 - generación de `ClubCandidateField`;
 - intensidad/probabilidad de interés;
 - multiplicidad y correlaciones entre clubes;
@@ -1102,8 +1121,8 @@ Ningún fact financiero o de movimiento está allowlisted para score.
 
 ### Negociación y preferencias
 
-- transiciones probabilísticas de negociación;
-- varianza y tipos de contraoferta;
+- intercepts/coefficients de la negociación agregada single-stage;
+- varianza del outcome sobre términos congelados;
 - pesos de preferencias del jugador;
 - influencia de `ContractExpectation`;
 - willingness de comprador/vendedor/jugador;
@@ -1141,25 +1160,23 @@ No se asigna ningún valor en este bloque.
 
 | ID | Estado de Bloque 7 | Cierre estructural | Pendiente |
 |---|---|---|---|
-| G3B-G01 | Parcial | `ClubCandidateField` consume identidades, `ClubNeed`, fit, estado y mundo sin plantilla/cap. | Familia de generación, distribución, scope DR-065 y parámetros. |
-| G3B-G02 | Parcial | `TransferInterest` es entidad separada, probabilística, múltiple y basada en percepción/evidencia. | Fórmula, correlación, precisión, streams y calibración. |
-| G3B-G03 | Parcial | Oferta firme congelada separa fee, contrato, préstamo y viabilidad. | Función interés→oferta y distribución cuantitativa de términos. |
-| G3B-G04 | Parcial | `TransferNegotiation`, acuerdos separados, `PendingDecision`, atomicidad e idempotencia quedan definidos. | Matemática y ubicación de movimientos entre Qs en DR-067. |
+| G3B-G01 | `PARTIAL_CALIBRATION` | Enumeración canónica del scope, ClubNeed logistic-Normal y fit derivado sin plantilla/cap. | Valores, data y scope DR-065. |
+| G3B-G02 | `PARTIAL_CALIBRATION` | Transición Bernoulli logistic por candidato con factors market/region/club. | Coefficients, sigmas, targets y goldens. |
+| G3B-G03 | `PARTIAL_CALIBRATION` | Offer logistic; operation/expectation/duration softmax; fee/salary log-space. | Valores, catálogo monetario/contractual y calibración. |
+| G3B-G04 | `PARTIAL_CALIBRATION` | Seller logistic, negociación aggregate single-stage y checkpoint sin resampling. | Valores y policies DR-066/067. |
 | G3B-G05 | Resuelta estructuralmente | Permanente, loan y free transfer; afiliación dual; cambio atómico; historia multiclub. | Elegibilidad DR-066, continuidad DR-065 y parámetros. |
 | G3B-G06 | Resuelta estructuralmente | Entidad `Contract`, lifecycle, renovación por sucesor y `ContractExpectation` propio. | Schema temporal final DR-021/067 y balance contractual. |
-| G3B-G07 | Parcial | MarketValue es estimación monetaria observer-specific y queda separado de fee/salary; `Money` es exacto. | Fórmula, moneda/conversión, calibración y presentación DR-027/058. |
+| G3B-G07 | `PARTIAL_CALIBRATION` | Valuation observer-specific en log-space y MarketReferenceValue por weighted median canónica. | Valores, moneda/conversión, calibración y presentación DR-027. |
 | G3B-G08 | Calibración externalizada | Registry versionado obligatorio. | Todos los valores y targets. |
 
 ## 26. Decisiones todavía abiertas
 
-### Dependencias DR-008 / DR-058
+### Dependencias de calibración DR-008 / DR-058
 
-- funciones y distribuciones de percepción, valoración, interés, oferta,
-  viabilidad, negociación, fee, salary, renewal y preferencias;
-- correlaciones, orden de evaluación y composición probabilística;
-- escalas, precisión, cuantización y redondeo;
-- namespaces/contextos de streams;
-- parámetros iniciales y fixtures;
+- valores de percepción, valoración, interés, oferta, viabilidad, negociación,
+  fee, salary, renewal y preferencias;
+- loadings/correlaciones y precisiones concretas;
+- parámetros iniciales y expected outputs de fixtures;
 - targets/tolerancias Monte Carlo.
 
 ### Dependencias DR-021 / DR-067
@@ -1168,13 +1185,22 @@ No se asigna ningún valor en este bloque.
 - calendario de ventanas de mercado;
 - ubicación de movimientos entre Qs en el cursor;
 - validez/caducidad agregada de ofertas;
-- política de efectividad post-season y mid-season.
+- calendario publicado de la ventana post-season V1. G3D-2 fija que el slice
+  solo completa movimientos en `MARKET`, después del cierre deportivo y antes
+  de la temporada siguiente. Mid-season queda diferido y no se habilita por
+  extrapolación.
 
 ### Dependencia DR-027
 
+La policy de representación/calibración está cerrada por
+[ADR-083](adr/083-native-money-and-calibration-normalization.md); los artifacts
+con contenido real permanecen pendientes:
+
 - catálogo/fuente monetaria;
-- moneda de referencia por contexto;
-- conversión y snapshot de rates;
+- importes observados en moneda nativa y fecha/snapshot;
+- contexto normalizado de poder adquisitivo para calibración, derivado y con
+  provenance separada; no sustituye al `Money` nativo;
+- conversión y snapshot de rates cuando una vista cross-currency los requiera;
 - calibración;
 - presentación y disclaimer final.
 
@@ -1182,7 +1208,10 @@ No se asigna ningún valor en este bloque.
 
 - clasificación final facts/snapshots/trazas;
 - payloads, identidad e idempotencia definitivos;
-- owner y reglas de `RegistrationEligibility`;
+- owner y dataset de `RegistrationEligibility`. Para V1, el movimiento
+  post-season se hace efectivo en la temporada siguiente y valida holder,
+  sporting club, ventana, membresía, CompetitionDefinition y policy explícita;
+  una regla ausente produce `PENDING_DATA`, no elegibilidad inferida;
 - allowlist de scoring.
 
 ### Dependencia DR-065
@@ -1190,7 +1219,8 @@ No se asigna ningún valor en este bloque.
 - clubes/pools candidatos fuera del tier;
 - inputs mínimos de mercado para club abstracto;
 - oportunidad y Performance fuera del tier;
-- continuidad y retorno.
+- continuidad y retorno bajo el pool híbrido de ADR-081. La arquitectura está
+  cerrada; siguen pendientes catálogo, fields, materialización y goldens.
 
 ### Dependencias DR-048 / DR-049
 
@@ -1199,7 +1229,8 @@ dominante por sí misma. Reconversión y cohortes mantienen sus DR pendientes.
 
 ## 27. Gates antes de implementar
 
-1. schemas distinguen percepción, interés, oferta, negociación, outcome y
+1. schemas distinguen percepción, interés, oferta, propuesta contractual,
+   negociación, outcome y
    contrato;
 2. fixtures demuestran interés sin oferta y oferta sin movimiento;
 3. Market no lee latentes verdaderos;
@@ -1215,10 +1246,43 @@ dominante por sí misma. Reconversión y cohortes mantienen sus DR pendientes.
 13. loan conserva holding/sporting club e historial;
 14. movement atomicity impide afiliación o contrato parcial;
 15. temporada multiclub conserva splits sin duplicación;
-16. DR-067 cierra el cursor para movimientos entre Qs;
-17. DR-066 cierra elegibilidad del slice;
-18. DR-065 cierra continuidad fuera del tier;
+16. el calendario/data de DR-067 materializa la única ventana `MARKET`
+    post-season de V1; mid-season continúa fuera del slice;
+17. DR-066 publica las policies/data de inscripción V1 sin fallback permisivo;
+18. DR-065 publica el catálogo y fields del pool híbrido de ADR-081;
 19. DR-063 aprueba facts e idempotencia;
-20. parámetros, streams, precisión, golden fixtures y Monte Carlo están
-    versionados y aprobados;
+20. parámetros, expected golden outputs y Monte Carlo están versionados y
+    aprobados;
 21. Transfers no escribe ScoreLedger ni crea dependencia engine→scoring.
+
+## 28. Cierre matemático G3C-7
+
+[ADR-076](adr/076-transfer-market-contract-mathematics.md) y
+[`TRANSFER_MARKET_CONTRACT_MATH_SPEC.md`](TRANSFER_MARKET_CONTRACT_MATH_SPEC.md)
+cierran:
+
+- ClubNeed logistic-Normal y candidate field por enumeración canónica;
+- PlayerClubFit y opportunity projection determinista;
+- Interest/Offer mediante Bernoulli logistic separados;
+- BidderCompetitionField derivado;
+- valuation observer-specific y reference weighted median en log-space;
+- fee/salary log-space con Money exacto;
+- seller reservation/response;
+- ContractExpectation/duration por stable softmax;
+- renewal y loan propensities;
+- negociación agregada single-stage;
+- PlayerDecision explícita sin RNG;
+- checkpoints sin resampling;
+- factors/streams, invariantes, targets y goldens requeridos.
+
+G3B-G01–G04/G07 pasan a `PARTIAL_CALIBRATION`. DR-058 ya no está abierta por
+falta de familia matemática. G3D-2 cierra las policies V1 de moneda/calibración,
+pool externo, registro y cadencia post-season, pero la implementación sigue
+bloqueada por valores, datasets/Definitions publicados, schemas, goldens y
+calibración de DR-027/065/066/067.
+
+## 31. Consumo de Scoring tras G3C-11
+
+MarketValue, fee, salary y transfer facts no puntúan. Los movimientos conservan
+el contexto histórico; los facts de registration/attribution necesarios por
+PRI/CC pertenecen a DR-066/067 y nunca se infieren desde la fee o el club final.

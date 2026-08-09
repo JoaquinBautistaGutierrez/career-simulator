@@ -212,3 +212,14 @@ Antes de implementar:
 - [ADR-057: Salud, lesiones y recuperación](./057-health-injury-recovery-model.md)
 - [Registro DR-022](../DECISIONS_REQUIRED.md#dr-022--modelo-agregado-de-competiciones-y-mundo)
 - [DR-065](../DECISIONS_REQUIRED.md#dr-065--scope-competitivo-pools-externos-y-continuidad-fuera-del-tier)
+
+## Refinamiento matemático G3C-6
+
+[ADR-075](./075-club-competition-world-mathematics.md) y
+[`CLUB_COMPETITION_WORLD_MATH_SPEC.md`](../CLUB_COMPETITION_WORLD_MATH_SPEC.md)
+cierran las ecuaciones, distribuciones, samplers, orden y stream contracts de
+F05/F06/J02–J04.
+
+DR-022 pasa a `PARTIAL_CALIBRATION`: permanecen values, data, schemas,
+targets/goldens y la policy de DR-065. El refinamiento no acepta un
+`ExternalClubPool`, no inventa identities y no autoriza gameplay.

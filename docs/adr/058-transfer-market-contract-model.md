@@ -1,12 +1,13 @@
 # ADR-058: Estructura de transferencias, mercado y contratos
 
-- **Estado:** Aceptado — alcance estructural; DR-058 permanece parcialmente
-  abierta
+- **Estado:** Aceptado — alcance estructural; matemática refinada por ADR-076
 - **Fecha:** 2026-07-28
 - **Decisión relacionada:** DR-058
 - **Especificación normativa:**
   [`../TRANSFER_MARKET_CONTRACT_SPEC.md`](../TRANSFER_MARKET_CONTRACT_SPEC.md)
 - **Aclara:** ADR-013, ADR-022, ADR-043, ADR-052, ADR-054 y ADR-055
+- **Refinado por:**
+  [ADR-076](./076-transfer-market-contract-mathematics.md)
 
 ## Contexto
 
@@ -28,8 +29,9 @@ Sin una frontera explícita, una implementación podía:
 - asumir elegibilidad inmediata en toda competición;
 - crear score desde cantidades financieras.
 
-Las fórmulas, distribuciones, calendario de mercado, elegibilidad y calibración
-siguen pendientes. Este ADR fija la estructura sin inventarlos.
+Este ADR fijó la estructura sin inventar fórmulas. ADR-076 cerró posteriormente
+familias, ecuaciones, samplers y streams; calendario, elegibilidad, valores y
+calibración continúan pendientes.
 
 ## Decisión
 
@@ -42,6 +44,8 @@ MarketPerception
 -> ClubNeed
 -> TransferInterest
 -> TransferOffer
+-> SellerResponse, cuando corresponda
+-> ContractProposal
 -> TransferNegotiation
 -> PlayerDecision, cuando corresponda
 -> TransferOutcome
@@ -99,9 +103,11 @@ identidad y conserva el predecesor.
 
 ### Oferta, acuerdos y decisión
 
-Una oferta firme congela comprador, vendedor cuando corresponde, movimiento,
-fee, propuesta contractual/préstamo, ventana, validez y referencias. No se
-vuelve a sortear al mostrarla o reanudarla.
+Una oferta congela comprador, vendedor cuando corresponde, movimiento, fee,
+ventana, validez y referencias. ADR-076 separa la posterior
+`ContractProposal`/`LoanProposal`, generada una sola vez después de la respuesta
+compatible del seller/holding club. Nada se vuelve a sortear al mostrar o
+reanudar.
 
 `TransferNegotiation` distingue acuerdo entre clubes de acuerdo con el jugador.
 Una operación puede fallar después de cualquiera de los dos.
@@ -179,7 +185,7 @@ engine no depende de scoring.
 
 ### Costes y restricciones
 
-- DR-008/058 deben aprobar matemática, streams, precisión y fixtures;
+- DR-008/058 deben aprobar valores, expected goldens y calibración;
 - DR-021/067 deben cerrar tiempo y cadencia mid-season;
 - DR-027 debe cerrar fuente, conversión, calibración y presentación;
 - DR-063/ADR-010 ya aprueban facts y semántica; faltan schemas concretos;
@@ -191,10 +197,10 @@ engine no depende de scoring.
 ## Impacto en el Design Board
 
 - G3B-G05 y G3B-G06 quedan resueltas estructuralmente.
-- G3B-G01, G02, G03, G04 y G07 quedan estructuralmente restringidas y
-  parcialmente abiertas.
+- G3B-G01, G02, G03, G04 y G07 quedan estructuralmente restringidas; ADR-076
+  las lleva a `PARTIAL_CALIBRATION`.
 - G3B-G08 queda confirmada como calibración externalizada.
-- DR-058 pasa a parcialmente resuelta; no queda cerrada matemáticamente.
+- DR-058 pasa a `PARTIAL_CALIBRATION`; no queda cerrada por values/policies.
 - DR-027 queda parcialmente resuelta solo en representación exacta.
 - DR-066 y DR-067 registran elegibilidad y cursor mid-season.
 

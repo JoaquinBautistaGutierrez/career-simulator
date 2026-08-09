@@ -1,22 +1,27 @@
 # Performance Model Specification
 
-**Estado:** Normativa estructural para G3B — Bloque 4; interfaces Health/Transfers/National Team/Awards refinadas por Bloques 5/7/8; matemática ejecutable y balance pendientes  
-**Fecha:** 2026-07-28  
-**Decisión principal:** DR-055, parcialmente resuelta por [ADR-055](adr/055-performance-and-production-model.md)  
+**Estado:** Normativa estructural; matemática G3C-4 cerrada por
+[ADR-073](adr/073-performance-production-form-mathematics.md); calibración
+pendiente  
+**Fecha:** 2026-07-29  
+**Decisión principal:** DR-055, `PARTIAL_CALIBRATION` por
+[ADR-055](adr/055-performance-and-production-model.md) y
+[ADR-073](adr/073-performance-production-form-mathematics.md)  
 **Decisiones relacionadas:** DR-008, DR-010, DR-053, DR-054, DR-056, DR-057, DR-058 a DR-061, DR-063, DR-064 y DR-066 a DR-068  
 **Decisiones del board cubiertas:** G3B-A06, G3B-D01 a G3B-D10 y contratos directos con G3B-B02/B05, C02/C05/C06, E01, F01/F04, G02/G07, H02/H03, I01/I03, K01/K02 y M02/M07/M14/M15
 
 ## 1. Propósito y límites
 
-Este documento define la estructura causal de Performance para el vertical slice
-`GK`/`CM`/`ST`. Separa capacidad verdadera, proyección contextual, rendimiento
-realizado, producción observable y evidencia consolidada.
+Este documento define la estructura causal de Performance para el vertical
+slice `GK`/`CM`/`ST`. Separa capacidad verdadera, proyección contextual,
+rendimiento realizado, producción observable y evidencia consolidada. Su
+matemática ejecutable está en
+[`PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md`](PERFORMANCE_PRODUCTION_FORM_MATH_SPEC.md).
 
-No define:
+Este documento estructural no repite:
 
-- coeficientes, escalas o transformaciones numéricas finales;
-- familias definitivas de distribuciones;
-- parámetros de balance, correlaciones o priors;
+- ecuaciones y samplers ya congelados por ADR-073;
+- valores de balance, correlaciones o priors del ParameterSet;
 - calendario, resultados colectivos o fuerza de clubes;
 - hazards de salud, desarrollo, transferencias, selección, premios o scoring;
 - schemas implementables definitivos de facts, que deben conformar
@@ -119,8 +124,8 @@ La transformación puede depender de:
 
 Puede aplicar sensibilidades diferentes por capability o familia. Por ejemplo,
 fatiga puede afectar más una tarea explosiva que una tarea táctica. La función,
-el dominio numérico intermedio, las interacciones, el orden y la precisión siguen
-externalizados.
+el dominio, las interacciones y el orden quedan fijados por ADR-073; sus
+coeficientes permanecen externalizados.
 
 Cada influencia declara su ruta. Si una parte de forma, presión, fitness o
 contexto ya se incorporó a EffectiveCapabilities, no se vuelve a multiplicar
@@ -140,7 +145,7 @@ Invariantes:
 Con este contrato G3B-A06 queda resuelta estructuralmente. El potencial continúa
 siendo una distribución emergente de trayectorias conforme a
 [`PLAYER_MODEL_SPEC.md`](PLAYER_MODEL_SPEC.md); la función y los parámetros de
-proyección siguen siendo matemática calibrable de DR-055.
+proyección están definidos en el math spec y siguen pendientes de calibración.
 
 ## 5. UnderlyingPerformance
 
@@ -179,7 +184,8 @@ pero:
 - no reemplaza el vector de Performance;
 - no se reutiliza silenciosamente entre consumidores con semánticas distintas.
 
-Escala, fórmula y bandas del rating son parámetros posteriores.
+ADR-073 fija la proyección purpose-scoped como combinación convexa de
+dimensiones. Sus pesos y cualquier escala de presentación siguen en parámetros.
 
 ## 6. Exposición, volumen y evidencia
 
@@ -234,15 +240,11 @@ varianzas distintas. No se lo trata como un multiplicador automático de calidad
 media.
 
 Los conteos se generan con distribuciones discretas, no redondeando una
-expectativa. Poisson, Negative Binomial, mixtures u otros procesos permanecen
-como alternativas hasta aprobar:
-
-- ajuste de media y varianza;
-- sobredispersión;
-- correlaciones;
-- soporte y colas;
-- comportamiento con exposición cero o escasa;
-- precisión, streams y fixtures.
+expectativa. ADR-073 fija `NegativeBinomial2` para producción overdispersed,
+Binomial para éxitos dentro de oportunidades confirmadas y los samplers
+inverse-CDF en log-space. Poisson queda disponible solo cuando la calibración
+demuestre media-varianza compatible. Los valores de dispersión, correlaciones y
+targets permanecen en el ParameterSet.
 
 No se imponen máximos editoriales a estadísticas o ratings. Solo rigen
 identidades lógicas y físicas derivadas de hechos ya generados, como una atajada
@@ -319,10 +321,9 @@ ni obligación de simular cada pase, recuperación o duelo. Pueden permanecer
 ocultas en UI, pero deben conservarse de forma auditable para premios, selección,
 mercado y scoring posicional.
 
-El modelo generativo puede usar oportunidades/acciones internas para producir
-los componentes y los conteos correlacionados. La familia exacta y la decisión
-de persistir contadores adicionales solo se aprueban cuando un consumidor
-normativo justifique su uso.
+ADR-073 genera los cuatro componentes mediante factores Normal correlacionados
+y goals/assists mediante NB2. Contadores adicionales solo se añaden cuando un
+consumer normativo justifique su uso.
 
 ### 8.4 GK
 
@@ -364,8 +365,10 @@ Reglas:
   catálogo versionado cuando exista un uso downstream aprobado, sin alterar
   estos mínimos.
 
-La definición agregada de oportunidades de valla invicta y participación
-elegible depende de DR-021/DR-022/DR-054. No se inventan partidos individuales.
+ADR-073 define el contrato matemático
+`cleanSheetEligibleAppearances/cleanSheetEligibleMinutes` y deriva clean sheets
+asignando goals conceded a unidades agregadas elegibles. La producción de esas
+unidades continúa upstream en DR-021/DR-022/DR-054; no se inventan partidos.
 
 ## 9. Contrato desde Club & Competitions
 
@@ -437,9 +440,9 @@ pueden persistirse como facts referenciados. Si solo existe exposición agregada
 el `pressureBreakdown` es la evidencia canónica y no se inventa un evento
 separado.
 
-La definición exacta de exposición high-pressure y sus oportunidades sigue en
-DR-021/DR-022/DR-060. G3B-D08 queda estructuralmente resuelta y matemáticamente
-parcial.
+ADR-073 fija el consumo matemático de `pressureExposure`; su productor y las
+oportunidades calificadas siguen en DR-021/DR-022. G3B-D08 queda
+`PARTIAL_CALIBRATION`, no abierta por fórmula local.
 
 ## 11. Dynamic States y ownership
 
@@ -456,7 +459,8 @@ nextForm =
   + confirmedContextEffects
 ```
 
-La expresión no aprueba suma, escala o función. Exige:
+ADR-073 concreta esta familia como AR(1) mean-reverting en espacio logit,
+cuantizado a `0..10000`. Conserva:
 
 - persistencia parcial;
 - regresión o saturación de la influencia;
@@ -480,10 +484,10 @@ confirmado; no es propietario de su dinámica completa.
 ### 11.3 Fitness y fatigue
 
 Health posee `fitness`, `fatigue`, `LoadState`, condiciones y su evolución
-conforme a [`HEALTH_INJURY_SPEC.md`](HEALTH_INJURY_SPEC.md). Performance solo
-consume el snapshot y las restricciones confirmadas antes de producción. Sus
-efectos pueden variar por capability o familia y sus transformaciones son
-parámetros de DR-055/DR-057.
+conforme a [`HEALTH_INJURY_SPEC.md`](HEALTH_INJURY_SPEC.md) y ADR-074.
+Performance solo consume el snapshot y las restricciones confirmadas antes de
+producción. Sus efectos varían por task mediante predictores aditivos de
+ADR-073; los values/goldens conjuntos permanecen pendientes de calibración.
 
 Después de cerrar producción, Performance entrega exposición/minutos e
 intensidad física/contextual realizados. No entrega el rating, goles u otra
@@ -652,7 +656,8 @@ breakdown. El allowlist y la granularidad se definen en
 6. Cero minutos implica cero producción participativa.
 7. Conteos se muestrean discretamente; no son expectativas redondeadas.
 8. Estadísticas correlacionadas comparten causas explícitas.
-9. `consistency` modifica principalmente dispersión, no calidad media.
+9. `consistency` modifica principalmente dispersión y no añade un predictor
+   directo de calidad media.
 10. `pressureResistance` no garantiza éxito o fracaso.
 11. Producción cruda no se reescribe por fuerza de competición.
 12. Sparse exposure conserva outliers y expresa menor fuerza de evidencia.
@@ -713,59 +718,67 @@ No se asignan valores en este documento.
   de EffectiveCapabilities está definida conceptualmente.
 - G3B-D01: objeto de Performance y las cinco capas quedan separados.
 
-### Parcialmente resueltas
+### Cierre matemático G3C-4
 
-- G3B-D02: inputs y orden causal definidos; función y coeficientes pendientes.
-- G3B-D03: jerarquía de shocks y obligación de correlación definidas; familia,
-  matriz y parámetros pendientes.
-- G3B-D04: estados, ownership y feedback diferido definidos; escalas y
-  ecuaciones pendientes.
-- G3B-D05/D06/D07: grafos y outputs mínimos definidos; distribuciones,
-  precisión y parámetros pendientes.
-- G3B-D08: presión/momentos importantes poseen evidencia estructural; la fuente
-  de oportunidades high-pressure depende de Club & Competitions.
-- G3B-D09: resumen y reglas de agregación definidos; fórmula y precisión
-  pendientes.
+G3B-D02 a D09 quedan `PARTIAL_CALIBRATION`:
+
+- D02: task logits y expectativa/realización multidimensional cerrados;
+- D03: factores Normal, consistency, NB2/Binomial e inverse-CDF cerrados;
+- D04: Form AR(1) en logit y señales de performance cerrados;
+- D05: grafo GK `shots→saves→conceded→clean sheets` cerrado;
+- D06: cuatro impactos CM y counts correlacionados cerrados;
+- D07: opportunity/chance/conversion ST y counts correlacionados cerrados;
+- D08: exposición/response high-pressure cerrados;
+- D09: evidence, agregación y splits cerrados.
+
+No queda una familia matemática o sampler abierto. Faltan valores, targets,
+goldens y producers upstream detallados en la especificación matemática.
 
 ### Calibrable
 
 - G3B-D10: confirmado como registro de parámetros; no bloquea contratos
   parametrizados, pero sí el gate de aceptación de gameplay.
 
-DR-055 y DR-056 permanecen parcialmente abiertas. DR-008 y DR-010 no se cierran.
+DR-055 pasa a `PARTIAL_CALIBRATION`. DR-056 conserva abiertas las dinámicas
+completas de confidence/morale/managerTrust; Form y las señales desde
+Performance están cerrados. DR-008 y DR-010 no se cierran.
 
 ### Alcance estadístico todavía pendiente
 
-`MASTER_SPEC` también menciona disciplina y, para GK, errores, penales y
-distribución. Este bloque no elimina esas necesidades ni inventa sus counters:
-DR-055 debe decidir qué métricas adicionales necesita el vertical slice, cuál
-es su owner y qué consumidor las justifica; ADR-010 ya cerró la clasificación
-de los facts existentes. Los outputs definidos en la sección 8 son mínimos, no
-un catálogo exhaustivo. ADR-060 confirma que los
-premios GK no pueden usar `goalsConceded` como proxy de calidad; si el catálogo
-mínimo no aporta evidencia suficiente, ese gap debe cerrarse en DR-055 y
-reflejarse después en `SCORING_FACTS_SPEC.md`
-antes de implementar el premio correspondiente.
+`MASTER_SPEC` también menciona disciplina y, para GK, errors, penalties y
+distribution. ADR-073 conserva `distributionPerformance` como dimensión
+subyacente y difiere errors/penalties por falta de consumer del slice. Añadir
+un contador requiere scope, grafo, distribución, facts, targets y fixtures; no
+se infiere desde goals conceded ni se crea por completitud.
 
 ## 19. Gates antes de implementar
 
 Antes de implementar Performance:
 
-1. DR-055 aprueba funciones, distribuciones, escalas, precisión y streams;
-2. DR-056 aprueba dominios y transiciones de Dynamic States;
-3. DR-021/DR-022 fijan calendario y `PerformanceContext`;
-4. ADR-057 fija la estructura de fitness/fatigue, restricciones y carga; DR-057
-   debe aprobar su matemática, precisión, streams y fixtures;
-5. DR-063 publica facts, schemas, identidad y allowlist;
-6. cada posición posee golden fixtures de cero, sparse y alta exposición;
-7. fixtures prueban conteos correlacionados y las identidades GK;
-8. property tests prueban ausencia de producción con cero minutos;
-9. fixtures prueban que raw production no cambia por evaluación contextual;
-10. Monte Carlo valida medias, dispersiones, colas y correlaciones aprobadas;
-11. outliers no son truncados ni convertidos en eventos especiales;
-12. replay y cadencia producen facts y hashes idénticos.
-13. fixtures mid-season conservan splits por club sin duplicación;
-14. DR-066/067 cierran elegibilidad y boundary antes de producir Performance
+1. publicar valores calibrados de `EngineParameterSet.performance`;
+2. aprobar goldens y targets de ADR-073;
+3. DR-021/DR-022 fijan producers de calendario y `PerformanceContext`;
+4. ADR-074 fija matemática, precisión, streams y adapters de
+   fitness/fatigue/restricciones; faltan ParameterSet y fixtures aprobados;
+5. G3C-6 entrega pressure exposure, contexts y clean-sheet eligibility;
+6. DR-056 completa owners de confidence/morale/managerTrust cuando corresponda;
+7. DR-063 ya publica facts/allowlist; faltan schemas concretos;
+8. cada posición posee golden fixtures de cero, sparse y alta exposición;
+9. fixtures prueban conteos correlacionados y las identidades GK;
+10. property tests prueban ausencia de producción con cero minutos;
+11. fixtures prueban que raw production no cambia por evaluación contextual;
+12. Monte Carlo valida medias, dispersiones, colas y correlaciones;
+13. outliers no son truncados ni convertidos en eventos especiales;
+14. replay y cadencia producen facts y hashes idénticos;
+15. fixtures mid-season conservan splits por club sin duplicación;
+16. DR-066/067 cierran elegibilidad y boundary antes de producir Performance
     para el nuevo club.
 
 Hasta cumplir esos gates no se implementa gameplay de Performance.
+
+## 36. Consumo de Scoring tras G3C-11
+
+ADR-080 consume summaries y facts de exposición/producción cerrados mediante
+profiles posicionales y cohortes congeladas. No lee hidden capabilities,
+latentes o presentation ratings. El cierre de Scoring no modifica Performance;
+solo formaliza el adapter facts→PRI/CC.

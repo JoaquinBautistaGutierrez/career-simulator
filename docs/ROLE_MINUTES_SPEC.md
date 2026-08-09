@@ -530,9 +530,9 @@ Ningún valor queda asignado por esta especificación.
 | DR-048 | Resuelta por ADR-071 |
 | DR-049 | Resuelta por ADR-071 |
 | DR-054 | `PARTIAL_CALIBRATION`: ecuaciones/samplers cerrados por ADR-072; faltan valores/targets |
-| DR-055 | Estructura aceptada por ADR-055; faltan matemática, escalas, precisión, streams, parámetros y fixtures del summary |
+| DR-055 | `PARTIAL_CALIBRATION` por ADR-073; summary y previous-performance interface cerrados |
 | DR-056 | Actualización de `managerTrust`, forma, confianza y feedback |
-| DR-057 | Estructura aceptada por ADR-057; G3C-5 debe producir la asignación médica consumida por ADR-072 |
+| DR-057 | `PARTIAL_CALIBRATION` por ADR-074; asignación médica consumida por ADR-072 cerrada |
 | DR-064 | Resuelta por ADR-072 |
 | DR-058 | Estructura aceptada por ADR-058; `ContractExpectation` queda separada; faltan influencia matemática, parámetros y fixtures |
 | DR-066 | Elegibilidad/inscripción competitiva posterior a movimientos |
@@ -541,7 +541,8 @@ Ningún valor queda asignado por esta especificación.
 
 Las aperturas upstream/downstream no invalidan el cierre matemático local.
 Implementar el subsistema oficial requiere valores, targets, goldens y los
-inputs de G3C-5/G3C-6.
+inputs de G3C-6; Health ya fijó su producer matemático, pero aún necesita
+ParameterSet/catálogo.
 
 ## 14. Gates antes de implementar
 
@@ -584,3 +585,9 @@ ADR-072 y
 Las seis filas asignadas a G3C-3 ya no conservan una familia matemática
 abierta. G3B-C04 y F03 están `RESOLVED_MATH`; C02, C03, C05 y C06 están
 `PARTIAL_CALIBRATION`.
+
+## 23. Consumo de Scoring tras G3C-11
+
+Scoring usa exposición real, opportunity y usage por posición; SportingRole no
+asigna PRI/CC. Availability solo influye a través de minutes/opportunity ya
+cerrados. No se recalcula este resolver dentro de Scoring.

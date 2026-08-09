@@ -613,9 +613,13 @@ Un pool externo agregado es compatible como opción arquitectónica si:
 - un club que entra al tier detallado puede materializar un `ClubState`
   reproducible.
 
-Esta opción **no queda aceptada como política del vertical slice**. DR-065 debe
-elegir entre un pool, tiers detallados u otra representación compatible y fijar
-la data necesaria.
+G3D-2 acepta esta opción como política del vertical slice mediante
+[ADR-081](adr/081-hybrid-external-club-pool.md): el pool es híbrido. Las
+identidades nominales provienen de un catálogo real versionado y los campos
+agregados no identificables cubren contexto competitivo. Cuando el protagonista
+o un fact nominal necesita un club concreto, la materialización es determinista
+y trazable. Un field abstracto nunca puede ser champion, club contractual ni
+owner de un fact nominal.
 
 ### 13.3 Club del protagonista fuera del tier detallado
 
@@ -628,8 +632,12 @@ Si el club del jugador desciende:
 - cualquier continuación necesita oportunidad, competición, Performance,
   mercado y scoring coherentes con ese tier.
 
-La política concreta de continuación está pendiente en DR-065. Hasta resolverla
-no puede cerrarse el vertical slice de movilidad.
+La política de continuidad queda cerrada estructuralmente por ADR-081: el
+jugador puede continuar en un club materializado fuera del tier detallado con
+los adapters mínimos de competición, Performance, Market y contrato. La
+ejecución permanece `DATA_REQUIRED` hasta publicar el catálogo real, los fields,
+las reglas de movilidad y sus goldens; no queda abierta una alternativa
+arquitectónica de DR-065.
 
 ## 14. Scope exacto del vertical slice
 
@@ -653,8 +661,9 @@ necesita:
     `TeamSupportField` y `PlayerCompetitiveContribution`;
 11. actualización determinista del mundo entre temporadas;
 12. al menos una ruta verificable de título colectivo por contexto.
-13. una `NationalTeamDefinition` argentina y fields internacionales mínimos,
-    sin inferir la nacionalidad deportiva del protagonista;
+13. una `NationalTeamDefinition` argentina y fields internacionales mínimos;
+    para V1 la nacionalidad deportiva inicial y única del protagonista es
+    Argentina conforme a [ADR-082](adr/082-vertical-slice-sporting-nationality.md);
 14. exactamente un premio global, uno juvenil y tres premios posicionales o de
     competición para el slice, con `AwardDefinition` versionada.
 
@@ -672,10 +681,11 @@ Permanecen pendientes:
 
 - IDs exactos, fuentes, fecha de corte y licencias: DR-025;
 - forma final de temporada/calendario/formato: DR-021;
-- política de participantes externos, promoción/descenso y continuidad:
-  DR-065;
+- catálogo real, fields y reglas versionadas de participantes externos,
+  promoción/descenso y continuidad bajo ADR-081: DR-025/065;
 - catálogo concreto de premios/selección: DR-025/059/060;
-- nacionalidad deportiva y eligibility internacional: DR-068;
+- fuente de nacionalidad deportiva y manifest de eligibility Argentina-only
+  bajo ADR-082: DR-025/068;
 - reglas matemáticas/calibración: DR-008/022;
 - moneda y presentación de valor: DR-027.
 
@@ -956,13 +966,13 @@ Ninguno de estos valores queda aprobado ni hardcoded:
 | G3B-F02 | Resuelta estructuralmente | `ManagerContext`, `TacticalIdentity` vectorial y `TacticalFit` derivado. | Función, escalas y parámetros. |
 | G3B-F03 | `RESOLVED_MATH` en G3C-3 | SeasonId ordinal, Q, unidad y contrato de oportunidad cerrados. | Fecha/label, generación, formatos y extrapolación en DR-021. |
 | G3B-F04 | Resuelta estructuralmente | Definition/State, tipos, calendario Q y contrato de outcome agregados. | Reglas/formato exactos y matemática. |
-| G3B-F05 | Parcial | Contribución, soporte, outcome por competición y correlación separados. | Familia de distribución, pesos, precisión y CC/scoring. |
-| G3B-F06 | Parcial | Movilidad de tier y no auto-transfer quedan fijadas. | Pool/scope/reglas/continuidad en DR-065. |
+| G3B-F05 | `PARTIAL_CALIBRATION` en G3C-6 | Noisy utility/rank para liga; logistic advance por phase; contribución, soporte y correlación cerrados. | Valores, definitions, targets/goldens y CC/scoring. |
+| G3B-F06 | `PARTIAL_CALIBRATION` con policy blocker | Ranking y slots producen `MobilityTransitionRequest`; no auto-transfer. | Pool/scope/materialización/continuidad en DR-065. |
 | G3B-F08 | Calibración externalizada | Snapshot y parámetros no son reglas hardcoded. | Valores y catálogo. |
 | G3B-J01 | Resuelta estructuralmente | `WorldState` híbrido de estados identificados y fields agregados. | Scope concreto de datos. |
-| G3B-J02 | Parcial | Jerarquía de shocks y single-sampling causal fijados. | Distribuciones, cargas, correlaciones y streams. |
-| G3B-J03 | Parcial | Transiciones por estado previo/resultados/contexto, sin destino fijo. | Fórmulas y calibración. |
-| G3B-J04 | Parcial | Ciclos estocásticos, persistencia/regresión y estabilidad conceptual. | Familia de proceso y parámetros. |
+| G3B-J02 | `PARTIAL_CALIBRATION` en G3C-6 | Factor model Normal global/regional/league/club/competition/residual. | Loadings, sigmas y targets. |
+| G3B-J03 | `PARTIAL_CALIBRATION` en G3C-6 | AR(1) en logit por state, snapshot previo y commit atómico. | Means, persistence, coefficients y targets. |
+| G3B-J04 | `PARTIAL_CALIBRATION` en G3C-6 | Ciclos continuos jerárquicos AR(1), sin regímenes guionados. | Persistence, amplitudes y targets. |
 | G3B-J05 | Calibración externalizada | Snapshot y targets quedan versionados. | Valores, matrices y fixtures. |
 
 G3B-F07 permanece diferible después del vertical slice: este bloque no elige
@@ -972,9 +982,11 @@ política de formatos más allá del horizonte aprobado.
 
 Antes de implementar gameplay de este bloque deben cerrarse:
 
-- DR-008: fórmulas, distribuciones, precisión, streams y fixtures;
+- DR-008: G3C-6 cierra estas cinco familias; permanece abierta por G3C-7 a
+  G3C-11, ParameterSets y calibración integrada;
 - DR-021: fecha, `SeasonId`, calendario y evolución de formatos;
-- DR-022: matemática ejecutable, escalas y calibración;
+- DR-022: `PARTIAL_CALIBRATION`; faltan valores, data, schemas, targets,
+  goldens y DR-065;
 - DR-025: catálogo real, fuentes, corte y licencias;
 - DR-063: resuelta; schemas futuros deben conformar su catálogo;
 - DR-064: resuelta por ADR-072; Calendar debe producir el dominio de oportunidad compatible;
@@ -1012,4 +1024,46 @@ Antes de implementar:
 17. parámetros, streams y precisión están versionados;
 18. golden/property tests y Monte Carlo cumplen targets aprobados;
 19. el inventario del slice coincide con DR-018/025/065;
-20. no se implementa gameplay hasta cerrar los bloqueos matemáticos.
+20. no se implementa gameplay hasta cerrar los bloqueos de parámetros, datos,
+    policy y calibración.
+
+## 23. Cierre matemático G3C-6
+
+La especificación normativa es
+[`CLUB_COMPETITION_WORLD_MATH_SPEC.md`](CLUB_COMPETITION_WORLD_MATH_SPEC.md) y
+la decisión transversal es
+[ADR-075](adr/075-club-competition-world-mathematics.md).
+
+G3C-6 fija:
+
+- states acotados y AR(1) mean-reverting en logit para Club/League/World;
+- processes separados de sporting strength, prestige, finance, stability y
+  qualities institucionales;
+- manager turnover por cumulative hazard y generación correlacionada;
+- `TacticalIdentity`, `TacticalFit` y `PositionCompetition` ejecutables;
+- phase graphs por Q, match equivalents y `TeamMinutesOpportunity`;
+- checkpoint de progression knockout dentro de `CONSEQUENCES(Qn)`;
+- contextos exactos de difficulty, congestion, pressure, training y recovery;
+- `TeamSupportField` sin protagonista y proyección de
+  `PlayerCompetitiveContribution`;
+- noisy utility/canonical rank para league y logistic/Bernoulli para
+  cup/continental;
+- jerarquía Normal de shocks y ciclos continuos AR(1);
+- `leagueCompetitiveStrength` dinámica y separada de IJL;
+- boundary rank→`MobilityTransitionRequest` sin resolver DR-065.
+
+Las cinco filas F05/F06/J02/J03/J04 pasan a `PARTIAL_CALIBRATION`. DR-065
+permanece abierta por scope/data/policy, no por falta de función local.
+
+## 24. Referencias matemáticas
+
+- [Mathematical Calibration Contract](MATHEMATICAL_CALIBRATION_CONTRACT.md)
+- [Club/Competition/World Math](CLUB_COMPETITION_WORLD_MATH_SPEC.md)
+- [ADR-075](adr/075-club-competition-world-mathematics.md)
+
+## 25. Consumo de Scoring tras G3C-11
+
+ADR-080 puntúa outcomes ya cerrados por competition edition y attribution
+facts autorizados. `leagueCompetitiveStrength` nunca reemplaza IJL; gameplay
+fields/utilities no contienen puntos. DR-066/067 siguen siendo upstream para
+registration/eligibility y no se infieren dentro de Scoring.

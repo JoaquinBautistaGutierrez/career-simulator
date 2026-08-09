@@ -139,10 +139,11 @@ versión. La deduplicación no depende del orden incidental de objetos.
 | `DecisionResolved` | `PERSISTED_DOMAIN_FACT` | `decisionId`, choice, efectos validados y resume cursor | No |
 | `CareerAbandoned` | `PERSISTED_DOMAIN_FACT` | causa, estado previo y policy ref | No |
 | `CareerInvalidated` | `PERSISTED_DOMAIN_FACT` | causa, evidencia, actor autorizado y estado previo | No |
-| `CareerCompleted` | `PERSISTED_DOMAIN_FACT` | boundary terminal, cierre confirmado y referencias de consolidación | No; habilita finalización, no puntos |
+| `CareerFinalizationConfirmed` | `PERSISTED_DOMAIN_FACT` | terminal cursor, último gameplay fact ordinal, causal refs, `VersionSet` y `parameterSetHash`; fija closed fact frontier | No; autoriza proyección final |
+| `CareerCompleted` | `PERSISTED_DOMAIN_FACT` | finalization ref, closed fact set hash, final ScoreSnapshot, integridad/compatibilidad y referencias de consolidación | No; habilita elegibilidad, no puntos |
 | `DiscoveryConfirmed` | `PERSISTED_DOMAIN_FACT` | `discoveryId`, `EventInstance`/outcome y procedencia | No |
 | `ScoringCorrectionAuthorized` | `PERSISTED_DOMAIN_FACT` | correction ID, actor/policy autorizante, motivo, entry/facts afectados y evidencia | No; puede autorizar una `REVERSAL`, nunca un posting |
-| `CareerFinalizationRequested` | `INTERNAL_SIGNAL` | solicitud y precondiciones | No; su semántica final depende de DR-069 |
+| `CareerFinalizationRequested` | `INTERNAL_SIGNAL` | solicitud y precondiciones antes de confirmación | No |
 
 Los nombres especializados `PlayerTransferDecisionRequested`,
 `RetirementDecisionRequested` y `ComebackDecisionRequested` son proyecciones
@@ -266,22 +267,38 @@ Un `AwardWon` puede mapear a `PPI` o `PSN` según la
 
 | Nombre canónico | Clase | Payload semántico mínimo | Scoring |
 |---|---|---|---|
-| `PublicAttentionGenerated` | `PERSISTED_DOMAIN_FACT` | source fact, causal signal, markets, intensity/context | No directo |
-| `SportingReputationUpdated` | `PERSISTED_DOMAIN_FACT` | markets, estado previo/posterior y evidence keys | No directo |
-| `PublicReputationUpdated` | `PERSISTED_DOMAIN_FACT` | markets, awareness/sentiment previo/posterior y causes | Candidato PBR |
-| `FollowerCountUpdated` | `PERSISTED_DOMAIN_FACT` | total previo, delta entero, total posterior, market y cause | Candidato PBR |
-| `EngagementUpdated` | `PERSISTED_DOMAIN_FACT` | estado previo/posterior, market y cause | Candidato PBR |
+| `PublicAttentionGenerated` | `PERSISTED_DOMAIN_FACT` | source fact, causal signal, markets, profile/decay family y context; nunca state delta impuesto | No directo |
+| `SportingReputationUpdated` | `PERSISTED_DOMAIN_FACT` | markets, standing/evidence previo-posterior, accepted EvidenceKeys, aggregate y causal refs | No directo |
+| `PublicReputationUpdated` | `PERSISTED_DOMAIN_FACT` | markets, awareness/sentiment previo-posterior, aggregate y causal refs | Candidato PBR |
+| `FollowerCountUpdated` | `PERSISTED_DOMAIN_FACT` | breakdown/total `uint64` previo-posterior, delta signed decimal canónico y causal refs | Candidato PBR |
+| `EngagementUpdated` | `PERSISTED_DOMAIN_FACT` | rate previo/posterior por audience partition y causal refs | Candidato PBR |
 | `RetirementOccurred` | `PERSISTED_DOMAIN_FACT` | episode, cause, playing status previo/posterior y decision ref | No directo |
 | `ComebackOccurred` | `PERSISTED_DOMAIN_FACT` | episode, retirement ref, playing status previo/posterior | No directo |
 | `ReputationSignalAccepted` | `INTERNAL_SIGNAL` | evidence key y purpose | No |
 | `RetirementHazardEvaluated` | `INTERNAL_SIGNAL` | causes, probability y stream refs | No |
 | `ComebackOpportunityGenerated` | `INTERNAL_SIGNAL` | opportunity, context y stream refs | No por sí solo |
+| `RetirementOpportunityGenerated` | `INTERNAL_SIGNAL` | competing risks, context y stream refs; se materializa en `DecisionRequested` si requiere elección | No |
+| `FinalizationOpportunityGenerated` | `INTERNAL_SIGNAL` | viability, context y stream refs; no cierra Career | No |
 | `AudienceMilestoneReached` | `DERIVED_SUMMARY` | milestone y state refs | No automático |
 | `RegionalReputationUpdated` | `DERIVED_SUMMARY` | vista de updates con breakdown regional | No alias |
 
 `FollowersChanged` migra a `FollowerCountUpdated`; `PlayerRetired` migra a
 `RetirementOccurred`. Un retiro, comeback, lesión, accidente o catástrofe no
 genera puntos por ocurrir.
+
+**Refinamiento G3C-9:** `REPUTATION_SOCIAL_MATH_SPEC.md` cierra la producción
+determinista de estos facts y su payload auditable. No cambia la allowlist ni
+la matemática PBR: `PublicAttentionGenerated` continúa sin puntuación directa,
+un update puede existir sin puntuar y Scoring nunca reconstruye el estado
+social ejecutando gameplay.
+
+**Refinamiento G3C-10:** `RetirementOccurred`/`ComebackOccurred` cambian solo
+`PlayerPlayingStatus` y pueden repetirse por episodios. Las opportunities son
+internal signals y, cuando requieren elección, su payload congelado vive en el
+`DecisionRequested` genérico. Solo `CareerFinalizationConfirmed` es el Domain
+Fact irreversible: desde su ordinal no se admiten nuevos gameplay facts ni
+facts score-affecting. Su `closedFactSetHash` se calcula después de incorporar
+el propio boundary para evitar autorreferencias de identidad.
 
 ### 4.9 Records, achievements y contenido
 
@@ -672,17 +689,19 @@ rareAndHistoric <= 1000
 PBR <= min(2000, 5% * priorSportingPoints)
 ```
 
-`MASTER_SPEC` no define expresamente `priorSportingPoints`. El subtotal usado
-por su primer desempate es una opción razonable:
+ADR-080 adopta normativamente el subtotal deportivo puro usado también por el
+primer desempate:
 
 ```text
-candidatePriorSportingPoints = PRI + PTC_CLUB + PPI + PSN
+priorSportingPoints = PRI + PTC_CLUB + PPI + PSN
+PBR = ROUND_HALF_UP(min(socialExact + historicExact,
+                       2000,
+                       priorSportingPoints / 20))
 ```
 
-No se adopta esa igualdad por inferencia. DR-010 debe cerrar la base exacta
-además de la transformación de reputación/followers/engagement, eligibility de
-achievements históricos y cuantización del límite de 5 %. Los caps limitan
-puntos, nunca facts, eventos, followers o estadísticas.
+PRL queda fuera para evitar que records/longevidad expandan recursivamente el
+cap. Los subcaps de `socialExact` y `historicExact` se aplican antes del cap
+agregado. Los caps limitan puntos, nunca facts, eventos, followers o stats.
 
 ### 9.7 Etiquetas narrativas
 
@@ -710,9 +729,10 @@ Los facts conservan su scope original:
 - contrato/loan/movement boundary.
 
 No se reescriben estadísticas al club final ni se usa un IJL único por
-temporada. Cada regla declara su unidad de agregación. La ponderación exacta de
-PRI por exposición, el CC en cambios de club y la dominancia posicional siguen
-pendientes en SC-10/SC-11, DR-049, DR-066 y DR-067.
+temporada. PRI pondera cada segmento por exposición/evidencia y conserva su
+factor competitivo; achievements calculan CC por competition edition. DR-049
+cierra dominancia por minutos efectivos. DR-066/067 siguen siendo el owner de
+facts de registration/eligibility, que Scoring nunca infiere.
 
 ## 11. Reconstrucción y re-scoring
 
@@ -720,7 +740,8 @@ Pipeline puro:
 
 ```text
 closed DomainFact set
-+ immutable scoring registry
++ immutable ScoringConfiguration
++ immutable ScoringCalibrationData
 + scoringVersion
 -> validate allowlist/provenance
 -> select facts by canonical scope
@@ -742,27 +763,36 @@ competitivo exige bump de `scoringVersion`.
 
 ## 12. `ScoreSnapshot` y ranking
 
-Un snapshot final contiene conceptualmente:
+Un snapshot final contiene normativamente:
 
 ```text
 ScoreSnapshot
-  scoreSnapshotId
+  snapshotId
   careerId
+  status: PROVISIONAL | FINAL
+  factFrontierId
+  schemaVersion
+  engineVersion
+  contentVersion
+  dataVersion
   scoringVersion
-  domainFactSetHash
-  ledgerHeadHash
-  categorySubtotals
-  careerPoints
-  leaderboardCompatibilityKey
-  finalizationFactRef
+  parameterSetHash
+  scoringConfigurationHash
+  scoringCalibrationDataHash
+  competitiveCompatibilityKey
+  ledgerDigest
+  categorySubtotals { PRI, PTC_CLUB, PPI, PSN, PRL, PBR }
+  priorSportingPoints
+  totalPC
+  narrativeTier
   integrityStatus
 ```
 
-`LeaderboardCompatibilityKey` debe incluir como mínimo `scoringVersion`.
-Igualdad de `scoringVersion` es necesaria, pero no se declara suficiente:
-DR-036 debe decidir presets, automatización, Creation Budget, engine/data y
-otras dimensiones comparables. DR-035 sigue tratando tamaños de muestra,
-percentiles y frecuencia pública.
+La policy inicial usa una exact-key que incorpora las cinco versiones, hashes
+de ParameterSet/config/calibration, preset, Creation Budget, automation y mode
+ruleset. DR-036 conserva cualquier futura equivalencia entre claves distintas.
+DR-035 sigue tratando tamaños de muestra y percentiles públicos, no cohortes
+congeladas de scoring.
 
 Elegibilidad mínima:
 
@@ -774,29 +804,32 @@ Elegibilidad mínima:
 | `PlayerPlayingStatus.RETIRED` con Career abierta | No final |
 | `CareerStatus.RETIRED` en consolidación | No hasta `COMPLETED` |
 
-El primer retiro deportivo no congela PC. DR-069 debe fijar el boundary
-irreversible, la atomicidad de scoring final y la referencia que llena
-`finalizationFactRef`.
+El primer retiro deportivo no congela PC. ADR-079/DR-069 fijan
+`CareerFinalizationConfirmed` como boundary irreversible y
+`finalizationFactRef`. El pipeline `CareerStatus.RETIRED`/FINALIZING proyecta
+ledger/snapshot final de forma idempotente sobre el closed fact set; el commit
+de artefactos, integridad y compatibilidad produce `CareerCompleted`. Solo
+entonces el snapshot es final competitivo y puede evaluarse para ranking.
 
 ## 13. Estado de SC-01 a SC-13
 
-| SC ID | Status | Decisión normativa | Matemática restante | Facts requeridos | Parámetros requeridos | Blocking DR |
+| SC ID | Status | Decisión normativa final | Matemática restante | Facts requeridos | Publicación requerida | Blocking DR/data |
 |---|---|---|---|---|---|---|
-| SC-01 | `RESOLVED` | PC suma los seis subtotales enteros; no hay multiplicador ni redondeo final adicional. | Ninguna propia; depende de cerrar categorías. | Entries posteadas/reversals | Ninguno propio | DR-010 por componentes |
-| SC-02 | `PARTIAL` | CC es por logro, `[0,1.10]`, deriva de participación/performance y solo modula logros colectivos. | Fórmula, scope, cohortes, exceptional tail. | Minutes, appearances, performance, competition outcome | Pesos, transforms, precisión | DR-008, DR-010, DR-049 |
-| SC-03 | `PARTIAL` | Fórmula de liga y porcentajes domésticos se conservan; outcome × CC. | Valores dentro de rangos, atribución y caps menores. | CompetitionFinished + participation facts | IJL catalog, competition definitions | DR-010, DR-066, DR-067 |
-| SC-04 | `PARTIAL` | Tabla internacional y porcentajes de fase se conservan; outcome × CC. | Valores ranged/missing, stacking de fases y atribución. | CompetitionFinished + participation facts | CompetitionScoringDefinition | DR-010, DR-066, DR-067 |
-| SC-05 | `PARTIAL` | Tabla nacional se conserva; PSN no duplica PPI/PRI y usa contexto nacional. | Componentes, resultados no definidos, CC y exclusividad. | National CompetitionFinished, AwardWon, performance facts | Mapping/CC/stacking | DR-010, DR-059, DR-068 |
-| SC-06 | `PARTIAL` | Valores de premios y 100 %/60 % se conservan mediante grupos data-driven. | Más de dos equivalentes, empates, orden con caps. | AwardWon | Equivalence groups y stacking | DR-010, DR-049, DR-060 |
-| SC-07 | `PARTIAL` | PRI usa componentes `450/120/230/120/80`, máximo 1000 pre-factor e IJL fijo. | Transforms, cohortes, percentiles, GK/CM/ST y multicontexto. | Minutes, production, performance summaries | Cohortes, weights, normalization | DR-008, DR-010, DR-049, DR-055 |
-| SC-08 | `PARTIAL` | Records/milestones son facts distintos; 20 seasons reemplaza 15. | Catálogo, rangos exactos, mínimos one-club y record replacement. | RecordAchieved, CareerMilestoneAchieved | Record definitions y values | DR-010, DR-069 |
-| SC-09 | `PARTIAL` | PRL/PBR quedan reconciliados; subcaps 1000/1000 y cap agregado `min(2000,5% del puntaje deportivo previo)`. | Base exacta del puntaje previo, popularity transform, historic eligibility y quantization del cap. | Public/social updates, HistoricAchievementConfirmed | Transforms, base y cap order | DR-010, DR-061 |
-| SC-10 | `PARTIAL` | Cada fact conserva su contexto; no hay IJL único ni duplicación. | Ponderación por exposición y reglas de movimientos. | Scoped minutes/performance/outcomes | Exposure weighting | DR-010, DR-021, DR-066, DR-067 |
-| SC-11 | `PARTIAL` | Scoring consumirá una única dominancia por scope, nunca posición inicial/final arbitraria. | Función, scopes, empates y cero minutos. | MinutesRecorded.usageByPosition | Dominance policy | DR-049 |
-| SC-12 | `RESOLVED` | Decimal/racional exacto, `ROUND_HALF_UP` por entry, PC entero y reversals append-only. | Orden de caps pertenece a SC-03–09/M17. | Fact IDs y correction facts | Precisión declarada por rule | DR-010 por orden de familias |
-| SC-13 | `RESOLVED` | Bandas fijas de `MASTER_SPEC`; son presentación derivada. | Solo futuras recalibraciones de presentación versionadas. | PC final | Narrative tier mapping | Ninguno para score |
+| SC-01 | `RESOLVED_MATH` | PC es la suma exacta de seis subtotales enteros; no hay redondeo final. | Ninguna | entries/reversals | goldens de suma | — |
+| SC-02 | `PARTIAL_CALIBRATION` | CC por competición usa participación/contribución evidence-weighted, spline racional monótona y unidades 1/10000 en `[0,1.10]`. | Ninguna familia | minutes/appearances/starts/performance/pressure | weights, splines, cohorts, targets | DR-066/067 solo facts |
+| SC-03 | `DATA_REQUIRED` | logro doméstico = base exacta × outcome × CC; liga usa tabla verificada de la fórmula aprobada. | Ninguna | CompetitionFinished + attribution facts | valores exactos de rangos/IJL catalog | DR-066/067 |
+| SC-04 | `DATA_REQUIRED` | logro internacional terminal = base/multiplier definido × CC; sin stacking implícito de fases. | Ninguna | CompetitionFinished + attribution facts | definitions/ranged values | DR-066/067 |
+| SC-05 | `DATA_REQUIRED` | PSN puntúa outcomes nacionales × CC; PRI y PPI conservan semántica exclusiva. | Ninguna | national outcomes/participation | youth/outcome/category mappings | DR-068/definitions |
+| SC-06 | `DATA_REQUIRED` | equivalencia global ordenada aplica `1`, `3/5`, `0...` dentro de un cálculo lógico; awards distintos acumulan. | Ninguna | AwardWon | award catalog/group membership | DR-025/data |
+| SC-07 | `PARTIAL_CALIBRATION` | PRI exacto `450/120/230/120/80` usa cohortes GK/CM/ST, evidencia, segmentos e IJL/factor por contexto. | Ninguna familia | minutes/production/performance summaries | cohorts, transforms, weights, targets | calibration data |
+| SC-08 | `DATA_REQUIRED` | records/longevity usan entitlement máximo y postings delta; 20 seasons totaliza 700. | Ninguna | RecordAchieved/CareerMilestoneAchieved | record values y milestone criteria | data policy |
+| SC-09 | `PARTIAL_CALIBRATION` | social popularity usa cohortes y PBR aplica subcaps `1000/1000`, `2000` y `5%` de `PRI+PTC+PPI+PSN` antes de un rounding. | Ninguna familia | social updates/HistoricAchievementConfirmed | cohorts, weights/transforms, definitions | calibration/data |
+| SC-10 | `DATA_REQUIRED` | PRI pondera exposición por segmento; logros usan attribution de la edición; no hay IJL único ni duplicación. | Ninguna | facts scoped | registration/eligibility facts | DR-066/067 |
+| SC-11 | `RESOLVED_MATH` | dominante usa minutos efectivos por Position→PositionGroup y tie-break canónico de DR-049; cero minutos no forma cohorte. | Ninguna | usageByPosition | golden | — |
+| SC-12 | `RESOLVED_MATH` | racional exacto, `ROUND_HALF_UP` una vez por cálculo lógico, orden de caps fijo y reversals append-only. | Ninguna | facts/corrections | arithmetic goldens | — |
+| SC-13 | `RESOLVED_MATH` | tiers aprobados son derivación inclusiva de PC y no afectan score/gameplay. | Ninguna | final PC | boundary goldens | — |
 
-Resultado: **3 `RESOLVED`; 10 `PARTIAL`**.
+Resultado G3C-11: **4 `RESOLVED_MATH`, 3 `PARTIAL_CALIBRATION`, 6 `DATA_REQUIRED`, 0 sin familia matemática**. La matriz M añade la decisión transversal de cohortes M15 al conjunto de data (M10 ya corresponde a SC-10), para un total de siete decisiones M `DATA_REQUIRED`.
 
 ## 14. Parameter Registry Candidates
 
@@ -826,21 +859,23 @@ No se registra namespace de RNG para scoring: el contrato actual no usa azar.
 
 ## 15. Decisiones y gates pendientes
 
-La estructura permite diseñar schemas de `DomainFact`,
-`ScoringRuleDefinition`, `ScoreLedgerEntry`, `ScoreLedger` y `ScoreSnapshot`.
-No permite todavía implementar scoring real.
+ADR-080 y [SCORING_MATH_SPEC](SCORING_MATH_SPEC.md) permiten diseñar los
+schemas completos, pero todavía no autorizan implementar scoring real.
 
-Bloqueos:
+Bloqueos de publicación:
 
-1. DR-010: fórmulas/parameters de SC-02 a SC-11 donde figuran `PARTIAL`,
-   orden de caps y fixtures.
-2. DR-049: posición dominante.
-3. DR-055: métricas/cohortes ejecutables, especialmente GK.
-4. DR-059/060: outcomes/fields ejecutables de selección y premios.
-5. DR-061: matemática de reputación/social usada por PBR.
-6. DR-066/067: eligibility y atribución tras movimientos.
-7. DR-069: finalización, freeze, ranking y terminación.
-8. DR-025/035/036: catálogos, muestras y compatibilidad competitiva.
+1. bundle inicial inmutable de `ScoringConfiguration` y
+   `ScoringCalibrationData`;
+2. cohorts con provenance, samples, knots, hierarchy y hashes;
+3. catálogos exactos de competitions, awards, records y milestones donde el
+   master solo aporta rangos;
+4. DR-066/067: facts de eligibility/registration/attribution tras movimientos;
+5. expected golden outputs y hashes para todas las familias;
+6. calibration targets y aceptación Monte Carlo end-to-end;
+7. DR-036 para cualquier compatibilidad más amplia que la exact-key V1.
+
+DR-010 está `RESOLVED_MATH`; DR-049/055/059/060/061/063/069 ya entregan las
+interfaces necesarias. DR-025/035 conservan data/presentación según su owner.
 
 DR-063 queda cerrada estructuralmente por este documento. Cualquier cambio al
 catálogo, identidad, clasificación o allowlist requiere revisar
@@ -869,3 +904,23 @@ catálogo, identidad, clasificación o allowlist requiere revisar
 - scoring no usa RNG;
 - `COMPLETED`/integridad/versiones gobiernan elegibilidad;
 - golden `ScoreSnapshot` incluye hashes, scoringVersion y compatibility key.
+
+## 17. Confirmación de facts tras G3C-8
+
+La matemática de Selection/Awards de
+[`NATIONAL_TEAM_AWARDS_MATH_SPEC.md`](NATIONAL_TEAM_AWARDS_MATH_SPEC.md) no
+altera el catálogo ni el scoring:
+
+- `NationalTeamCallUpIssued`, `TournamentSquadSelected` e
+  `InternationalRoleAssigned` conservan su clasificación canónica;
+- minutos, producción, Performance y Competition reutilizan facts genéricos
+  con `contextType=NATIONAL_TEAM`;
+- `AwardNominated`, `AwardPlacementRecorded` y `AwardWon` siguen siendo los
+  únicos facts de outcome aplicables;
+- eligibility, candidate signals, field draws y `AwardEditionResolved` son
+  internal signals/derived summary;
+- no existen aliases `InternationalMinutesRecorded`,
+  `InternationalPerformanceRecorded` o `StatisticalAwardWon`;
+- Awards no crea `ScoreLedgerEntry`, no puntúa y no aplica anti-duplicación.
+
+No cambia ninguna fórmula, allowlist o valor de scoring.

@@ -85,14 +85,24 @@ Rechazada porque los rótulos son explicativos y no una regla adicional de gamep
 - Fixtures futuros demuestran que todo valor superior a `1.00` se explica por participación y rendimiento extraordinarios.
 - Los intervalos de presentación no alteran el valor mecánico.
 
+## Refinamiento G3C-11
+
+[ADR-080](./080-exact-scoring-mathematics.md) cierra la fórmula: CC es un
+transform continuo, racional y monótono de participación y contribución
+evidence-weighted por competition edition; se cuantiza en 1/10000 y conserva
+`[0,1.10]`. SportingRole no asigna CC. Los intervalos de este ADR continúan
+siendo descriptivos.
+
 ## Gate
 
-Este ADR cierra el rango y la semántica de DR-009. No habilita implementar la fórmula ni el ScoreLedger definitivo hasta cerrar DR-008 y DR-010.
+DR-009 y la familia matemática están cerradas. Implementación espera el
+`ScoringConfiguration`, cohortes, valores calibrados y goldens iniciales.
 
 ## Referencias
 
 - [ADR-007: Canonicalización y hashing](./007-canonicalization-and-hashing.md)
 - [ADR-010: Domain Facts y ScoreLedger estructural](./010-scoring-ledger-and-domain-facts.md)
+- [ADR-080: Matemática exacta de Scoring](./080-exact-scoring-mathematics.md)
 - [Registro de decisiones](../DECISIONS_REQUIRED.md#dr-009--coeficiente-de-contribución)
 - [DR-008: Fórmulas faltantes](../DECISIONS_REQUIRED.md#dr-008--fórmulas-faltantes-del-simulador)
 - [DR-010: Scoring incompleto](../DECISIONS_REQUIRED.md#dr-010--scoring-incompleto)

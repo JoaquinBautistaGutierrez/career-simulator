@@ -1,8 +1,9 @@
 # ADR-061: Modelo estructural de reputación y audiencia social
 
-- Estado: Aceptado para estructura; matemática pendiente
+- Estado: Aceptado; matemática cerrada por ADR-078, calibración/data pendientes
 - Fecha: 2026-07-28
 - Decisión relacionada: DR-061
+- Refinado por: ADR-078
 - Alcance: reputación deportiva, reputación pública, mercados, atención,
   followers, engagement y frontera con consumidores
 
@@ -34,9 +35,9 @@ AudienceState
 - Audience separa `FollowerCount` de `EngagementState`.
 - No existe `fameOverall`.
 
-Followers es un entero exacto no negativo y puede crecer o caer. La
-representación técnica de rango ampliado, los dominios de reputación/engagement
-y la precisión quedan pendientes en DR-061/063.
+Followers es un entero exacto no negativo y puede crecer o caer. ADR-078 fija
+`uint64` por partición no superpuesta, total derivado, estados acotados
+cuantizados y error tipado —nunca clipping— ante overflow técnico.
 
 ### Scopes regionales
 
@@ -81,8 +82,9 @@ del club. Una causa entra una sola vez.
 - El estado global es reproducible desde mercados y parámetros versionados.
 - La dinámica puede incluir memoria, decay, churn, regresión y shocks sin floors
   o hard caps editoriales.
-- DR-061 sigue bloqueando gameplay por matemática, dominios, precisión,
-  streams, parámetros, fixtures y calibración.
+- DR-061 queda `PARTIAL_CALIBRATION`: ADR-078 cierra matemática, dominios,
+  precisión, streams y fixtures requeridos; todavía faltan values, definitions,
+  evidence, goldens computados y calibración aprobada.
 
 ## Alternativas rechazadas
 
@@ -106,17 +108,25 @@ Rechazada porque duplica causas, rompe ownership y permite bypass de balance.
 
 Rechazado porque contradice caídas, churn, polémicas e inactividad.
 
-## Pendiente
+## Refinamiento matemático de G3C-9
 
-DR-061 debe cerrar:
+[ADR-078](./078-reputation-public-attention-social-mathematics.md) y
+[REPUTATION_SOCIAL_MATH_SPEC.md](../REPUTATION_SOCIAL_MATH_SPEC.md) fijan:
 
-- dominios, escalas, precisión y serialización;
-- ecuaciones de memoria/actualización;
-- familia de conteos y cambios de followers;
-- regional diffusion/agregación;
-- correlaciones y shared shocks;
-- parámetros, streams, golden fixtures y targets Monte Carlo;
-- mercados concretos del slice junto con DR-025.
+- AR(1) logit separado para Sporting, awareness, sentiment, attention y
+  engagement;
+- evidence memory exponencial, deduplicación y suma canónica;
+- difusión regional lagged de un paso y vistas globales derivadas;
+- acquisition/churn en log-space con mixture viral Bernoulli;
+- `uint64`, `ROUND_HALF_EVEN`, overflow tipado y streams jerárquicos;
+- batches en `CONSEQUENCES(Qn)` y `SEASON_CLOSE` sin nueva fase;
+- targets, tail diagnostics y golden-vector requirements.
+
+Permanecen pendientes values del ParameterSet, Definitions de mercados/reach,
+evidencia externa, tolerancias y goldens computados. DR-025 conserva los datos
+concretos del slice; DR-010 conserva Scoring. ADR-079 cierra la matemática de
+Retirement/finalization y deja DR-062 en `PARTIAL_CALIBRATION` y DR-069
+resuelta.
 
 ## Pruebas y gates
 
@@ -135,4 +145,7 @@ DR-061 debe cerrar:
 - [ADR-014: DSL de eventos](./014-event-dsl.md)
 - [ADR-015: Versionado](./015-version-taxonomy.md)
 - [ADR-060: Awards](./060-awards-model.md)
+- [ADR-078: matemática de Reputation/Social](./078-reputation-public-attention-social-mathematics.md)
+- [ADR-079: Retirement/Comeback/Finalization](./079-retirement-comeback-finalization-mathematics.md)
+- [Especificación matemática](../REPUTATION_SOCIAL_MATH_SPEC.md)
 - [Registro de decisiones — DR-061](../DECISIONS_REQUIRED.md#dr-061--reputación-deportiva-reputación-pública-y-seguidores)
