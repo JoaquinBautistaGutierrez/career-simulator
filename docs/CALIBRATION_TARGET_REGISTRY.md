@@ -672,3 +672,25 @@ evidence could later disagree with comeback, social-decline or finalization
 preferences. It never overwrites a `PT-*` value. `CT-FIN-TIME-001` remains
 Product Defined even though elapsed time without a return may inform
 ContinuationViability.
+
+## 19. Integrated readiness audit G3D-4F
+
+All **186** target IDs were mechanically recounted and classified in
+[G3D Calibration Readiness Scorecard](G3D_CALIBRATION_READINESS_SCORECARD.md).
+No ID, metric, denominator, type, range or Product Target value changes.
+
+| Integrated readiness | Targets |
+|---|---:|
+| `READY_FOR_CALIBRATION` | 13 |
+| `READY_WITH_LIMITATIONS` | 91 |
+| `PRODUCT_DEFINED` | 6 |
+| `INVARIANT_ONLY` | 28 |
+| `DIAGNOSTIC_ONLY` | 29 |
+| `BLOCKED_BY_DATA` | 10 |
+| `BLOCKED_BY_IDENTIFIABILITY` | 9 |
+| **Total** | **186** |
+
+Critical target orphans are zero. `BLOCKED_*` targets remain scoring/P2
+refinements or have an explicit product/sensitivity strategy; they are not
+silently accepted. All 77 exact `PT-...-NNN` targets remain frozen. Wildcard
+overlay rows such as `PT-QC-*` are selectors and are not counted as target IDs.

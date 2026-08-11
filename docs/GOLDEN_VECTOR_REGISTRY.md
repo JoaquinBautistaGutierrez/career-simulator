@@ -538,3 +538,21 @@ These existing requirements gain
 `empiricalFixtureBasis=AVAILABLE_WITH_LIMITATIONS` or
 `productBoundaryBasis=AVAILABLE`. Publication state remains `SPECIFIED`; no
 parameter dependency is cleared and no output is asserted.
+
+## 20. Integrated derivation-readiness audit G3D-4F
+
+All **139** IDs were mechanically recounted and classified in
+[G3D Calibration Readiness Scorecard](G3D_CALIBRATION_READINESS_SCORECARD.md).
+
+| Readiness | Goldens | Derivation phase |
+|---|---:|---|
+| `STRUCTURAL_ONLY` | 16 | `BEFORE_CALIBRATION` |
+| `READY_FOR_EXPECTED_OUTPUT_DERIVATION` | 3 | `DURING_CALIBRATION` |
+| `READY_AFTER_PARAMETERSET` | 101 | `AFTER_PARAMETERSET_CANDIDATE` |
+| `BLOCKED_BY_DATA` | 19 | after scoring configuration/cohort gaps close |
+| **Total** | **139** | — |
+
+Every ID remains `SPECIFIED`; no expected output, input fixture or publication
+status changes. V1-critical expected outputs require manual/exact worksheets or
+an independent reference implementation and review; the implementation under
+test cannot be their sole source.

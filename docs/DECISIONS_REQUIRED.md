@@ -5882,6 +5882,30 @@ SportingReputation remains latent; followers and MarketValue are not its truth.
 Retirement excludes national-team retirement, free agency and temporary
 inactivity. Official comeback cases prove accessibility and meaningful return,
 but do not supply an at-risk denominator or alter the 3–8%, 2+ or 3+ Product
-Targets. All 275 templates remain `UNASSIGNED`, all 77 Product Targets remain
+Targets. All 268 canonical templates remain `UNASSIGNED`, all 77 Product Targets remain
 unchanged, all 139 goldens remain uncomputed and Data V1 remains unpublished.
 Result: `GO_FOR_G3D_4F_WITH_REPUTATION_RETIREMENT_LIMITATIONS`.
+
+## 20. G3D-4F — Integrated P1 calibration-readiness reconciliation
+
+G3D-4F audits all P0/P1 evidence and every current registry identity. It
+corrects a G3D-1 reporting defect: the canonical parameter tables have always
+contained 268 rows, not 275. No parameter identity is added or removed; all
+existing templates remain value-free.
+
+| DR / scope | State after G3D-4F | Closed/audited | Remaining gate |
+|---|---|---|---|
+| `DR-008` mathematics | `CLOSED` | all G3C equations, families, streams and contracts | none mathematical |
+| `DR-008` Product numeric targets | `CLOSED` | 77 exact Product Target IDs unchanged | none Product-numeric |
+| `DR-008` P0 data | `READY_WITH_NONBLOCKING_LIMITATIONS` | immutable candidate artifacts available | Data V1/license freeze before publication |
+| `DR-008` P1 evidence | `ACQUIRED_WITH_LIMITATIONS` | 201 EvidenceRecords, 100 route uses, integrated bias/license audit | targeted/P2 improvements and validation-quality snapshots |
+| `DR-008` parameter audit | `COMPLETE_WITH_268_TEMPLATE_ERRATUM` | 268/268 paths classified, zero duplicates/orphans | candidate tooling/manifests must use corrected count |
+| `DR-008` EngineParameterSet | `UNPUBLISHED / VALUES_UNASSIGNED` | candidate contract and order defined | G3D-5 estimation, joint/integrated calibration and validation |
+| `DR-008` goldens | `NOT_DERIVED` | 139/139 readiness classified | independent expected outputs and Gate 7 |
+| `DR-008` Monte Carlo | `NOT_EXECUTED` | campaign contract defined | G3D-5 execution and Gates 1–7 |
+| `DR-025/027/059/060/061/062/065–069` | prior policy/math states unchanged | evidence/identifiability dependencies reconciled | no architectural decision reopened |
+
+DR-008 remains `PARTIAL_CALIBRATION`; it is not a pending formula decision.
+G3D-5 may start only through a separately authorized task after the three
+pre-calibration controls in `G3D_INITIAL_CALIBRATION_PLAN.md`. Result:
+`GO_FOR_G3D_5_WITH_PRECALIBRATION_FIXES`.

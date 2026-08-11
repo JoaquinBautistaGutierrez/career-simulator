@@ -2840,3 +2840,41 @@ gaps, Health definition/censoring, Club/Market private observability, National/
 Award field denominators, social platform/era measurement, strict CM/ST
 retirement coverage, representative comeback denominator, and every Product
 Defined or weakly identified family. G3D-4F is not started by this closure.
+
+### Cierre G3D-4F — Integrated P1 Evidence Audit & Calibration Readiness
+
+**Resultado:** `GO_FOR_G3D_5_WITH_PRECALIBRATION_FIXES`.
+
+G3D-4F reconciles 201 P1 EvidenceRecords, 40 DatasetDefinitions, 186
+Calibration Targets, 139 Golden Vectors and 77 exact Product Targets. The
+mechanical parameter audit corrects the original G3D-1 prose count from 275 to
+**268 canonical templates**; Git history and G3C contracts show no seven
+missing normative paths. All 268 are classified and remain value-free.
+
+Before the first value-bearing child candidate, G3D-5A must:
+
+1. adopt 268 in candidate schema/manifests/validators;
+2. bind immutable candidate-data/evidence/transform hashes;
+3. declare provisional priors/ranges and mandatory sensitivity for every F/G
+   path used.
+
+`CALIBRATION_CAN_USE_CANDIDATE_DATA`; Data V1 remains unpublished and must be
+frozen before competitive V1 publication, not before exploratory estimation.
+
+#### Authorized G3D-5 sequence
+
+| Phase | Inputs | Authorized output | Gate | Explicit boundary |
+|---|---|---|---|---|
+| `G3D-5A` — anchors/identity/transforms | G3D-4F matrices, P0/P1 candidate hashes | structural/binding and direct-estimate anchor proposal | cardinality, schema, provenance, domains | no automatic publication or gameplay |
+| `G3D-5B` — Player/Development/Role/Performance | 4A evidence + accepted anchors | staged player/exposure/production candidates | direct targets, GK/CM/ST, Quick/Custom | no Health/downstream compensation |
+| `G3D-5C` — Health | 4B evidence + Role exposure candidate | incidence/recovery/relapse candidate | six families, denominators, tails | sequela/MedicalQuality sensitivity mandatory |
+| `G3D-5D` — Club/World/Market | 4C evidence + accepted upstream candidates | club/manager/market child candidate | no circular MarketValue, exact Money, Interest ≠ Offer | POST_SEASON_ONLY and ExternalClub policy unchanged |
+| `G3D-5E` — National Team/Awards | 4D evidence + closed upstream windows | selection/outcome/award child candidate | eligibility/no-draw, comparative/statistical split | no scoring points or current-award feedback |
+| `G3D-5F` — Reputation/Social | 4E evidence + completed sporting facts | lagged reputation/audience child candidate | platform/era and PBR/social guardrails | no follower/MarketValue sporting truth |
+| `G3D-5G` — Lifecycle | 4E survival evidence + Health/Role/Market | retirement/comeback/finalization-opportunity child candidate | competing risks, Product tails, no caps/cooldowns | no auto-finalization |
+| `G3D-5H` — integrated Engine | all accepted child candidates | `INTEGRATED_CANDIDATE` | cross-system and tail acceptance | reopen causal upstream group, never compensate downstream |
+| `G3D-5I` — Scoring/tier validation | immutable facts + scoring data/config candidates | separate scoring diagnostics/candidates | Gate 6 catalogs/cohorts/tier composition | EngineParameterSet and Scoring remain separate |
+| `G3D-5J` — goldens/MC acceptance | integrated candidates + independent references | validation/publication proposal | Gates 1–7 and replay | no `FROZEN_V1` on failed critical gate |
+
+No G3D-5 phase starts automatically. Each future subphase requires its own
+authorization, checks, selective commit and successful push.

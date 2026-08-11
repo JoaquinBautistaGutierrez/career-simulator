@@ -743,3 +743,25 @@ Canonical evidence:
 - [Reputation/Retirement Evidence Index](G3D_P1_REPUTATION_RETIREMENT_EVIDENCE_INDEX.md);
 - [Reputation/Retirement Source Manifest](G3D_P1_REPUTATION_RETIREMENT_SOURCE_LICENSE_MANIFEST.md);
 - [Reputation/Retirement Observational Hash Manifest](G3D_P1_REPUTATION_RETIREMENT_OBSERVATIONAL_HASH_MANIFEST.md).
+
+## 23. Integrated calibration-use audit G3D-4F
+
+All **40** canonical DatasetDefinitions were audited without lifecycle
+promotion. The complete row-by-row result is in
+[G3D Calibration Readiness Scorecard](G3D_CALIBRATION_READINESS_SCORECARD.md).
+
+| Calibration-use readiness | Datasets |
+|---|---:|
+| `READY_FOR_CALIBRATION_USE` | 5 |
+| `READY_WITH_LIMITATIONS` | 25 |
+| `REFERENCE_ONLY` | 1 |
+| `BLOCKED_BY_COVERAGE` | 5 |
+| `SOURCE_IDENTIFIED_ONLY` | 4 |
+| **Total** | **40** |
+
+This audit vocabulary does not skip the DatasetDefinition lifecycle. Candidate
+calibration may consume immutable, hash-bound P0/P1 candidate artifacts and
+permitted summaries (`CALIBRATION_CAN_USE_CANDIDATE_DATA`), while competitive
+publication still requires `VALIDATED`/`FROZEN`, license approval and a
+published dataVersion. The four source-identified-only rows are scoring
+datasets and block Gate 6, not initial Engine anchors.

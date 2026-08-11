@@ -529,7 +529,7 @@ Un bundle de Scoring V1 exige de forma separada:
 
 ## 12. Conteo y estado G3D-1
 
-El conteo mecánico de filas arroja **275 parameter-path templates canónicos** y
+El conteo mecánico corregido de filas arroja **268 parameter-path templates canónicos** y
 cero duplicados. Todas las filas calibrables permanecen `UNASSIGNED`; las
 identidades estructurales aprobadas quedan `PROVISIONAL_DESIGN`, nunca
 `FROZEN_V1` en esta fase. La cardinalidad escalar expandida se publicará cuando
@@ -584,7 +584,7 @@ Todo template hereda los blockers de su rama. Un valor no avanza de
 
 La cardinalidad escalar se calcula desde hashes de esos catálogos al congelar
 el candidate. Agregar una key después de publicación crea nueva versión/hash;
-no activa un default. Los 275 templates canónicos no cambian en G3D-2.
+no activa un default. Los 268 templates canónicos no cambian en G3D-2.
 
 ## 15. Provenance y acquisition dependencies G3D-3A
 
@@ -626,7 +626,7 @@ ownerApprovalRefs[]
 `PRODUCT_DEFINED` conserva Product approval. Un valor derivado de datos no
 avanza sin source→evidence→transform→estimate lineage.
 
-No se crearon aliases ni deprecations en G3D-3A. Conteo: **275 templates
+No se crearon aliases ni deprecations en G3D-3A. Conteo corregido: **268 templates
 canónicos**, todos con los mismos paths y valores/estados previos.
 
 ## 16. Referencias G3D-3A
@@ -637,7 +637,7 @@ canónicos**, todos con los mismos paths y valores/estados previos.
 
 ## 17. Catalog cardinality overlay G3D-3C
 
-Los 275 templates y todos sus `currentValue`/publication statuses permanecen
+Los 268 templates y todos sus `currentValue`/publication statuses permanecen
 sin cambios. G3D-3C solo fija cardinalidades de expansión que ya se desprenden
 de catálogos candidatos; ninguna cifra siguiente es un coeficiente.
 
@@ -675,7 +675,7 @@ added to parameter paths.
 
 ## 18. Product-target consumer overlay G3D-3D
 
-Los 275 templates conservan `currentValue`, publication status y classification
+Los 268 templates conservan `currentValue`, publication status y classification
 sin cambios. Esta sección añade únicamente metadata heredable:
 
 ```text
@@ -713,7 +713,7 @@ permanece `UNASSIGNED`; G3D-3D no crea `EngineParameterSetCandidate`.
 
 ## 19. P0 dependency overlay G3D-3B2
 
-The 275 templates remain value-free and `UNASSIGNED`. Only prior blockers are
+The 268 templates remain value-free and `UNASSIGNED`. Only prior blockers are
 reclassified:
 
 | Dimension / branches | Previous dependency | G3D-3B2 state |
@@ -727,7 +727,7 @@ No `EngineParameterSetCandidate` was created.
 
 ## 20. P1 player-evidence and identifiability overlay G3D-4A
 
-All 275 templates remain `UNASSIGNED` and value-free. No path, alias,
+All 268 templates remain `UNASSIGNED` and value-free. No path, alias,
 classification or sensitivity changes. The following metadata is attached to
 the affected canonical branches:
 
@@ -753,7 +753,7 @@ consumers from G3D-3D are unchanged.
 
 ## 21. P1 Health evidence and identifiability overlay G3D-4B
 
-All 275 templates remain value-free and `UNASSIGNED`. No path, domain,
+All 268 templates remain value-free and `UNASSIGNED`. No path, domain,
 classification, sensitivity, monotonicity or publication status changes. This
 overlay adds only evidence/dataset/identifiability metadata.
 
@@ -781,7 +781,7 @@ recurrence proportion becomes a Bernoulli/Poisson parameter here.
 
 ## 22. P1 Club/Market evidence and identifiability overlay G3D-4C
 
-All **275** templates remain `UNASSIGNED` and value-free. No canonical path,
+All **268** templates remain `UNASSIGNED` and value-free. No canonical path,
 alias, classification, sensitivity, domain, monotonicity or publication state
 changes. Only evidence/dataset/identifiability metadata is added.
 
@@ -810,7 +810,7 @@ parameter value.
 
 ## 23. P1 National Team/Awards evidence and identifiability overlay G3D-4D
 
-All **275** templates remain value-free and `UNASSIGNED`. No canonical path,
+All **268** templates remain value-free and `UNASSIGNED`. No canonical path,
 alias, classification, sensitivity, domain, monotonicity or publication state
 changes. Only evidence/dataset/identifiability metadata is attached.
 
@@ -838,7 +838,7 @@ winner share becomes an Award probability.
 
 ## 24. P1 Reputation/Social/Retirement evidence and identifiability overlay G3D-4E
 
-All **275** templates remain value-free and `UNASSIGNED`. No canonical path,
+All **268** templates remain value-free and `UNASSIGNED`. No canonical path,
 alias, classification, sensitivity, domain, monotonicity or publication state
 changes. Only evidence/dataset/identifiability metadata is attached.
 
@@ -864,3 +864,36 @@ changes. Only evidence/dataset/identifiability metadata is attached.
 No event growth becomes an impulse coefficient, follower summary a dynamic
 parameter, retirement mean a hazard intercept, or comeback anecdote a
 probability. Finalization remains Product Defined.
+
+## 25. Integrated identifiability audit G3D-4F
+
+The authoritative exhaustive classification is
+[G3D Parameter Identifiability Matrix](G3D_PARAMETER_IDENTIFIABILITY_MATRIX.md).
+Mechanical recount of sections 6–7 corrects the historical G3D-1 prose error:
+there are **268**, not 275, canonical parameter-path templates. Commit `2564527`
+already contained the same 268 rows while its summary reported 275. No duplicate
+exists and no seven omitted normative paths were found in the G3C parameter
+contracts; placeholder identities are forbidden.
+
+| Identifiability class | Templates |
+|---|---:|
+| `A_DIRECT_ESTIMATION_CANDIDATE` | 20 |
+| `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` | 22 |
+| `C_JOINT_CALIBRATION_REQUIRED` | 146 |
+| `D_PRODUCT_CONSTRAINED_CALIBRATION` | 2 |
+| `E_SYNTHETIC_STRUCTURAL` | 48 |
+| `F_WEAKLY_IDENTIFIED` | 17 |
+| `G_UNIDENTIFIABLE_V1` | 9 |
+| `H_NOT_REQUIRED_FOR_INITIAL_SLICE` | 4 |
+| **Total** | **268** |
+
+All 268 identities retain their prior value/publication state. G3D-4F assigns
+no value. F/G rows require `sensitivityRequired=true`, explicit provisional
+range/prior and alternative-scenario analysis before use. G rows are scoring
+resources excluded from initial Engine anchor calibration and block Gate 6,
+not G3D-5A.
+
+Candidate lifecycle and artifact fields are defined in
+[G3D Initial Calibration Plan](G3D_INITIAL_CALIBRATION_PLAN.md). Candidate
+calibration may use immutable, hash-bound candidate data; `FROZEN_V1` still
+requires published data/license/golden/acceptance gates.
