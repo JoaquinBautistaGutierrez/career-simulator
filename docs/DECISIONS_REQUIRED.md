@@ -5815,3 +5815,26 @@ changing a decision family, mathematical contract or product target.
 ADR-074 and DR-021/025/027/035/036/065–068 remain unchanged. The 77 product
 targets, all scoring rules and all 275 unassigned parameter templates are
 untouched. Result: `GO_FOR_G3D_4C_WITH_HEALTH_EVIDENCE_LIMITATIONS`.
+
+## 17. G3D-4C — Club/Market observational evidence reconciliation
+
+G3D-4C adds 40 P1 EvidenceRecords and aggregate club, manager, transfer,
+employment and loan summaries without changing any mathematical or product
+decision.
+
+| DR / scope | State after G3D-4C | Evidence advance | Remaining gate |
+|---|---|---|---|
+| `DR-008` integrated calibration | `PARTIAL_CALIBRATION` | Club/Manager/Market/Contract observation shapes and identifiability mapped | National/Awards and Reputation/Social/Retirement P1, local gaps, ParameterSet candidates, integrated runs and expected goldens |
+| `DR-025` competition/catalog | `RESOLVED_DATA_V1_CANDIDATE` unchanged | club participation/competition contexts cross-checked for observational segmentation | atomic catalog publication/scoring/calibration gates; no Definition changed |
+| `DR-027` Money | `RESOLVED_DATA_V1_CANDIDATE` unchanged | fee/salary evidence preserves currency/date limitations and existing transform lineage | native disclosed fee/wage observations, normalized candidate and goldens; no transform/value change |
+| `DR-065` ExternalClubPool | policy resolved, empirical readiness advanced | detailed/materializable/abstract classes retained while transfers reference real counterparties | source/licensing and demand-driven materialization; no detailed-club expansion |
+| `DR-066` registration | policy resolved, empirical readiness advanced | FIFA TMS/contract semantics documented | future registration/catalog implementation and validated transaction data |
+| `DR-067` market timing | policy resolved, unchanged | observed movements provide calibration context only | V1 remains `POST_SEASON_ONLY`; mid-season evidence never reopens gameplay policy |
+| Club/Manager math | `RESOLVED_MATH / PARTIAL_CALIBRATION` | score/finance/development/stability/turnover/tactical/position proxies acquired | latent mappings, Argentina depth and manager-cause adjudication |
+| Market/Contract math | `RESOLVED_MATH / PARTIAL_CALIBRATION` | movement, age, positive-fee tail, duration and loan shapes acquired | at-risk/type/native Money/salary/renewal panels and private-pipeline joint fit |
+
+`Interest != Offer`, `MarketValue != Performance`, fee and salary remain
+separate, and zero-coded/undisclosed observations are not rewritten. The 77
+product targets, 275 unassigned parameter templates, 139 uncomputed goldens,
+ExternalClubPool and Data V1 publication state remain unchanged. Result:
+`GO_FOR_G3D_4D_WITH_CLUB_MARKET_LIMITATIONS`.

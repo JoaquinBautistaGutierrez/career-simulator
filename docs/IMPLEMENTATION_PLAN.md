@@ -2766,3 +2766,29 @@ Health blockers carried forward are freeze-quality licensing, modern local
 panels, exact CM/ST family mapping, standardized training/load histories,
 censored episode-level recovery/recurrence data and sequela/MedicalQuality
 identification. No subsequent phase starts automatically.
+
+### Cierre G3D-4C — P1 Clubs, Managers, Market & Transfers evidence
+
+**Resultado:** `GO_FOR_G3D_4D_WITH_CLUB_MARKET_LIMITATIONS`.
+
+G3D-4C acquires aggregate evidence for the frozen 16 clubs, manager spells,
+tactical/position proxies, movement/fee tails, club financial environments,
+contracts, salaries and loans. Ten existing DatasetDefinitions advance at most
+to `NORMALIZED_WITH_LIMITATIONS`; all 275 parameter templates remain
+`UNASSIGNED`, all 77 Product Targets remain unchanged, all 139 goldens remain
+without expected outputs and Data V1 is not published.
+
+#### Reconciled sequence after G3D-4C
+
+| Phase | Inputs | Authorized output | Gate | Explicit boundary |
+|---|---|---|---|---|
+| `G3D-4D` — National Team & Awards | validated national/award candidates plus G3C math | selection, international exposure, outcome and award-history evidence | eligibility, field, timing, position and catalog mapping | no scoring values, coefficients or gameplay; not started here |
+| `G3D-4E` — Reputation, Social & Retirement | public/lifecycle contracts | permitted platform and longitudinal aggregates | privacy, platform era and career-state definitions | no sponsor, score or retirement-hazard calibration |
+| consolidated observational readiness | completed G3D-4A..4E artifacts | cross-domain identifiability/dependency report | coverage, license, mapping and target readiness | no parameter values unless separately authorized |
+| Initial ParameterSet Calibration | complete P1 evidence + product targets + P0 candidates | explicit parameter candidates, sensitivity and acceptance reports | upstream readiness and separate authorization | no automatic start from evidence acquisition |
+
+Carried blockers are Argentina strict position minutes, comparable 16-club
+finance/control/development panels, manager event causes, official/licensed
+player-at-risk transfer data, native disclosed fee semantics, local salary/
+contract/renewal cohorts and private Interest/Offer/negotiation identification.
+No later phase starts automatically.

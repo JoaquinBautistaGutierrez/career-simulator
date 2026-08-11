@@ -477,3 +477,23 @@ These vectors now have
 `empiricalFixtureBasis=AVAILABLE_WITH_LIMITATIONS`; the family/catalog dependency
 is cleared at candidate-definition level only. No vector reaches
 `INPUTS_FROZEN`, `EXPECTED_COMPUTED` or `PUBLISHED_V1`.
+
+## 17. Club/Market empirical-input readiness G3D-4C
+
+All **139** goldens remain `SPECIFIED`; no inputs are frozen and no expected
+output is computed. G3D-4C adds empirical fixture/distribution basis only.
+
+| Golden IDs | Empirical basis after G3D-4C | Still required |
+|---|---|---|
+| `GV-CLUB-EVOL-001`, `GV-CLUB-SLOW-001` | score/finance/history/proxy contexts for 16 clubs | synthetic fixture, calibrated latent maps and independent arithmetic |
+| `GV-MGR-TURN-001`, `GV-MGR-GEN-001` | turnover/spell evidence and departure-cause limitation | parameter candidate, adjudicated fixture and factor draws |
+| `GV-TACTIC-001`, `GV-PCOMP-001` | formation persistence plus Spain GK/CM/ST concentration/depth | latent adapter, Argentina panel, parameters and draws |
+| `GV-WORLD-EVOL-001`, `GV-MOBILITY-BOUNDARY-001` | competition/participation and movement source context | world/league candidate values; boundary remains normative |
+| `GV-MKT-VAL-001`, `GV-MKT-AGE-001`, `GV-MKT-LEVERAGE-001`, `GV-MKT-NEED-001`, `GV-MKT-FIT-001` | dated valuation/age/club/contract proxy basis | causal parameters and exact fixture values |
+| `GV-MKT-INTEREST-001`, `GV-MKT-OFFER-001`, `GV-MKT-SELLER-001`, `GV-MKT-NEG-001`, `GV-MKT-WAIT-001` | selected-outcome/private-observability boundary | synthetic fixture plus joint-calibrated probabilities |
+| `GV-MKT-FEE-001`, `GV-MKT-SALARY-001`, `GV-MONEY-ERROR-001` | fee tail, official cost/salary context and unchanged Money bindings | native exact amounts, parameter candidate and checked arithmetic |
+| `GV-CONTRACT-EXPECT-001`, `GV-CONTRACT-DUR-001`, `GV-MKT-RENEW-001`, `GV-MKT-LOAN-001` | duration/loan evidence and renewal-denominator limitation | local terms, parameters and independent derivation |
+
+This improves empirical readiness for **25** existing golden requirements (8
+club/manager/position/world-boundary and 17 market/contract/money). Publication
+state is unchanged.

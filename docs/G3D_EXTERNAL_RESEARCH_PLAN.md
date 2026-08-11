@@ -317,3 +317,22 @@ Raw medical/player data is not stored. Sources are aggregate-only and primarily
 `REFERENCE_ONLY`; freeze needs license review or an approved derived-aggregate
 route. No parameter value, G3C equation or product target changed. Result:
 `GO_FOR_G3D_4C_WITH_HEALTH_EVIDENCE_LIMITATIONS`; G3D-4C was not started.
+
+## 17. G3D-4C P1 Club/Market evidence result
+
+Scope was limited to Club/World/Manager and Transfer/Market/Contract evidence.
+It adds 40 atomic records from 20 sources and retains the frozen 16-club set.
+
+| Research area | Evidence state | Coverage | Residual research gap |
+|---|---|---|---|
+| club sporting/position | `OBSERVATIONAL_SUMMARY_AVAILABLE_WITH_LIMITATIONS` | score contexts for all 16; strict GK/CM/ST concentration for Spain | Argentina appearance panel, shots/opponent adjustment and Control proxies |
+| club qualities/finance | `OBSERVATIONAL_EVIDENCE_ACQUIRED` | official LALIGA/three-club accounts, AFA context, training/stability methodologies | comparable 16-club finance/development/reach; MedicalQuality weak |
+| managers/tactics | `OBSERVATIONAL_SUMMARY_AVAILABLE_WITH_LIMITATIONS` | current detailed-club spells, historical Argentina terminations, formation proxies | departure cause, appointment dates, expectation and latent factor identification |
+| transfers/fees | `OBSERVATIONAL_SUMMARY_AVAILABLE_WITH_LIMITATIONS` | FIFA international definitions plus slice movement/age/positive-fee tail | player-at-risk/type/native Money/undisclosed/add-on completeness |
+| salary/contracts/loans | `OBSERVATIONAL_EVIDENCE_ACQUIRED_WITH_LIMITATIONS` | official cost contexts, global duration/salary/loan shape | contemporary local wages, start/end/renewal and loan-outcome panels |
+| Interest/Offer/SellerResponse | `OBSERVABILITY_LIMIT_DOCUMENTED` | selected completed outcomes only | private candidate/offer/rejection/negotiation data or synthetic joint constraints |
+
+Raw provider/player data remains outside the repository and license review is
+explicit. No rating, parameter, Product Target, scoring value or Data V1 is
+published. Result: `GO_FOR_G3D_4D_WITH_CLUB_MARKET_LIMITATIONS`; G3D-4D is not
+started.

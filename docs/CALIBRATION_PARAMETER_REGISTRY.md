@@ -778,3 +778,32 @@ overlay adds only evidence/dataset/identifiability metadata.
 to the full causal coefficient. In particular, no published incidence is copied
 into a log-hazard intercept, no duration becomes a LogNormal parameter and no
 recurrence proportion becomes a Bernoulli/Poisson parameter here.
+
+## 22. P1 Club/Market evidence and identifiability overlay G3D-4C
+
+All **275** templates remain `UNASSIGNED` and value-free. No canonical path,
+alias, classification, sensitivity, domain, monotonicity or publication state
+changes. Only evidence/dataset/identifiability metadata is added.
+
+| Parameter branch/family | Evidence binding | Identifiability | Observational support | Remaining dependency |
+|---|---|---|---|---|
+| `clubWorld.clubState.{attack|defense|control}.*` | `DS-CLUB-HISTORICAL-STRENGTH`; `EV-P1-CLUB-002..005` | `JOINT_CALIBRATION_REQUIRED` | score environment and Spain possession/formation proxies | opponent adjustment, competition-strength and multivariate Control mapping |
+| `clubWorld.clubState.{prestige|financialPower|developmentQuality|medicalQuality|stability}.*` | club/finance/training/stability evidence | `JOINT_CALIBRATION_REQUIRED`; MedicalQuality `WEAKLY_IDENTIFIED` | official histories/accounts plus academy/squad/manager proxies | latent transforms, Argentina finance/development, Health case mix and reach |
+| `clubWorld.manager.turnover.*` | `DS-MANAGER-TENURE`; `EV-P1-MGR-*` | spell shape `DIRECTLY_ESTIMABLE`, hazard `JOINT_CALIBRATION_REQUIRED` | current name spells plus historical Argentina terminations | cause/at-risk spell adjudication and expectation controls |
+| `clubWorld.manager.context.*`, `clubWorld.tactical.*` | formation/manager evidence | `WEAKLY_IDENTIFIED` | tactical-persistence proxies only | correlated factors/loadings and provider-noise model |
+| `clubWorld.positionCompetition.*` | `DS-SQUAD-COMPETITION-PROXY`; strict Spain GK/CM/ST minutes | observation component `DIRECTLY_ESTIMABLE` Spain, joint overall | top share, HHI and depth shape | Argentina strict panel, opportunity and entrenchment joins |
+| `transfersMarket.valuation.*`, `transfersMarket.age.*` | valuation/movement evidence | age `DIRECTLY_ESTIMABLE`; valuation `JOINT_CALIBRATION_REQUIRED` | dated age and external valuation proxy | no MarketValue truth/circularity; performance/club/contract joint fit |
+| `transfersMarket.market.{scarcity|clubNeed|fit}.*` | position/transfer/club context | `JOINT_CALIBRATION_REQUIRED` | candidate observable proxies | candidate field and latent strategy/need decomposition |
+| `transfersMarket.interest.*`, `transfersMarket.offer.*` | FIFA/provider observability assessment | `WEAKLY_IDENTIFIED` | completed selected outcomes only | full candidates, interest, offers and rejection denominator |
+| `transfersMarket.fee.*` | `DS-TRANSFER-FEES`; `EV-P1-MKT-007,008` | positive-tail observation `DIRECTLY_ESTIMABLE`, causal model joint | positive EUR-proxy distribution and unresolved-zero class | native Money/date/disclosure/add-ons, selection and seller context |
+| `transfersMarket.salary.*` | `DS-SALARY-REFERENCE`; official finance and FIFPRO | `JOINT_CALIBRATION_REQUIRED` | league/club cost context and broad salary tails | local verified wages; gross/net/bonus and fee separation |
+| `transfersMarket.contract.duration.*` | `DS-CONTRACT-REFERENCE`; `EV-P1-CONTRACT-002,003,009` | broad shape `INDIRECTLY_IDENTIFIABLE` | global duration/entry-mode association | local longitudinal start/end/options cohort |
+| `transfersMarket.renewal.*` | expiry schema and contract evidence | `WEAKLY_IDENTIFIED` | outcome announcements/snapshot only | all-at-risk expiry denominator and censoring |
+| `transfersMarket.loan.*` | CIES loan evidence | broad incidence/age `INDIRECTLY_IDENTIFIABLE` | 75-league cross-section and destination relation | local duration, return and conversion panel |
+| `transfersMarket.sellerResponse.*`, `transfersMarket.negotiation.*` | public outcome/source limitations | `WEAKLY_IDENTIFIED` | no reliable asking/rejected-offer panel | synthetic/product constraints plus integrated validation |
+| `transfersMarket.money.*` | G3D-3B2 bindings, unchanged | `DEFINITION_AVAILABLE` | native minor-unit/date/transform contract | transaction source lineage; no transform/value change |
+
+`DIRECTLY_ESTIMABLE` describes a future observation likelihood component, not a
+causal gameplay coefficient. No score rate becomes club strength, manager
+change rate becomes a hazard intercept, or fee/contract aggregate becomes a
+parameter value.

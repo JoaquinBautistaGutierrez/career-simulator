@@ -619,3 +619,20 @@ is `ARGENTINA_DIRECT_LIMITED`, `SPAIN_DIRECT_LIMITED` and
 `MULTI_LEAGUE_REFERENCE`. GK has direct position evidence; CM/ST retain
 `POSITION_MAPPING_LIMITATION`. Epidemiological rates do not replace the G3D-3D
 product guardrails.
+
+## 16. P1 Club/Market observational-readiness overlay G3D-4C
+
+No target ID, type, product number, denominator or acceptance tolerance changes.
+The registry remains **186 targets** and all **77 `PT-*`** values are unchanged.
+
+| Evidence state | Target IDs | Meaning after G3D-4C |
+|---|---|---|
+| `CALIBRATION_READY` | `CT-MKT-AGE-001` | strict GK/CM/ST movement-age summaries support an initial observation model; transfer selection/context remains joint |
+| `OBSERVATIONAL_SUMMARY_AVAILABLE` | `CT-CLUB-STRENGTH-001`, `CT-MGR-TURN-001`, `CT-TACTIC-001`, `CT-PCOMP-001`, `CT-MKT-VAL-001`, `CT-MKT-FEE-001`, `CT-MKT-TRANS-001`, `CT-MKT-TAIL-001`, `CT-CONTRACT-DUR-001`, `CT-MKT-LOAN-001` | direct summaries/tails exist, but geography, source definition, at-risk denominator, latent mapping or licensing prevents blind copying |
+| `OBSERVATIONAL_EVIDENCE_ACQUIRED` | `CT-CLUB-BASE-001`, `CT-CLUB-PRESTIGE-001`, `CT-CLUB-FIN-001`, `CT-CLUB-STAB-001`, `CT-MGR-QUALITY-001`, `CT-CLUB-DEVQ-001`, `CT-CLUB-MEDQ-001`, `CT-WORLD-LEAGUE-001`, `CT-WORLD-TAIL-001`, `CT-MKT-SCAR-001`, `CT-MKT-NEED-001`, `CT-MKT-FIT-001`, `CT-MKT-FEAS-001`, `CT-MKT-SAL-001`, `CT-MKT-MONEY-001`, `CT-CONTRACT-EXPECT-001` | evidence constrains inputs/diagnostics; causal latent separation remains joint/weak |
+| `OBSERVATIONAL_SOURCE_IDENTIFIED` | `CT-MKT-INT-001`, `CT-MKT-OFFER-001`, `CT-MKT-BID-001`, `CT-MKT-SELLER-001`, `CT-MKT-RENEW-001`, `CT-MKT-NEG-001`, `CT-MKT-DECISION-001` | source routes demonstrate observability limits; candidate/offer/rejection/expiry-risk denominators are absent |
+| unchanged invariant/structural | `CT-CLUB-INVARIANT-001` | mathematical/structural acceptance remains spec-derived; `CT-MKT-MONEY-001` above remains the Market Money invariant |
+
+The 35 IDs above are the complete G3D-4C overlay. A zero-coded fee is not a
+free move, Squad Cost Limit is not wages, and Spain position evidence cannot
+claim Argentina coverage.

@@ -660,3 +660,32 @@ Canonical evidence:
 - [Injury Incidence Evidence](G3D_P1_HEALTH_INJURY_INCIDENCE_EVIDENCE.md);
 - [Recovery/Relapse Evidence](G3D_P1_HEALTH_RECOVERY_RELAPSE_EVIDENCE.md);
 - [Health Observational Hash Manifest](G3D_P1_HEALTH_OBSERVATIONAL_HASH_MANIFEST.md).
+
+## 20. P1 Club/Market evidence overlay G3D-4C
+
+G3D-4C retains all 40 canonical `datasetId` values. It advances only existing
+Club/Manager/Market/Contract definitions, commits aggregate documentary
+evidence and keeps raw provider/player/contract data outside the repository.
+
+| Dataset ID | G3D-4C state | Acquired/normalized coverage | Limitation / next gate |
+|---|---|---|---|
+| `DS-CLUB-VERTICAL-SLICE` | `NORMALIZED_WITH_LIMITATIONS` | all frozen 16 identities; score, manager, formation, participation and market context; official finance routes for three Spain clubs | no final ratings; Argentina player/control/finance depth, medical/reach and reusable-license panel incomplete |
+| `DS-CLUB-HISTORICAL-STRENGTH` | `NORMALIZED_WITH_LIMITATIONS` | 39 Spain club-seasons and 16 partial Argentina provider club-seasons; GF/GA/GD/win summaries | Argentina depth/format coverage and opponent-adjusted shots/chances absent |
+| `DS-CLUB-FINANCIAL-REFERENCE` | `NORMALIZED_WITH_LIMITATIONS` | LALIGA aggregate/cost-limit semantics, three official Spain club accounts, AFA institutional route | no comparable 16-club accounts; nominal ARS/EUR never pooled; player wages absent |
+| `DS-MANAGER-TENURE` | `NORMALIZED_WITH_LIMITATIONS` | detailed-club match-name spells, historical Argentina termination study and global tenure context | current events lack appointment/departure dates and cause-taxonomy adjudication |
+| `DS-SQUAD-COMPETITION-PROXY` | `NORMALIZED_WITH_LIMITATIONS` | strict GK/CM/ST minutes concentration for 39 Spain club-seasons | no usable Argentina strict-position panel; provider/license review |
+| `DS-TRANSFER-HISTORY` | `NORMALIZED_WITH_LIMITATIONS` | 2021–cutoff slice movement/age/position aggregates plus FIFA international type context | no complete at-risk cohort; provider type/free/loan/undisclosed fields insufficient |
+| `DS-TRANSFER-FEES` | `NORMALIZED_WITH_LIMITATIONS` | strictly positive provider-fee distribution/tails and explicit zero-code class | provider EUR proxy lacks original currency/minor-unit/add-on/disclosure semantics |
+| `DS-MARKET-VALUATION-PROXY` | `ACQUIRED` | dated provider valuation schema/source route | methodology/license review; diagnostic only; never Performance truth |
+| `DS-SALARY-REFERENCE` | `NORMALIZED_WITH_LIMITATIONS` | official league/club cost environments and FIFPRO global distribution shape | no contemporary local verified wage panel; gross/net/bonus comparability |
+| `DS-CONTRACT-REFERENCE` | `NORMALIZED_WITH_LIMITATIONS` | broad duration/entry-mode and loan evidence; current expiry schema | no local start/end cohort, expiry-risk renewal denominator or loan outcomes |
+
+All future row-level player observations use `ANONYMIZED_OBSERVATION`; public
+club/manager identities may remain identified only where required by their
+consumer. Candidate states never imply `FROZEN` or Data V1 publication.
+
+Canonical evidence and licensing:
+[G3D_P1_CLUB_MARKET_EVIDENCE_INDEX.md](G3D_P1_CLUB_MARKET_EVIDENCE_INDEX.md),
+[G3D_P1_CLUB_MARKET_SOURCE_LICENSE_MANIFEST.md](G3D_P1_CLUB_MARKET_SOURCE_LICENSE_MANIFEST.md)
+and
+[G3D_P1_CLUB_MARKET_OBSERVATIONAL_HASH_MANIFEST.md](G3D_P1_CLUB_MARKET_OBSERVATIONAL_HASH_MANIFEST.md).
