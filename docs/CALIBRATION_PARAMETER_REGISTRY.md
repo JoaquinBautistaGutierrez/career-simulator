@@ -807,3 +807,31 @@ changes. Only evidence/dataset/identifiability metadata is added.
 causal gameplay coefficient. No score rate becomes club strength, manager
 change rate becomes a hazard intercept, or fee/contract aggregate becomes a
 parameter value.
+
+## 23. P1 National Team/Awards evidence and identifiability overlay G3D-4D
+
+All **275** templates remain value-free and `UNASSIGNED`. No canonical path,
+alias, classification, sensitivity, domain, monotonicity or publication state
+changes. Only evidence/dataset/identifiability metadata is attached.
+
+| Parameter branch/family | Evidence binding | Identifiability | Observational support | Remaining dependency |
+|---|---|---|---|---|
+| `nationalTeam.candidate.*` | `DS-NATIONAL-SELECTION-HISTORY`; `EV-P1-NT-001..010` | `JOINT_CALIBRATION_REQUIRED` | final/preliminary/preparation stages, strict position and candidate proxy | complete plausible non-selected denominator; upstream Performance/evidence context |
+| `nationalTeam.selectionField.*` | candidate proxy and selected-field evidence | `INDIRECTLY_IDENTIFIABLE` | core/tail scale and strict GK/CM/ST counts | mixture weights/location/scale must be jointly fitted; proxy coverage correction |
+| `nationalTeam.callUp.*` | squad/call-up histories and calendar opportunities | `JOINT_CALIBRATION_REQUIRED` | first-call-up event and repeated selection facts | at-risk field, non-selected observations, merit/need/availability joins |
+| `nationalTeam.squad.*` | 29-to-26 preparation reduction, prelist-to-26 final stage | observed stage `DIRECTLY_ESTIMABLE`, causal model joint | direct tournament-stage counts | multi-edition field and context definitions |
+| `nationalTeam.incumbency.*` | `EV-P1-NT-004,011..016` | transition summaries `DIRECTLY_ESTIMABLE`, AR process joint | 17/26 cross-cycle retention and minute concentration | multi-window selected/non-selected transitions; no empirical rate becomes `phi` |
+| `nationalTeam.roleMinutesProfileRef` and adapters | strict World Cup 2022 position-minute panel | observational component `DIRECTLY_ESTIMABLE` | GK/CM/ST starts, appearances and shares | ordinary-window panel, frozen opportunity fixture and common Role/Minutes parameters |
+| `nationalTeam.generation.*` | squad turnover/age/depth and outcome history | `JOINT_CALIBRATION_REQUIRED` | multi-cycle continuity and major progression | separate persistent generation from team form, tactics and opponent context |
+| `nationalTeam.teamStrength.*`, `nationalTeam.support.*` | `DS-NATIONAL-COMPETITION-HISTORY`; `EV-P1-NT-017..020` | outcome likelihood `DIRECTLY_ESTIMABLE`; latent axes joint | 111 context-tagged results and official endpoints | opponent-adjusted attack/defense/control proxy panel |
+| `nationalTeam.contributionProfileRef.*`, `nationalTeam.competition.*` | international exposure/outcome context plus G3D-4A Performance | `JOINT_CALIBRATION_REQUIRED` | authorized contextual contribution inputs available | protagonist vs support separation and competition-field fit |
+| `awards.comparativeField.*` | official 30/10/10 fields and longitudinal winner histories | `JOINT_CALIBRATION_REQUIRED` | field-size, concentration and repeat tails | official nominees are not latent field; full nominee ranks and upstream Performance |
+| `awards.statisticalField.*` | two LALIGA top-scorer upper-tail editions | upper-tail component `DIRECTLY_ESTIMABLE`; NB2 joint | winner/runner-up counts and statistical semantics | multi-season full field with minutes/exposure for location/dispersion/ties |
+| `awards.candidateProfiles.*`, `awards.positionTaskMappings.*` | comparative winners/positions plus G3D-4A Performance | `JOINT_CALIBRATION_REQUIRED` | GK/CM-like/forward representation and production association | strict role mapping, achievements and position fairness/product constraints |
+| `awards.historyReputation.*` | repeat histories only | `WEAKLY_IDENTIFIED` | persistence/repeat tails | lagged Sporting/Public Reputation evidence in G3D-4E; no current-award feedback |
+| `awards.featureTransforms.*` and judged-noise families | nominee/winner extreme-tail observations | `WEAKLY_IDENTIFIED` | ordinal outcomes and limited procedure facts | human weights private/non-public; joint/synthetic constraints and Monte Carlo |
+
+`DIRECTLY_ESTIMABLE` applies only to a future observational likelihood or
+catalog component. No roster ratio becomes a call-up intercept, transition rate
+becomes incumbency persistence, result rate becomes team strength, or historical
+winner share becomes an Award probability.

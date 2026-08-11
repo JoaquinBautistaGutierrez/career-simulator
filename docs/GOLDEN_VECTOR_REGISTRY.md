@@ -497,3 +497,24 @@ output is computed. G3D-4C adds empirical fixture/distribution basis only.
 This improves empirical readiness for **25** existing golden requirements (8
 club/manager/position/world-boundary and 17 market/contract/money). Publication
 state is unchanged.
+
+## 18. National Team/Awards empirical-input readiness G3D-4D
+
+All **139** golden IDs remain `SPECIFIED`; no fixture is frozen and no expected
+output is computed. G3D-4D adds empirical basis only.
+
+| Golden IDs | Empirical basis after G3D-4D | Still required |
+|---|---|---|
+| `GV-NT-CAND-001`, `GV-NT-FIELD-001` | selected/preselected stages, strict position counts and incomplete candidate proxy | synthetic/frozen candidate fixture and calibrated mixture values |
+| `GV-NT-CALL-001`, `GV-NT-INELIGIBLE-001`, `GV-NT-SQUAD-001` | opportunity/call-up/squad-stage evidence; Argentina-only eligibility unchanged | call-up/squad parameter candidate and exact draws; ineligible vector remains invariant-derived |
+| `GV-NT-INC-001`, `GV-NT-MIN-001` | cross-cycle retention and strict GK/CM/ST exposure shares | incumbency/Role-Minutes candidates, ordinary-window fixture and draws |
+| `GV-NT-OUTCOME-001`, `GV-NT-CONTEXT-001` | 111 context-tagged results plus official major endpoints | team/field/contribution candidates and fixed opponent/context draws |
+| `GV-AWD-UTILITY-001`, `GV-AWD-CFIELD-001`, `GV-AWD-PLACE-001` | comparative field sizes, winner concentration, repeat/position histories | candidate utility/field values, exact abstract draws and independent expected output |
+| `GV-AWD-STAT-001` | LALIGA scorer upper-tail and rank semantics | full-field NB2 candidate, fixed production/exposure and draws |
+| `GV-AWD-TIE-001` | real/catalog tie provenance remains available; observed tie-frequency panel incomplete | exact definition fixture and independent arithmetic |
+| `GV-AWD-INELIGIBLE-001`, `GV-AWD-POS-001`, `GV-AWD-MULTI-001` | eligibility/catalog, position representation and compatible-repeat evidence | parameter fixtures; ineligible no-draw behavior remains invariant-derived |
+
+These **17** existing requirements gain
+`empiricalFixtureBasis=AVAILABLE_WITH_LIMITATIONS`. Publication status remains
+`SPECIFIED`; no ID reaches `INPUTS_FROZEN`, `EXPECTED_COMPUTED` or
+`PUBLISHED_V1`.

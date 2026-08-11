@@ -336,3 +336,22 @@ Raw provider/player data remains outside the repository and license review is
 explicit. No rating, parameter, Product Target, scoring value or Data V1 is
 published. Result: `GO_FOR_G3D_4D_WITH_CLUB_MARKET_LIMITATIONS`; G3D-4D is not
 started.
+
+## 18. G3D-4D P1 National Team/Awards evidence result
+
+Scope was limited to Argentina senior selection/exposure/outcomes and the five
+frozen V1 Award slots. It adds 38 atomic records from 21 source routes (14 newly
+registered), without changing P0 definitions or scoring.
+
+| Research area | Evidence state | Coverage | Residual research gap |
+|---|---|---|---|
+| candidate/call-up/squad | `OBSERVATIONAL_EVIDENCE_ACQUIRED_WITH_LIMITATIONS` | 2022/2024/2026 final/preparation/preliminary stages and strict candidate proxy | complete plausible non-selected denominator and first-call-up distribution |
+| Role/Minutes/incumbency | `CALIBRATION_READY_WITH_LIMITATIONS` | strict GK/CM/ST World Cup minutes plus 17/26 cross-cycle final-squad retention | ordinary multi-window exact exposure and non-selected transitions |
+| strength/generation/outcomes | `OBSERVATIONAL_SUMMARY_AVAILABLE_WITH_LIMITATIONS` | 111 context-tagged matches and official major endpoints | opponent/control panel and generation-vs-form identification |
+| comparative Awards | `OBSERVATIONAL_SUMMARY_AVAILABLE_WITH_LIMITATIONS` | 2025 30/10/10 fields, Ballon/Kopa/Yashin histories and POTY observations | full nominee ranks, judged weights and cross-era adapter |
+| statistical Award | `READY_WITH_LIMITATIONS` | two LALIGA scorer upper-tail editions and canonical alias semantics | full multi-season scorer fields, minutes and tie incidence |
+
+Raw provider/match-event datasets remain outside the repository; dynamic
+official pages require snapshots before freeze. No empirical frequency becomes
+a parameter or Product Target. Result:
+`GO_FOR_G3D_4E_WITH_NATIONAL_AWARD_LIMITATIONS`; G3D-4E is not started.

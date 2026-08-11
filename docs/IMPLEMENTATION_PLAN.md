@@ -2743,6 +2743,31 @@ GK aging evidence, freeze-quality event-task licensing, preferred-foot evidence,
 and joint identification of latent Creation/Development/Role/Form variables.
 No later phase starts automatically.
 
+### Cierre G3D-4D — P1 National Team & Awards evidence
+
+**Resultado:** `GO_FOR_G3D_4E_WITH_NATIONAL_AWARD_LIMITATIONS`.
+
+G3D-4D acquires Argentina senior preparation/preliminary/final-squad evidence,
+strict GK/CM/ST international exposure, cross-cycle incumbency constraints,
+context-tagged outcomes and longitudinal evidence for the five frozen Award
+slots. Three existing DatasetDefinitions advance to
+`NORMALIZED_WITH_LIMITATIONS`; no call-up probability, judging weight,
+ParameterSet value, scoring value, golden output or Data V1 is published.
+
+#### Reconciled sequence after G3D-4D
+
+| Phase | Inputs | Authorized output | Gate | Explicit boundary |
+|---|---|---|---|---|
+| `G3D-4E` — Reputation, Social & Retirement | public/reputation/lifecycle contracts plus upstream P1 | permitted platform, reputation and longitudinal retirement evidence | privacy, platform/era, career-state and censoring semantics | no sponsor, scoring, hazard or gameplay calibration; not started here |
+| consolidated P1 readiness | completed G3D-4A..4E artifacts | cross-domain identifiability, conflict, licensing and dependency report | all position/geography/data gaps explicit | no parameter values or publication |
+| Initial ParameterSet Calibration | consolidated P1 evidence + 77 Product Targets + P0 candidates | explicit versioned candidate values, sensitivity and acceptance reports | upstream readiness, license, independent checks and separate authorization | cannot start automatically from acquisition |
+
+Carried National Team/Award blockers are the complete plausible non-selected
+Argentina field, a multi-window debut-age/minutes panel, opponent-adjusted
+attack/defense/control and generation separation, full multi-edition nominee/
+scorer fields, comparative judging identifiability, cross-era equivalence and
+freeze-quality snapshots for dynamic official pages. G3D-4E is not started.
+
 ### Cierre G3D-4B — P1 Health, Injury & Recovery evidence
 
 **Resultado:** `GO_FOR_G3D_4C_WITH_HEALTH_EVIDENCE_LIMITATIONS`.

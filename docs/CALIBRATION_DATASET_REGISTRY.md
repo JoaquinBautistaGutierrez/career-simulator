@@ -689,3 +689,28 @@ Canonical evidence and licensing:
 [G3D_P1_CLUB_MARKET_SOURCE_LICENSE_MANIFEST.md](G3D_P1_CLUB_MARKET_SOURCE_LICENSE_MANIFEST.md)
 and
 [G3D_P1_CLUB_MARKET_OBSERVATIONAL_HASH_MANIFEST.md](G3D_P1_CLUB_MARKET_OBSERVATIONAL_HASH_MANIFEST.md).
+
+## 21. P1 National Team/Awards evidence overlay G3D-4D
+
+G3D-4D retains all 40 canonical `datasetId` values and advances only the three
+existing National Team/Awards observational datasets. Public nominal facts and
+derived summaries are committed; provider rows remain outside the repository.
+
+| Dataset ID | G3D-4D state | Acquired/normalized coverage | Limitation / next gate |
+|---|---|---|---|
+| `DS-NATIONAL-SELECTION-HISTORY` | `NORMALIZED_WITH_LIMITATIONS` | Argentina 2022/2024/2026 final/preparation/preliminary squads; strict GK/CM/ST World Cup 2022 starts/appearances/minutes; cross-cycle retention; one ordinary-window first-call-up tail | selected-only bias; incomplete plausible non-selected denominator; debut-age and ordinary-window exact-minute panels incomplete |
+| `DS-NATIONAL-COMPETITION-HISTORY` | `NORMALIZED_WITH_LIMITATIONS` | 111 cutoff-compatible Argentina results segmented by competition context; official World Cup endpoints; ranking and squad-cycle proxy routes | Tier C full result panel; opponent/control normalization and generation-vs-form separation remain joint |
+| `DS-AWARD-HISTORY` | `NORMALIZED_WITH_LIMITATIONS` | five frozen slots; official 2025 fields; Ballon/Kopa/Yashin winner histories; LALIGA POTY and scorer upper-tail observations | nominees/winners are selected tails; POTY human procedure incomplete; full multi-season scorer/nominee panels and cross-era adapters pending |
+
+All three candidates use the existing `MULTI_SEASON`/`LONGITUDINAL` window
+contracts and are not `FROZEN`. Strict position mapping preserves unmapped broad
+roles. `DS-AWARD-DEFINITION-CATALOG` is unchanged: G3D-4D supplies calibration
+history, not new definitions or scoring values.
+
+Canonical evidence:
+
+- [National Team Evidence](G3D_P1_NATIONAL_TEAM_EVIDENCE.md);
+- [Awards Calibration Evidence](G3D_P1_AWARDS_CALIBRATION_EVIDENCE.md);
+- [National/Awards Evidence Index](G3D_P1_NATIONAL_AWARDS_EVIDENCE_INDEX.md);
+- [National/Awards Source Manifest](G3D_P1_NATIONAL_AWARDS_SOURCE_LICENSE_MANIFEST.md);
+- [National/Awards Observational Hash Manifest](G3D_P1_NATIONAL_AWARDS_OBSERVATIONAL_HASH_MANIFEST.md).

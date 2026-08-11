@@ -636,3 +636,20 @@ The registry remains **186 targets** and all **77 `PT-*`** values are unchanged.
 The 35 IDs above are the complete G3D-4C overlay. A zero-coded fee is not a
 free move, Squad Cost Limit is not wages, and Spain position evidence cannot
 claim Argentina coverage.
+
+## 17. P1 National Team/Awards observational-readiness overlay G3D-4D
+
+No target ID, type, product number, denominator or acceptance tolerance changes.
+The registry remains **186 targets** and all **77 `PT-*`** values are unchanged.
+
+| Evidence state | Target IDs | Meaning after G3D-4D |
+|---|---|---|
+| `CALIBRATION_READY` | `CT-NT-MIN-001`, `CT-NT-OUTCOME-001`, `CT-AWD-REPEAT-001` | strict-position international exposure, context-tagged outcome history and official repeat-winner series support an initial observational component; candidate parameters remain unpublished |
+| `OBSERVATIONAL_SUMMARY_AVAILABLE` | `CT-NT-CALL-001`, `CT-NT-INC-001`, `CT-NT-SQUAD-001`, `CT-NT-STRENGTH-001`, `CT-NT-GEN-001`, `CT-NT-TAIL-001`, `CT-AWD-WIN-001`, `CT-AWD-POS-001`, `CT-AWD-PERF-001`, `CT-AWD-STAT-001`, `CT-AWD-FIELD-001`, `CT-AWD-TAIL-001` | direct summaries/tails exist, but selected-only bias, context, latent mapping, small-N or source freeze limits prevent blind copying |
+| `OBSERVATIONAL_EVIDENCE_ACQUIRED` | `CT-NT-FIELD-001`, `CT-NT-CONTRIB-001`, `CT-AWD-MULTI-001` | field scale, contribution and compatible-award association are constrained indirectly; joint upstream Performance/Reputation calibration remains required |
+| unchanged structural/invariant | `CT-AWD-INVARIANT-001` | eligibility, family separation and ordinal coherence remain spec-derived; no observed range is needed |
+
+The call-up target does **not** gain an absolute observed probability: the
+plausible non-selected field is incomplete. Award histories never modify PPI,
+PSN or any `PT-*` target. `CT-AWD-STAT-001` retains a full-field/multi-season
+data gate despite two direct upper-tail editions.

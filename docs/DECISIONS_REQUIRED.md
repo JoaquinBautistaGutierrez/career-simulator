@@ -5838,3 +5838,28 @@ separate, and zero-coded/undisclosed observations are not rewritten. The 77
 product targets, 275 unassigned parameter templates, 139 uncomputed goldens,
 ExternalClubPool and Data V1 publication state remain unchanged. Result:
 `GO_FOR_G3D_4D_WITH_CLUB_MARKET_LIMITATIONS`.
+
+## 18. G3D-4D — National Team/Awards observational evidence reconciliation
+
+G3D-4D adds 38 P1 EvidenceRecords and aggregate Argentina-selection,
+international-outcome and five-slot Award histories without changing any
+mathematical, eligibility, catalog or scoring decision.
+
+| DR / scope | State after G3D-4D | Evidence advance | Remaining gate |
+|---|---|---|---|
+| `DR-008` integrated calibration | `PARTIAL_CALIBRATION` | National Team/Awards observation shapes and identifiability mapped | Reputation/Social/Retirement P1, consolidated readiness, ParameterSet candidates, sensitivity, runs and expected goldens |
+| `DR-025` competition/Award catalog | `RESOLVED_DATA_V1_CANDIDATE` unchanged | five identities/definitions gain multi-edition field, winner, repeatability and statistical-tail evidence | atomic publication, complete calibration histories and scoring config; no Definition or point changed |
+| `DR-048` positional scope | resolved scope unchanged | strict GK/CM/ST mapping preserves broad `MF`/`FW` as limitations instead of inferred conversion | no out-of-scope reconversion or position expansion |
+| `DR-049` dominant-position/tie scope | resolved math unchanged | selected/minute and Award position observations provide future diagnostics | joint position transforms and fairness acceptance; no scoring tie rule changes |
+| `DR-056` dynamic form interface | `RESOLVED_MATH / PARTIAL_CALIBRATION` unchanged | current outcomes, generation and Award histories are explicitly separated from latent Form | joint Performance/National/Award calibration; no feedback or coefficient inferred |
+| `DR-059` SelectionCompetitionField | `RESOLVED_MATH / PARTIAL_CALIBRATION` | preparation/prelist/final stages, strict position counts and candidate proxy acquired | complete plausible non-selected denominator and core/elite mixture fit |
+| `DR-060` AwardCompetitionField | `RESOLVED_MATH / PARTIAL_CALIBRATION` | official 30/10/10 fields, repeat winners, position diagnostics and scorer tails acquired | latent comparative field/judging and multi-season NB2 full-field fit |
+| `DR-068` sporting nationality/eligibility | policy resolved, unchanged | AFA/FIFA Argentina senior sources bind the V1 evidence scope | Argentina remains sole initial eligibility; player eligibility resolver/publication gate only |
+
+The observed 29-to-26 and prelist-to-26 reductions do not define absolute
+`P(call-up)`: the non-selected plausible field is incomplete. Official Award
+nominee count does not define latent field size. No judging weight, selection
+coefficient, scoring point or ParameterSet value is assigned. The 77 Product
+Targets, 275 unassigned templates, 139 uncomputed goldens and
+`DATA_V1_NOT_PUBLISHED` state remain unchanged. Result:
+`GO_FOR_G3D_4E_WITH_NATIONAL_AWARD_LIMITATIONS`.
