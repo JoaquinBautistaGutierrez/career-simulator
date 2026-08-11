@@ -214,3 +214,8 @@ propagate. No raw restricted data, parameter value, target tolerance, expected
 golden, scoring config, gameplay rule or code implementation was added. Closed
 ADR policies were not reopened.
 
+> **Cardinality correction (G3D-4F/4G):** the 275-template count reported at
+> the time was subsequently audited as a prose/counting error. The canonical
+> registry contains 268 unique normative parameter templates; no seven paths
+> are missing.
+

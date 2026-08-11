@@ -897,3 +897,22 @@ Candidate lifecycle and artifact fields are defined in
 [G3D Initial Calibration Plan](G3D_INITIAL_CALIBRATION_PLAN.md). Candidate
 calibration may use immutable, hash-bound candidate data; `FROZEN_V1` still
 requires published data/license/golden/acceptance gates.
+
+## 26. G3D-4G canonical integrity and F/G policy
+
+Career Simulator V1 defines exactly **268 canonical parameter templates**.
+Mechanical recount yields 268 unique row IDs, 268 unique normative paths, zero
+duplicates and zero orphans. The historical 275 count was a documentation
+cardinality error; no seven normative paths are missing.
+
+All templates inherit the calibration class, priority, coupling group,
+evidence/target mapping and strategy from the exhaustive
+[Identifiability Matrix](G3D_PARAMETER_IDENTIFIABILITY_MATRIX.md). The 17 F and
+9 G templates additionally inherit the row-specific range/prior/deferral,
+sensitivity scenarios and freeze rule from
+[Weak Parameter Prior and Sensitivity Contract](G3D_WEAK_PARAMETER_PRIOR_AND_SENSITIVITY_CONTRACT.md).
+
+`assignedParameterValues=0`. The registry remains an identity/metadata source;
+none of the ranges or priors is a candidate or frozen value. G3D-5A membership
+is the exact 69-template list in
+[G3D Initial Calibration Plan](G3D_INITIAL_CALIBRATION_PLAN.md).

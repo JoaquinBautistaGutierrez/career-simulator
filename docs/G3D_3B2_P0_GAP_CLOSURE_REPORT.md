@@ -148,3 +148,8 @@ G3D-3B2 does not start it. ParameterSet calibration is not authorized by this
 report.
 
 Final result: **`P0_DATA_READY_WITH_NONBLOCKING_LIMITATIONS`**.
+
+> **Cardinality correction (G3D-4F/4G):** the 275-template count reported at
+> the time was subsequently audited as a prose/counting error. The canonical
+> registry contains 268 unique normative parameter templates; no seven paths
+> are missing.

@@ -1,6 +1,6 @@
 # G3D Calibration Readiness Scorecard
 
-Status: `GO_WITH_PRECALIBRATION_FIXES`
+Status: `GO_FOR_G3D_5A_OBSERVABLE_ANCHORS`
 
 Reference cutoff: `2026-08-07T23:59:59.999Z`
 
@@ -439,4 +439,16 @@ move only after a ParameterSet candidate; structural primitives may begin indepe
   provisional/sensitivity policy for F/G rows.
 - Scoring RED cells block scoring/tier validation and V1 publication, not G3D-5A Engine anchors.
 
-Result: **`GO_FOR_G3D_5_WITH_PRECALIBRATION_FIXES`**.
+## 6. G3D-4G precalibration control result
+
+| Control | Result |
+|---|---|
+| canonical cardinality/identity | `PASS` — 268 rows, 268 IDs, 268 paths, 0 duplicates/orphans |
+| immutable input lineage | `PASS` — candidate bundle and reproducible root SHA-256 |
+| F weak policy | `PASS` — 17/17 |
+| G deferral policy | `PASS` — 9/9; inactive through G3D-5H |
+| no values | `PASS` — 0 assigned |
+| exact initial scope | `PASS` — 69 A/B/E Engine anchors |
+
+The target, dataset and golden readiness counts above do not change. Result:
+**`GO_FOR_G3D_5A_OBSERVABLE_ANCHORS`**.

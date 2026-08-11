@@ -170,3 +170,8 @@ separate G3D-4F `GO` can authorize G3D-5 Initial ParameterSet Candidate
 Calibration.
 
 Final result: **`GO_FOR_G3D_4F_WITH_REPUTATION_RETIREMENT_LIMITATIONS`**.
+
+> **Cardinality correction (G3D-4F/4G):** the 275-template count reported at
+> the time was subsequently audited as a prose/counting error. The canonical
+> registry contains 268 unique normative parameter templates; no seven paths
+> are missing.

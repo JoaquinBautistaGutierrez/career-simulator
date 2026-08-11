@@ -332,3 +332,13 @@ non-empty set of current registry IDs that match that prefix; they are not new I
 - Values assigned by G3D-4F: **0**.
 - Pre-calibration identity correction: prose cardinality `275` versus canonical
   table cardinality `268`; resolved here as an erratum, not by fabricating parameters.
+
+## 6. G3D-4G policy closure
+
+The 268-row universe and both partitions are unchanged. The 17 F rows map
+one-to-one to provisional weak-prior/range profiles and the 9 G rows map
+one-to-one to explicit Scoring deferral in
+[Weak Parameter Prior and Sensitivity Contract](G3D_WEAK_PARAMETER_PRIOR_AND_SENSITIVITY_CONTRACT.md).
+Coverage is F `17/17`, G `9/9`, sensitivity `26/26`; assigned values remain
+zero. G rows are inactive in G3D-5A..5H. The exact 69 active A/B/E Engine
+anchors are listed in [G3D Initial Calibration Plan](G3D_INITIAL_CALIBRATION_PLAN.md).

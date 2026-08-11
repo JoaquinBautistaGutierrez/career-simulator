@@ -694,3 +694,12 @@ Critical target orphans are zero. `BLOCKED_*` targets remain scoring/P2
 refinements or have an explicit product/sensitivity strategy; they are not
 silently accepted. All 77 exact `PT-...-NNN` targets remain frozen. Wildcard
 overlay rows such as `PT-QC-*` are selectors and are not counted as target IDs.
+
+## 20. G3D-4G lineage metadata
+
+The **186** target identities, metrics, denominators, numeric ranges and
+tolerances are unchanged; all **77** exact Product Targets remain unchanged.
+Future calibration evidence attaches through
+`CIB-G3D4G-RSNAP-20260807-C1` and its root hash. F/G target consumers use the
+26-row sensitivity contract and cannot pass by treating a prior as observed
+evidence. No target status is promoted by this metadata-only binding.

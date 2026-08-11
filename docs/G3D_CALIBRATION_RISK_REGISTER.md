@@ -41,3 +41,16 @@ open until its detection artifact and mitigation are referenced by a candidate a
 - License risks may permit local exploratory calibration but always block competitive freeze.
 - A rare but coherent sporting tail is not a risk event; only excessive frequency, invariant
   violation or causal leakage is.
+
+## G3D-4G control overlay
+
+| Risk | G3D-4G control | State after control |
+|---|---|---|
+| `CR-001` cardinality ambiguity | physical 268-row/path recount, explicit normative erratum, no synthetic paths | `CLOSED` |
+| calibration input drift | immutable `CalibrationInputBundleCandidate`, RFC 8785 root hash, successor-on-change rule | `LOW`; bundle mismatch blocks run acceptance |
+| F weak-family dominance | 17/17 broad priors, named scenarios and `SENSITIVITY_BLOCKS_FREEZE` | `MEDIUM` until executed; no longer a start blocker |
+| G false identification | 9/9 `DEFERRED_UNTIL_SCORING_DATA`, excluded through G3D-5H | `LOW` for Engine anchors; remains Gate 6 risk |
+| accidental all-parameter fit | exact 69-template G3D-5A active list | `LOW` |
+
+No risk is mitigated by assigning a value. Residual F sensitivity remains an
+acceptance/freeze obligation in the future calibration phase.

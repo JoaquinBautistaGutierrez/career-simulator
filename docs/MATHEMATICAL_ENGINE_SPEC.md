@@ -2202,7 +2202,7 @@ normativos, sin asignar valores ni implementar modelos:
 
 | Registro | Cobertura G3D-1 |
 |---|---:|
-| [Parameter Registry](CALIBRATION_PARAMETER_REGISTRY.md) | 275 parameter-path templates, sin duplicados |
+| [Parameter Registry](CALIBRATION_PARAMETER_REGISTRY.md) | 268 parameter-path templates canónicos, sin duplicados |
 | [Target Registry](CALIBRATION_TARGET_REGISTRY.md) | 186 métricas canónicas |
 | [Dataset Registry](CALIBRATION_DATASET_REGISTRY.md) | 40 datasets/catálogos planificados |
 | [Golden Registry](GOLDEN_VECTOR_REGISTRY.md) | 139 golden requirements `SPECIFIED` |
@@ -2211,6 +2211,11 @@ Los paths parametrizados se expanden sobre catálogos versionados; ninguna
 ausencia equivale a cero. Las filas calibrables permanecen `UNASSIGNED`. Las
 identidades matemáticas ya aprobadas quedan `PROVISIONAL_DESIGN`, no
 `FROZEN_V1`.
+
+**Corrección de cardinalidad G3D-4F/4G:** la cifra histórica 275 fue un error de
+prosa/recuento. El registry normativo contiene exactamente 268 templates
+únicos; no faltan siete parameter paths y no se crea ninguno para cuadrar la
+cifra.
 
 ### 39.1 Runtime y publicación
 

@@ -2329,8 +2329,9 @@ y recibir autorización explícita.
 
 Artefactos:
 
-- [Calibration Parameter Registry](CALIBRATION_PARAMETER_REGISTRY.md): 275
-  parameter-path templates sin duplicados;
+- [Calibration Parameter Registry](CALIBRATION_PARAMETER_REGISTRY.md): 268
+  parameter-path templates canónicos sin duplicados (la cifra histórica 275
+  fue corregida por auditoría G3D-4F/4G; no faltan siete paths);
 - [Calibration Target Registry](CALIBRATION_TARGET_REGISTRY.md): 186 targets
   canónicos sin duplicados;
 - [Calibration Dataset Registry](CALIBRATION_DATASET_REGISTRY.md): 40 datasets
@@ -2878,3 +2879,23 @@ frozen before competitive V1 publication, not before exploratory estimation.
 
 No G3D-5 phase starts automatically. Each future subphase requires its own
 authorization, checks, selective commit and successful push.
+
+### Cierre G3D-4G — Precalibration Integrity, Lineage & Prior Bounds
+
+**Resultado:** `GO_FOR_G3D_5A_OBSERVABLE_ANCHORS`.
+
+The current normative universe is 268 canonical templates, not the historical
+prose count 275. G3D-4G binds the P0 and five P1 manifest families under
+`CIB-G3D4G-RSNAP-20260807-C1`, defines weak/deferred policy for all 26 F/G
+templates and passes PC-1..PC-6 with zero assigned values.
+
+The next separately authorized phase is:
+
+`G3D-5A — Observable Anchor Estimation & Candidate Population`.
+
+Its exact active universe is the 69-template list in
+[G3D Initial Calibration Plan](G3D_INITIAL_CALIBRATION_PLAN.md): 20 A Engine
+anchors, 16 B Engine bindings and 33 E Engine structural identities. It may
+estimate/populate only those identities against the bound input bundle. It may
+not activate F/G, calibrate joint C groups, populate Scoring, publish Data V1,
+freeze V1 or implement gameplay. G3D-5A is not started by this closure.

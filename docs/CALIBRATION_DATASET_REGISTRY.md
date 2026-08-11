@@ -765,3 +765,16 @@ permitted summaries (`CALIBRATION_CAN_USE_CANDIDATE_DATA`), while competitive
 publication still requires `VALIDATED`/`FROZEN`, license approval and a
 published dataVersion. The four source-identified-only rows are scoring
 datasets and block Gate 6, not initial Engine anchors.
+
+## 24. G3D-4G calibration-input lineage
+
+All **40** DatasetDefinitions retain their lifecycle states. Dataset definition
+identity is separated from candidate content identity by
+[G3D Calibration Input Lineage Manifest](G3D_CALIBRATION_INPUT_LINEAGE_MANIFEST.md),
+which binds the P0 candidate manifest, five P1 observational manifests,
+evidence/source indexes and transform versions under one root hash.
+
+`REFERENCE_ONLY`/dynamic raw content remains outside the repository; the bundle
+binds permitted EvidenceRecords, summaries, retrieval metadata and transforms.
+This is `CALIBRATION_CAN_USE_CANDIDATE_DATA`, not `FROZEN` and not Data V1
+publication.

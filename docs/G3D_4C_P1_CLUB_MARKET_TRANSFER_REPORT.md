@@ -233,3 +233,8 @@ parameters, alter scoring, reopen market policies or implement gameplay.
 - [Evidence Index](G3D_P1_CLUB_MARKET_EVIDENCE_INDEX.md)
 - [Source and License Manifest](G3D_P1_CLUB_MARKET_SOURCE_LICENSE_MANIFEST.md)
 - [Observational Hash Manifest](G3D_P1_CLUB_MARKET_OBSERVATIONAL_HASH_MANIFEST.md)
+
+> **Cardinality correction (G3D-4F/4G):** the 275-template count reported at
+> the time was subsequently audited as a prose/counting error. The canonical
+> registry contains 268 unique normative parameter templates; no seven paths
+> are missing.

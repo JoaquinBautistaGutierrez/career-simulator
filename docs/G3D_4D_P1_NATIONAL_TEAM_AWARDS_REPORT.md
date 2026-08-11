@@ -190,3 +190,8 @@ under a separate authorization. It must not treat the Award histories here as
 Sporting/Public Reputation values. After G3D-4E, the plan requires consolidated
 P1 readiness before any ParameterSet value is assigned. This report does not
 start either phase.
+
+> **Cardinality correction (G3D-4F/4G):** the 275-template count reported at
+> the time was subsequently audited as a prose/counting error. The canonical
+> registry contains 268 unique normative parameter templates; no seven paths
+> are missing.

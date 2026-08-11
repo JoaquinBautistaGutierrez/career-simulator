@@ -167,3 +167,8 @@ in this closure.
 - [Development/Aging Evidence](G3D_P1_DEVELOPMENT_AGING_EVIDENCE.md)
 - [Role/Minutes Evidence](G3D_P1_ROLE_MINUTES_EVIDENCE.md)
 - [Performance/Production Evidence](G3D_P1_PERFORMANCE_PRODUCTION_EVIDENCE.md)
+
+> **Cardinality correction (G3D-4F/4G):** the 275-template count reported at
+> the time was subsequently audited as a prose/counting error. The canonical
+> registry contains 268 unique normative parameter templates; no seven paths
+> are missing.

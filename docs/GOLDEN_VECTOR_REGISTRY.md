@@ -556,3 +556,12 @@ Every ID remains `SPECIFIED`; no expected output, input fixture or publication
 status changes. V1-critical expected outputs require manual/exact worksheets or
 an independent reference implementation and review; the implementation under
 test cannot be their sole source.
+
+## 21. G3D-4G lineage binding
+
+All **139** golden identities remain `SPECIFIED`; no expected output or frozen
+fixture is added. Future calibration-dependent derivations must record
+`CIB-G3D4G-RSNAP-20260807-C1` plus its bundle root hash. A successor input
+bundle invalidates only derivations tied to the prior bundle; structural
+requirements retain their identities but still require independent
+verification. This update changes lineage metadata only.

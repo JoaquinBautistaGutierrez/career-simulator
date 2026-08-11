@@ -1579,7 +1579,48 @@ Scoring bundle publicado; requiere revisión/version impact del acceptance
 bundle y, si provoca nuevos valores causales/competitivos, las versiones
 propietarias normales.
 
-## 20. Referencias
+## 20. Immutable CalibrationInputBundle (G3D-4G)
+
+Toda estimación, calibración conjunta, campaña Monte Carlo o derivación de
+goldens dependiente de parámetros DEBE declarar un `CalibrationInputBundle`
+inmutable. El bundle identifica inputs; no contiene valores de parámetros.
+
+Campos mínimos:
+
+- `calibrationInputBundleId`, `schemaVersion` y estado;
+- `referenceCutoffDate` y `referenceSnapshotId`;
+- hashes de Parameter, Target, Dataset y Golden registries;
+- hash del artifact de Product Targets;
+- candidate-data manifest y manifests observacionales P0/P1 individuales;
+- evidence/source/transform manifest hashes relevantes;
+- hashes de este contrato, Engine Math y Scoring Math;
+- `createdFromCommit`, algoritmo, canonicalization y `bundleRootHash`.
+
+Documentos normativos usan `CanonicalDocumentUtf8LfV1`: Unicode NFC, LF y
+UTF-8 sin BOM. Payloads estructurados usan RFC 8785. El root se calcula con
+SHA-256 sobre un objeto canónico que excluye el propio `bundleRootHash`, ordena
+arrays por identidad estable y no incluye timestamps accidentales, orden del
+filesystem o locale. No se permite concatenación ambigua.
+
+Para fuentes `REFERENCE_ONLY` o dinámicas, la unidad inmutable es el
+EvidenceRecord/summary permitido, metadata de retrieval y transform versionado;
+no se incorpora raw restringido para obtener reproducibilidad. Cada transform
+declara ID/versión, schemas, regla determinista, rounding, missing-data policy,
+upstream y consumers. Un spreadsheet o paso manual invisible no es un input
+válido.
+
+Una vez usado por un run, el bundle no se modifica. Cualquier cambio en
+evidence, dataset candidate, transform, registry, Target/Product Target o spec
+relevante crea nuevo `calibrationInputBundleId` y root hash. Todo futuro
+ParameterSet guarda ambos. Dos ParameterSets con bundles distintos no
+comparten calibration lineage aunque sus valores coincidan.
+
+`VALIDATED_CANDIDATE` permite calibración contra candidate data permitida;
+`FROZEN_V1` sigue requiriendo los gates normales de licencia, datos,
+aceptación, goldens y publicación. Fuente concreta:
+[G3D Calibration Input Lineage Manifest](G3D_CALIBRATION_INPUT_LINEAGE_MANIFEST.md).
+
+## 21. Referencias
 
 - [G3B Mathematical Design Board](G3B_DESIGN_BOARD.md)
 - [Especificación matemática del motor](MATHEMATICAL_ENGINE_SPEC.md)

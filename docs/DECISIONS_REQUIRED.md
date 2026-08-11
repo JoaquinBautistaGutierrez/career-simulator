@@ -5909,3 +5909,30 @@ DR-008 remains `PARTIAL_CALIBRATION`; it is not a pending formula decision.
 G3D-5 may start only through a separately authorized task after the three
 pre-calibration controls in `G3D_INITIAL_CALIBRATION_PLAN.md`. Result:
 `GO_FOR_G3D_5_WITH_PRECALIBRATION_FIXES`.
+
+## 21. G3D-4G — Precalibration integrity reconciliation
+
+G3D-4G closes the three start controls without changing equations, Product
+Targets, data lifecycle, scoring or values.
+
+| DR-008 scope | State after G3D-4G | Evidence/gate |
+|---|---|---|
+| Mathematics | `CLOSED` | 63/63 G3C families unchanged |
+| Product Targets | `CLOSED` | 77 exact IDs unchanged |
+| P0 | `READY_WITH_NONBLOCKING_LIMITATIONS` | P0 candidate manifest bound to input bundle |
+| P1 | `ACQUIRED_WITH_LIMITATIONS` | five observational manifests bound individually |
+| Parameter cardinality | `268_CANONICAL` | 268 unique IDs/paths; zero duplicates/orphans; 275 historical prose erratum |
+| Parameter identifiability | `AUDITED` | exhaustive A–H and P0/P1/P2/H partitions |
+| Calibration input lineage | `BOUND_CANDIDATE` | `CIB-G3D4G-RSNAP-20260807-C1` plus root SHA-256 |
+| Weak/unidentifiable policy | `DEFINED` | F 17/17, G 9/9, sensitivity 26/26 |
+| Parameter values | `UNASSIGNED` | assigned values = 0 |
+| EngineParameterSet | `UNPUBLISHED` | no value-bearing candidate |
+| Initial calibration | `READY` | PC-1..PC-6 `PASS`; exact 69-template G3D-5A scope |
+| Goldens | expected outputs pending | 139 remain `SPECIFIED` |
+| Monte Carlo | not executed | future staged campaigns only |
+
+DR-008 remains `PARTIAL_CALIBRATION` because values, campaigns, acceptance,
+goldens and publication remain future work; it is not mathematically or
+precalibration-contract blocked. No other DR policy is reopened.
+
+Result: `GO_FOR_G3D_5A_OBSERVABLE_ANCHORS`.

@@ -1,19 +1,25 @@
 # G3D Initial Calibration Plan
 
-Status: `AUTHORIZED_AFTER_PRECALIBRATION_FIXES`
+Status: `AUTHORIZED_FOR_SEPARATE_G3D_5A_TASK`
 
 This plan defines G3D-5. It creates no parameter value, ParameterSet candidate, scoring
 configuration or executable gameplay artifact.
 
 ## 1. Entry decision
 
-G3D-5 may begin after three pre-calibration controls are recorded in its first run manifest:
+G3D-4G closed the three pre-calibration controls. Every G3D-5A run manifest
+must preserve their bindings:
 
 1. use the audited **268** canonical parameter-path templates; do not perpetuate the historical
    275-row claim and do not invent seven paths;
 2. bind an immutable candidate-data manifest/hash and permitted derived artifacts; Data V1 does
    not need publication before experimentation;
 3. declare provisional range, prior and mandatory global sensitivity for every F/G parameter.
+
+The authoritative controls are
+[Precalibration Gate Checklist](G3D_PRECALIBRATION_GATE_CHECKLIST.md),
+[Calibration Input Lineage Manifest](G3D_CALIBRATION_INPUT_LINEAGE_MANIFEST.md)
+and [Weak Parameter Prior and Sensitivity Contract](G3D_WEAK_PARAMETER_PRIOR_AND_SENSITIVITY_CONTRACT.md).
 
 Decision: `CALIBRATION_CAN_USE_CANDIDATE_DATA`. Data V1 freeze is required before
 `VALIDATED_CANDIDATE` can become `FROZEN_V1`, not before initial estimation. A candidate cannot
@@ -53,6 +59,8 @@ EngineParameterSetCandidate {
   dataCandidateId
   dataManifestHash
   evidenceManifestHash
+  calibrationInputBundleId
+  calibrationInputBundleRootHash
   productTargetManifestHash
   calibrationSeedSetId
   parameterRegistryHash
@@ -170,8 +178,96 @@ No web evidence may decide point values. Normative/Product provenance remains ma
 
 ## 9. First authorized work in G3D-5A
 
-G3D-5A may prepare exact transforms, candidate schemas/manifests, independent worksheets and
-anchor estimates from classes A/B/E. It must not publish, freeze or use G/F values without the
-declared provisional/sensitivity contract. Gameplay implementation remains separately blocked.
+G3D-5A may prepare exact transforms, candidate schemas/manifests, independent
+worksheets and observable/structural anchors only from the list below. Every
+run binds `CIB-G3D4G-RSNAP-20260807-C1` and its root hash. It must not publish,
+freeze, activate F/G values or implement gameplay.
 
-Result after this audit: **`GO_FOR_G3D_5_WITH_PRECALIBRATION_FIXES`**.
+### 9.1 `G3D-5A_ACTIVE_PARAMETER_TEMPLATES`
+
+This is the normative, exhaustive active list. Matrix row number plus canonical
+path jointly identify membership; wildcard expansion does not create another
+template identity.
+
+| Matrix row | Canonical parameter template | Class |
+|---:|---|---|
+| 10 | `player.creation.powerSurrogate.referenceCdf.{position}.{knot}` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 12 | `player.creation.mathProfile.{capabilityScale\|stateRounding\|standardNormalSampler\|positionOrder\|positionGroupOrder\|footOrder}` | `E_SYNTHETIC_STRUCTURAL` |
+| 13 | `development.capabilityFamilyMap.{capability}` | `E_SYNTHETIC_STRUCTURAL` |
+| 14 | `development.mathProfile.{capabilityEvolutionSpace\|developmentComposition\|maturationWindowMultiplier\|verticalSliceEnabledPositions}` | `E_SYNTHETIC_STRUCTURAL` |
+| 34 | `roleMinutes.minutes.intercept.{context}.{position}.{role}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 38 | `roleMinutes.minutes.sigmaPlayer.{context}.{position}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 42 | `roleMinutes.appearances.intercept.{context}.{competitionType}.{role}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 44 | `roleMinutes.starts.intercept.{context}.{competitionType}.{role}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 46 | `roleMinutes.appearances.minimumRecordedMinutes` | `E_SYNTHETIC_STRUCTURAL` |
+| 48 | `roleMinutes.contextFeatureCatalog` | `E_SYNTHETIC_STRUCTURAL` |
+| 49 | `roleMinutes.role.canonicalOrder` | `E_SYNTHETIC_STRUCTURAL` |
+| 50 | `roleMinutes.mathProfile.logitNormalMean` | `E_SYNTHETIC_STRUCTURAL` |
+| 51 | `roleMinutes.quantization.state` | `E_SYNTHETIC_STRUCTURAL` |
+| 52 | `performance.taskAbilities.tasks.{position}.{task}` | `E_SYNTHETIC_STRUCTURAL` |
+| 57 | `performance.underlying.dimensionsByPosition.{position}` | `E_SYNTHETIC_STRUCTURAL` |
+| 72 | `performance.stProduction.{kappaGoals\|kappaAssists}.{positionContext}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 73 | `performance.cmProduction.{goalModel\|assistModel}.{parameter}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 76 | `performance.cmProduction.{kappaGoals\|kappaAssists}.{context}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 77 | `performance.gkProduction.shotsFacedModel.{parameter}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 78 | `performance.gkProduction.saveModel.{parameter}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 80 | `performance.gkProduction.{exposureSigma\|kappaShotsFaced}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 81 | `performance.gkProduction.cleanSheetEligibilityPolicyRef` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 85 | `performance.streamModelIds.{purpose}` | `E_SYNTHETIC_STRUCTURAL` |
+| 86 | `health.math.{epsilonHealthState\|recoveryBurdenUnitScale}` | `E_SYNTHETIC_STRUCTURAL` |
+| 98 | `health.recovery.{requirementIntercept\|requirementSigma\|betaSeverity\|betaRecoveryCapacity\|betaMedical\|betaAge\|betaHistory\|contextWeight}.{injuryFamily}.{contextKey}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 102 | `health.availability.intervalAllocation` | `E_SYNTHETIC_STRUCTURAL` |
+| 107 | `health.familyCatalogRef` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 108 | `health.contextFeatureCatalog` | `E_SYNTHETIC_STRUCTURAL` |
+| 109 | `health.traitTransform` | `E_SYNTHETIC_STRUCTURAL` |
+| 111 | `health.externalCause.adapterCatalogRef` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 112 | `health.samplerIds.{purpose}` | `E_SYNTHETIC_STRUCTURAL` |
+| 113 | `health.modelIds.{purpose}` | `E_SYNTHETIC_STRUCTURAL` |
+| 114 | `health.quantization.state` | `E_SYNTHETIC_STRUCTURAL` |
+| 115 | `health.{calibrationTargetSetRef\|goldenFixtureSetRef}` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 117 | `clubWorld.stateMath.{epsilonState\|quantizationProfile}` | `E_SYNTHETIC_STRUCTURAL` |
+| 125 | `clubWorld.tactics.tacticalDimensions.{dimension}` | `E_SYNTHETIC_STRUCTURAL` |
+| 127 | `clubWorld.positionCompetition.{meansByContextPositionDimension\|persistence\|clubStrengthCoefficients\|scarcityCoefficients\|financeCoefficients\|tacticalDemandCoefficients\|continuityCoefficients\|factorLoadings\|sigmas}.{key}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 128 | `clubWorld.positionCompetition.{scarcityMeans\|scarcityPersistence\|scarcityTalentCoefficients\|scarcityFactorLoadings\|scarcitySigmas}.{key}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 133 | `clubWorld.initialState.{deterministicOffsets\|factorLoadings\|entitySigmas\|fallbackProfileRefs}.{key}` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 134 | `clubWorld.streams.{purpose}.modelId` | `E_SYNTHETIC_STRUCTURAL` |
+| 136 | `competitions.calendar.minuteUnitsPerMatchEquivalentByDefinition.{competitionDefinition}` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 142 | `competitions.playerContribution.competitionAggregationRules.{competitionType}` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 144 | `competitions.leagueOutcome.canonicalTieBreakProfile` | `E_SYNTHETIC_STRUCTURAL` |
+| 150 | `competitions.phaseGraphProfiles.{competitionDefinition}` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 151 | `competitions.definitionParameterBindings.{competitionDefinition}` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 152 | `competitions.streams.{purpose}.modelId` | `E_SYNTHETIC_STRUCTURAL` |
+| 161 | `transfers.candidateField.{allowedOperationPolicies\|logicalEligibilityPolicies\|requiredContextFields\|canonicalOrderPolicy}` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 179 | `transfers.monetary.{quantizerId\|schemaRangePolicy\|positiveDomainPolicy\|conversionPolicyRefs\|referenceCurrencyContextRefs\|overflowValidationConfig}` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 181 | `transfers.streams.{purpose}.modelId` | `E_SYNTHETIC_STRUCTURAL` |
+| 187 | `nationalTeam.roleMinutesProfileRef` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 189 | `nationalTeam.teamStrength.{epsilonState\|mu\|phi\|betaGeneration\|betaRecent\|lambdaWorld\|lambdaSeason\|sigmaDimension}.{key}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 191 | `nationalTeam.contributionProfileRef.{position}` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 192 | `nationalTeam.competition.{utilityIntercept\|supportWeight\|betaContribution\|betaContext\|lambdaTournament\|sigmaTeam\|knockoutContextCoefficients}.{key}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 193 | `nationalTeam.streams.{purpose}.modelId` | `E_SYNTHETIC_STRUCTURAL` |
+| 196 | `awards.positionTaskMappings.{profile}.{position}.{featureId}` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 198 | `awards.statisticalField.{profile}.{baseLogMean\|betaCompetition\|betaEra\|betaFieldQuality\|sigmaEdition\|logKappa\|epsilonDispersion\|sigmaCompetitorHeterogeneity}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 200 | `awards.{normalSamplerId\|negativeBinomialSamplerId\|tieAlgorithmVersion}` | `E_SYNTHETIC_STRUCTURAL` |
+| 201 | `awards.streamModelIds.{awardDefinition}.{purpose}` | `E_SYNTHETIC_STRUCTURAL` |
+| 202 | `reputationSocial.numerical.{stateScale\|sentimentScale\|followerStorage\|quantization}` | `E_SYNTHETIC_STRUCTURAL` |
+| 210 | `reputationSocial.attention.{decayFamilies\|impulseProfiles}.{profile}.{parameter}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 212 | `reputationSocial.regional.diffusionPassesPerBoundary` | `E_SYNTHETIC_STRUCTURAL` |
+| 216 | `reputationSocial.followers.viralSampler` | `E_SYNTHETIC_STRUCTURAL` |
+| 217 | `reputationSocial.engagement.dynamics.{marketProfile}.{parameter}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 218 | `reputationSocial.publicEventProfiles.transforms.{signalProfile}.{parameter}` | `B_DERIVED_FROM_OBSERVATIONAL_SUMMARY` |
+| 220 | `reputationSocial.shocks.normalSampler` | `E_SYNTHETIC_STRUCTURAL` |
+| 221 | `reputationSocial.modelIds.{canonicalPairwiseSum\|followerLogAdapter\|regionalDiffusion\|globalProjection\|followerGrowth}` | `E_SYNTHETIC_STRUCTURAL` |
+| 224 | `retirementComeback.age.{positionFamily}.{location\|scale}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 236 | `retirementComeback.history.{episodeSummaryTransform\|priorLevelTransform}` | `A_DIRECT_ESTIMATION_CANDIDATE` |
+| 238 | `retirementComeback.numericalDomains.{hazardValidationBounds\|finitePredictorPolicy\|stateQuantization}` | `E_SYNTHETIC_STRUCTURAL` |
+
+Count: 20 class A + 16 Engine-owned class B + 33 Engine-owned class E = **69**.
+
+### 9.2 Explicit exclusions
+
+G3D-5A excludes all 146 C joint templates, 2 D Product-constrained templates,
+17 F weak templates and 4 H non-slice templates. It also excludes 30
+Scoring-owned templates (6 B, 15 E and 9 G). All remain canonical and
+value-free. The G rows activate only in G3D-5I under the weak/deferred contract.
+
+Result after G3D-4G: **`GO_FOR_G3D_5A_OBSERVABLE_ANCHORS`**.

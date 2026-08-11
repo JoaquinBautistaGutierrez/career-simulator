@@ -209,3 +209,8 @@ No G3D-4C research or calibration work is included here.
 - [Recovery, Relapse and Sequela Evidence](G3D_P1_HEALTH_RECOVERY_RELAPSE_EVIDENCE.md)
 - [Health Observational Hash Manifest](G3D_P1_HEALTH_OBSERVATIONAL_HASH_MANIFEST.md)
 - [Health Injury Recovery Math Spec](HEALTH_INJURY_RECOVERY_MATH_SPEC.md)
+
+> **Cardinality correction (G3D-4F/4G):** the 275-template count reported at
+> the time was subsequently audited as a prose/counting error. The canonical
+> registry contains 268 unique normative parameter templates; no seven paths
+> are missing.
