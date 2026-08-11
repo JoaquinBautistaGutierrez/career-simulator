@@ -457,3 +457,23 @@ fixture/distribution basis:
 Acceptance uses from G3D-3D are unchanged. These vectors have
 `empiricalFixtureBasis=AVAILABLE_WITH_LIMITATIONS`; none has
 `parameterDependencyCleared=TRUE`, `INPUTS_FROZEN` or a computed result.
+
+## 16. Health empirical-input readiness G3D-4B
+
+All 139 golden IDs remain `SPECIFIED`; no expected output, parameter fixture or
+draw is computed.
+
+| Golden group | G3D-4B readiness improvement | Acceptance use | Still missing |
+|---|---|---|---|
+| `GV-HLT-LOAD-001`, `GV-HLT-FAT-001`, `GV-HLT-FIT-001` | exposure/congestion evidence and ACWR methodological boundary | `CALIBRATION_ACCEPTANCE` | Load/Fatigue/Fitness candidate values and fixed contexts |
+| `GV-INJ-HAZARD-001`, `GV-INJ-COUNT-001` | six family IDs, match/training origins and player-hour empirical basis | hazard invariant/distributional regression | candidate hazard values, fixed exposure and deterministic draws |
+| `GV-INJ-SEVERITY-001` | observed severity bins, family duration shapes and tails | `DISTRIBUTIONAL_REGRESSION` | latent-bin fixture, candidate coefficients/sigma and exact draw |
+| `GV-REC-REQ-001`, `GV-REC-PROGRESS-001`, `GV-AVAIL-MED-001` | right-skewed duration and return-endpoint/censoring basis | distributional/calibration acceptance | requirement/work/availability candidates and calendar interval fixture |
+| `GV-RELAPSE-001` | recurrence definitions, family frequencies and early-time concentration | `DISTRIBUTIONAL_REGRESSION` | continuous memory candidate, parent episode and draw |
+| `GV-SEQUELA-001` | indirect post-return evidence and explicit weak-identification status | `DISTRIBUTIONAL_REGRESSION` | synthetic/joint candidate values and independent acceptance basis |
+| `GV-HLT-CADENCE-001` | observational endpoint adapter confirms cadence boundary remains necessary | `INVARIANT_ACCEPTANCE` | frozen Q fixture; no empirical value required |
+
+These vectors now have
+`empiricalFixtureBasis=AVAILABLE_WITH_LIMITATIONS`; the family/catalog dependency
+is cleared at candidate-definition level only. No vector reaches
+`INPUTS_FROZEN`, `EXPECTED_COMPUTED` or `PUBLISHED_V1`.

@@ -599,3 +599,23 @@ invariant classifications. P1 evidence may become their fixtures later, but does
 not modify their numeric product contract. Geographic metadata is
 `SPAIN_DIRECT`, `ARGENTINA_DIRECT_LIMITED`, and `MULTI_LEAGUE_REFERENCE`; the
 aggregate must never hide the Argentina gap.
+
+## 15. P1 Health observational-readiness overlay G3D-4B
+
+No target ID, type, product number, acceptance tolerance or denominator changes.
+The registry remains 186 targets and all 77 `PT-*` values remain byte-for-byte
+outside this Health overlay.
+
+| Evidence state | Target IDs | Meaning after G3D-4B |
+|---|---|---|
+| `CALIBRATION_READY` | `CT-INJ-FREQ-001`, `CT-INJ-MIX-001`, `CT-INJ-SEV-001`, `CT-REC-DUR-001` | multiple professional player-hour cohorts and family/duration shapes support initial observational estimation; definition, context, licensing and mixture controls remain mandatory |
+| `OBSERVATIONAL_SUMMARY_AVAILABLE` | `CT-INJ-LOAD-001`, `CT-INJ-AVAIL-001`, `CT-INJ-HIST-001`, `CT-REL-FREQ-001`, `CT-REL-DECAY-001`, `CT-INJ-TAIL-001` | empirical associations, return endpoints, history/recurrence and tails exist; latent separation or continuous-decay fit remains joint |
+| `OBSERVATIONAL_EVIDENCE_ACQUIRED` | `CT-HLT-LOAD-001`, `CT-HLT-FAT-001`, `CT-HLT-FIT-001`, `CT-REC-SENS-001`, `CT-SEQ-FREQ-001`, `CT-SEQ-MIX-001`, `CT-SEQ-BURDEN-001`, `CT-SEQ-DUR-001` | evidence constrains direction/diagnostics only; no direct observed target or causal parameter is identified |
+| unchanged invariant | `CT-HLT-INVARIANT-001` | mathematical/invariant acceptance remains spec-derived and does not require an observed range |
+
+Source quality is `TIER_A` for definition contracts and predominantly `TIER_B`
+for observational summaries, with one `TIER_C` methodological caution. Geography
+is `ARGENTINA_DIRECT_LIMITED`, `SPAIN_DIRECT_LIMITED` and
+`MULTI_LEAGUE_REFERENCE`. GK has direct position evidence; CM/ST retain
+`POSITION_MAPPING_LIMITATION`. Epidemiological rates do not replace the G3D-3D
+product guardrails.

@@ -634,3 +634,29 @@ The following related datasets do **not** advance: `DS-PLAYER-TRAIT-REFERENCE`,
 `DS-PRESSURE-PERFORMANCE-REFERENCE`. G3D-4A found no evidence sufficient to
 promote them. Source and transform hashes are in
 [G3D_P1_PLAYER_OBSERVATIONAL_HASH_MANIFEST.md](G3D_P1_PLAYER_OBSERVATIONAL_HASH_MANIFEST.md).
+
+## 19. P1 Health evidence overlay G3D-4B
+
+G3D-4B retains all 40 canonical `datasetId` values and advances only the two
+existing Health definitions. Published aggregates are committed; no raw study
+data, player identity or private medical observation enters the repository.
+
+| Dataset ID | G3D-4B state | Acquired coverage | Limitation / next gate |
+|---|---|---|---|
+| `DS-INJURY-EXPOSURE` | `NORMALIZED_WITH_LIMITATIONS` | total/match/training incidence with player-hour denominators; all six V1 families; Argentina/Spain direct and UEFA/global reference; congestion, age and GK context | source definition/era heterogeneity; Argentina second division/one season; Spain older aggregate; exact CM/ST and training-load panels absent; aggregate-only license route |
+| `DS-INJURY-RECOVERY` | `NORMALIZED_WITH_LIMITATIONS` | diagnosis/family duration means, medians and tails; censoring contract; recurrence semantics/frequencies; indirect post-return/sequela evidence | endpoint heterogeneity; no row-level censoring artifact; sequelae and MedicalQuality weakly identified; no frozen transform or licensed longitudinal mirror |
+
+Both datasets use `ANONYMIZED_OBSERVATION` for any future row-level candidate,
+`TIME_LOSS` as the primary comparable definition, explicit
+`injuryDefinitionClass`, and the mapping states
+`EXACT_MAPPING|FAMILY_MAPPING|AMBIGUOUS_MAPPING|UNMAPPED`. `UNKNOWN_UNSPECIFIED`
+is preserved. Neither dataset is `VALIDATED`, `FROZEN` or part of a published
+`dataVersion`.
+
+Canonical evidence:
+
+- [Health Evidence Index](G3D_P1_HEALTH_EVIDENCE_INDEX.md);
+- [Health Source and License Manifest](G3D_P1_HEALTH_SOURCE_LICENSE_MANIFEST.md);
+- [Injury Incidence Evidence](G3D_P1_HEALTH_INJURY_INCIDENCE_EVIDENCE.md);
+- [Recovery/Relapse Evidence](G3D_P1_HEALTH_RECOVERY_RELAPSE_EVIDENCE.md);
+- [Health Observational Hash Manifest](G3D_P1_HEALTH_OBSERVATIONAL_HASH_MANIFEST.md).

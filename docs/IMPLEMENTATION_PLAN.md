@@ -2742,3 +2742,27 @@ Player-side blockers carried forward: no Argentina player-season panel, direct
 GK aging evidence, freeze-quality event-task licensing, preferred-foot evidence,
 and joint identification of latent Creation/Development/Role/Form variables.
 No later phase starts automatically.
+
+### Cierre G3D-4B — P1 Health, Injury & Recovery evidence
+
+**Resultado:** `GO_FOR_G3D_4C_WITH_HEALTH_EVIDENCE_LIMITATIONS`.
+
+G3D-4B acquires aggregate professional-football incidence, family, severity,
+recovery, recurrence, post-return and workload evidence. The six V1 injury
+families and all G3C-5 mathematics remain unchanged. Two Health datasets advance
+to `NORMALIZED_WITH_LIMITATIONS`; no parameter, Product Target, Data V1 or
+golden output is published.
+
+#### Reconciled sequence after G3D-4B
+
+| Phase | Inputs | Authorized output | Gate | Explicit boundary |
+|---|---|---|---|---|
+| `G3D-4C` — Clubs, Managers, Market & Transfers | P0 club/money candidates and market contracts | contextual club/manager/transfer evidence | identity, monetary/date and license mappings | no coefficients or gameplay; not started here |
+| `G3D-4D` — National Team & Awards | national/award candidates and math | selection, international exposure and award-history evidence | eligibility, field, timing and catalog mapping | no scoring values |
+| `G3D-4E` — Reputation, Social & Retirement | public/lifecycle contracts | permitted platform and longitudinal aggregates | privacy, platform era and career-state definitions | no sponsor, score or hazard calibration |
+| Initial ParameterSet Calibration | completed P1 evidence and product targets | explicit parameter candidates and acceptance reports | all upstream readiness, identifiability, license and separate authorization | no automatic start from evidence acquisition |
+
+Health blockers carried forward are freeze-quality licensing, modern local
+panels, exact CM/ST family mapping, standardized training/load histories,
+censored episode-level recovery/recurrence data and sequela/MedicalQuality
+identification. No subsequent phase starts automatically.

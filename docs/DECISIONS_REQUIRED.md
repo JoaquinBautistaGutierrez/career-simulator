@@ -5800,3 +5800,18 @@ DR-021/025/027 and all resolved policies remain unchanged. The 77 product
 targets, tier/scoring rules, Data V1 state and all 275 unassigned parameter
 templates are untouched. Result:
 `GO_FOR_G3D_4B_WITH_PLAYER_EVIDENCE_LIMITATIONS`.
+
+## 16. G3D-4B — Health observational evidence reconciliation
+
+G3D-4B adds 43 P1 Health EvidenceRecords and aggregate summaries without
+changing a decision family, mathematical contract or product target.
+
+| DR / scope | State after G3D-4B | Evidence advance | Remaining gate |
+|---|---|---|---|
+| `DR-008` integrated calibration | `PARTIAL_CALIBRATION` | injury incidence, family, severity, recovery and recurrence evidence mapped | remaining P1 domains, Health joint fit, ParameterSet candidates, integrated runs and expected goldens |
+| Health/Injury math | `RESOLVED_MATH / PARTIAL_CALIBRATION` | exposure denominators, six-family mapping, return endpoints, recurrence semantics and tails acquired | no hazard, coefficient, sigma, persistence, recovery or sequela value assigned |
+| Data/publication | `DATA_REQUIRED` | two canonical Health datasets reach `NORMALIZED_WITH_LIMITATIONS` | freeze-quality licensed artifact, validation, candidate lineage and atomic Data V1 publication |
+
+ADR-074 and DR-021/025/027/035/036/065–068 remain unchanged. The 77 product
+targets, all scoring rules and all 275 unassigned parameter templates are
+untouched. Result: `GO_FOR_G3D_4C_WITH_HEALTH_EVIDENCE_LIMITATIONS`.

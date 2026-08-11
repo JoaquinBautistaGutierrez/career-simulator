@@ -298,3 +298,22 @@ reproducible public datasets. Transfermarkt-derived aggregates require upstream
 license review before freeze; StatsBomb/Dendir are reference-only/noncommercial.
 No raw data or player identities entered the repository. Result:
 `GO_FOR_G3D_4B_WITH_PLAYER_EVIDENCE_LIMITATIONS`; G3D-4B was not started.
+
+## 16. G3D-4B P1 Health evidence result
+
+Scope is limited to professional-football Health, Injury and Recovery evidence.
+It adds 43 atomic Health records from 20 sources and preserves the six V1
+InjuryDefinitions, player-hour denominators, origin, endpoint and recurrence
+semantics.
+
+| Research area | Evidence state | Coverage | Residual research gap |
+|---|---|---|---|
+| incidence/families | `CALIBRATION_READY_WITH_LIMITATIONS` | professional total/match/training cohorts; all six V1 families | exact CM/ST rates and contemporary local panels |
+| severity/recovery | `CALIBRATION_READY_WITH_LIMITATIONS` | consensus bins, diagnosis distributions and right-skewed time loss | censored episode-level artifact and latent adapter fit |
+| relapse | `OBSERVATIONAL_SUMMARY_AVAILABLE_WITH_LIMITATIONS` | muscle, groin, ankle and knee definitions/frequencies | continuous memory and definition harmonization |
+| sequelae/load | `OBSERVATIONAL_EVIDENCE_ACQUIRED` | post-return and congestion/workload associations | causal decomposition remains weak/joint |
+
+Raw medical/player data is not stored. Sources are aggregate-only and primarily
+`REFERENCE_ONLY`; freeze needs license review or an approved derived-aggregate
+route. No parameter value, G3C equation or product target changed. Result:
+`GO_FOR_G3D_4C_WITH_HEALTH_EVIDENCE_LIMITATIONS`; G3D-4C was not started.

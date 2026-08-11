@@ -750,3 +750,31 @@ the affected canonical branches:
 it does not authorize a parameter value, guarantee causal identification or
 advance publication status. Acceptance-critical flags and product-target
 consumers from G3D-3D are unchanged.
+
+## 21. P1 Health evidence and identifiability overlay G3D-4B
+
+All 275 templates remain value-free and `UNASSIGNED`. No path, domain,
+classification, sensitivity, monotonicity or publication status changes. This
+overlay adds only evidence/dataset/identifiability metadata.
+
+| Parameter branch/family | Evidence bindings | Identifiability | Observational support | Remaining dependency |
+|---|---|---|---|---|
+| `health.hazard.{intercept|betaExposure}.{injuryFamily}.{origin}.{contextKey}` | `DS-INJURY-EXPOSURE`; `EV-P1-INJ-004..025` | `DIRECTLY_ESTIMABLE` observational component | player-hour incidence by match/training and family/context | exposure/calendar transform, family mixture, era/geography and likelihood publication |
+| `health.hazard.{betaLoad|betaFatigue|betaFitness|contextWeight}` | `EV-P1-LOAD-*` plus G3D-4A exposure | `JOINT_CALIBRATION_REQUIRED` | congestion/load associations, no causal universal threshold | latent Load/Fatigue/Fitness separation and controlled campaign |
+| `health.hazard.{betaFragility|betaHistory}` / `health.history.*` | `EV-P1-REL-*`, `EV-P1-INJ-023` | `INDIRECTLY_IDENTIFIABLE` | prior injury and family recurrence associations | player history, site/type adapter and survivor/censoring controls |
+| `health.hazard.{betaAge|ageCenter|ageScale|longevityAgeProtection}` | `EV-P1-INJ-023` | `WEAKLY_IDENTIFIED` | calf-specific age association; no common effect in other muscle groups | smooth multi-family age fit; longitudinal age×exposure evidence |
+| `health.severity.*.{injuryFamily}.{contextKey}` | `EV-P1-INJ-003,005,013..021`; `DS-INJURY-RECOVERY` | `DIRECTLY_ESTIMABLE` latent-bin component | severity bins and diagnosis duration distributions | observation-bin→continuous likelihood; family/context mixture |
+| `health.recovery.{requirementIntercept|requirementSigma|betaSeverity}.{injuryFamily}.{contextKey}` | `EV-P1-REC-001..006` | `DIRECTLY_ESTIMABLE` observational component | positive right-skewed family duration and long-tail evidence | duration→abstract requirement mapping and censored likelihood |
+| `health.recovery.{betaRecoveryCapacity|betaMedical|betaAge|betaHistory|contextWeight}` | Recovery/relapse evidence | `JOINT_CALIBRATION_REQUIRED` | contextual associations only | latent traits, MedicalQuality and case-mix adjustment |
+| `health.recovery.work*`, `health.availability.*`, `health.restriction.*` | `EV-P1-REC-007,008` | `JOINT_CALIBRATION_REQUIRED` | return-to-training/play/performance endpoint contract | quarter recovery-work adapter and exact medical interval fixtures |
+| `health.relapse.*.{injuryFamily}.{feature}` | `EV-P1-REL-*` | `JOINT_CALIBRATION_REQUIRED` | family baselines and early-recurrence concentration | continuous memory fit, parent-episode relationship and origin/context |
+| `health.sequela.*.{injuryFamily}` | `EV-P1-SEQ-*` | `WEAKLY_IDENTIFIED` | indirect post-return participation/performance and rare persistent effects | occurrence/type/burden/decay cannot be separated from current evidence |
+| `health.sequelaCapabilityAffinity.*` | indirect sequela evidence only | `PRODUCT/SYNTHETIC` plus joint validation | no direct medical-to-capability observation | Development adapter and no-direct-capability-write invariant |
+| `health.load.*`, `health.fatigue.*`, `health.fitness.*` dynamics | `EV-P1-LOAD-*`; G3D-4A Role/Minutes | `JOINT_CALIBRATION_REQUIRED` | exposure/congestion associations and methodological uncertainty | repeated load/fitness data; ACWR must not become a threshold |
+| `health.burden.*` | family duration/availability evidence | `INDIRECTLY_IDENTIFIABLE` | episode duration and family tail constraints | composition weights jointly fit to downstream availability/retirement targets |
+| `health.familyCatalogRef` | six V1 mappings in G3D-4B artifacts | `DEFINITION_AVAILABLE` | exact candidate family IDs and source-label mapping contract | future atomic data catalog freeze; no numeric parameter |
+
+`DIRECTLY_ESTIMABLE` applies to a future observational likelihood component, not
+to the full causal coefficient. In particular, no published incidence is copied
+into a log-hazard intercept, no duration becomes a LogNormal parameter and no
+recurrence proportion becomes a Bernoulli/Poisson parameter here.
