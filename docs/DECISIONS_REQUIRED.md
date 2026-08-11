@@ -5863,3 +5863,25 @@ coefficient, scoring point or ParameterSet value is assigned. The 77 Product
 Targets, 275 unassigned templates, 139 uncomputed goldens and
 `DATA_V1_NOT_PUBLISHED` state remain unchanged. Result:
 `GO_FOR_G3D_4E_WITH_NATIONAL_AWARD_LIMITATIONS`.
+
+## 19. G3D-4E — Reputation/Social/Retirement observational evidence reconciliation
+
+G3D-4E adds 50 P1 EvidenceRecords and permitted aggregate attention, social,
+career-duration, retirement-context and comeback chronology evidence without
+changing any mathematical, lifecycle, Product Target or scoring decision.
+
+| DR / scope | State after G3D-4E | Evidence advance | Remaining gate |
+|---|---|---|---|
+| `DR-008` integrated calibration | `PARTIAL_CALIBRATION` | all planned P1 acquisition domains G3D-4A..4E now have evidence/readiness overlays | G3D-4F integrated evidence audit, parameter candidates, sensitivity, acceptance campaigns and independently verified goldens |
+| `DR-061` Reputation/Social | `RESOLVED_MATH / PARTIAL_CALIBRATION` | event-attention, follower-tail, gain/loss, engagement and regional-proxy evidence acquired | latent reputation/awareness/sentiment separation, longitudinal platform panels and joint calibration |
+| `DR-062` Retirement/Comeback | `RESOLVED_MATH / PARTIAL_CALIBRATION` | censored age/duration, retirement contexts and verified competitive comeback routes acquired | joint competing-hazard fit, strict CM/ST/local cohort and representative comeback denominator |
+| `DR-069` finalization | `RESOLVED` unchanged; observational family `PRODUCT_DEFINED` | real-life observability boundary confirms manual finalization has no empirical counterpart | frozen Product Targets, future harness fixtures and invariant/golden verification; no auto-finalization |
+| scoring/PBR boundary | unchanged | social and longevity evidence provides future distribution diagnostics only | no PBR/PRL formula, points, tier or ScoringConfiguration value changes |
+
+SportingReputation remains latent; followers and MarketValue are not its truth.
+Retirement excludes national-team retirement, free agency and temporary
+inactivity. Official comeback cases prove accessibility and meaningful return,
+but do not supply an at-risk denominator or alter the 3–8%, 2+ or 3+ Product
+Targets. All 275 templates remain `UNASSIGNED`, all 77 Product Targets remain
+unchanged, all 139 goldens remain uncomputed and Data V1 remains unpublished.
+Result: `GO_FOR_G3D_4F_WITH_REPUTATION_RETIREMENT_LIMITATIONS`.

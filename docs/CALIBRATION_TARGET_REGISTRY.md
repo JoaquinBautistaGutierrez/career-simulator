@@ -653,3 +653,22 @@ The call-up target does **not** gain an absolute observed probability: the
 plausible non-selected field is incomplete. Award histories never modify PPI,
 PSN or any `PT-*` target. `CT-AWD-STAT-001` retains a full-field/multi-season
 data gate despite two direct upper-tail editions.
+
+## 18. P1 Reputation/Social/Retirement observational-readiness overlay G3D-4E
+
+No target ID, type, product number, denominator or acceptance tolerance changes.
+The registry remains **186 targets** and all **77 `PT-*`** values are unchanged.
+
+| Evidence state | Target IDs | Meaning after G3D-4E |
+|---|---|---|
+| `CALIBRATION_READY` | `CT-RET-AGE-001` | censored multi-cohort age/duration shapes support an initial observational component; geography, start definition and position adapters remain mandatory |
+| `OBSERVATIONAL_SUMMARY_AVAILABLE` | `CT-REP-ATTN-001`, `CT-SOC-FOLLOW-001`, `CT-SOC-ENG-001`, `CT-SOC-TAIL-001`, `CT-RET-CAUSE-001`, `CT-RET-TAIL-001`, `CT-CB-ROUTE-001`, `CT-CB-SUCCESS-001` | dated platform/event and career/return summaries exist, but selected samples, incompatible definitions or missing denominators prevent blind copying |
+| `OBSERVATIONAL_EVIDENCE_ACQUIRED` | `CT-REP-SPORT-001`, `CT-REP-AWARE-001`, `CT-REP-REG-001`, `CT-REP-CORR-001`, `CT-RET-MOT-001`, `CT-RET-SENS-001`, `CT-RET-HEALTH-001`, `CT-RET-MARKET-001` | proxy directions/context are observed; latent and causal separation remains joint or weak |
+| `STILL_BLOCKED` | `CT-REP-SENT-001`, `CT-CB-FREQ-001`, `CT-CB-CYCLE-001`, `CT-FIN-TIME-001` | no comparable sentiment construct, representative comeback/multiple-cycle denominator or real-world manual-finalization event exists |
+| unchanged invariant/diagnostic | `CT-REP-INVARIANT-001`, `CT-SOC-STABILITY-001`, `CT-RET-INVARIANT-001` | mathematics/replay/overflow/lifecycle acceptance remains spec-derived; no observed range is required |
+
+`OBSERVATIONAL_REFERENCE_VS_PRODUCT_TARGET` is recorded where real-world
+evidence could later disagree with comeback, social-decline or finalization
+preferences. It never overwrites a `PT-*` value. `CT-FIN-TIME-001` remains
+Product Defined even though elapsed time without a return may inform
+ContinuationViability.

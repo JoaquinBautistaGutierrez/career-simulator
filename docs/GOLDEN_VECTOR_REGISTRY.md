@@ -518,3 +518,23 @@ These **17** existing requirements gain
 `empiricalFixtureBasis=AVAILABLE_WITH_LIMITATIONS`. Publication status remains
 `SPECIFIED`; no ID reaches `INPUTS_FROZEN`, `EXPECTED_COMPUTED` or
 `PUBLISHED_V1`.
+
+## 19. Reputation/Social/Retirement empirical-input readiness G3D-4E
+
+All **139** golden IDs remain `SPECIFIED`; no fixture is frozen and no expected
+output is computed. G3D-4E adds empirical or Product-boundary basis only.
+
+| Golden IDs | Basis after G3D-4E | Acceptance use | Still required |
+|---|---|---|---|
+| `GV-REP-SPORT-001`, `GV-REP-AWARE-001`, `GV-REP-ATTN-001`, `GV-REP-LAG-001`, `GV-REP-REGION-001` | typed event chronology, normalized attention and regional-proxy limitations | calibration/distributional regression plus lag invariants | candidate persistence/impulse/diffusion values and frozen dated fixtures |
+| `GV-REP-SENT-001` | explicit sentiment-versus-engagement observability boundary | invariant/weak-identification review | Product/synthetic candidate or construct-valid source |
+| `GV-SOC-FOLLOW-UP-001`, `GV-SOC-FOLLOW-DOWN-001`, `GV-SOC-ENG-001` | heavy-tail growth, official gain/loss semantics and engagement definitions | `DISTRIBUTIONAL_REGRESSION` | candidate dynamics, platform fixture and exact draws |
+| `GV-SOC-OVERFLOW-001` | preserved million-scale/extreme-growth observations | `INVARIANT_ACCEPTANCE` | exact uint64 boundary fixture; no empirical cap |
+| `GV-RET-MOT-001`, `GV-RET-DECLINE-001`, `GV-RET-HAZARD-001`, `GV-RET-DECISION-001`, `GV-RET-CURSOR-001` | censored career duration and multi-context retirement evidence | calibration plus lifecycle invariants | joint hazard candidate, upstream adapters and exact draws |
+| `GV-CB-HAZARD-001`, `GV-CB-ROUTE-001`, `GV-CB-CYCLES-001`, `GV-CB-VIABILITY-001` | verified return routes/gaps/quality and explicit denominator limitation | tail/distributional regression | Product-constrained candidate, representative denominator and fixed histories |
+| `GV-FIN-OPP-001`, `GV-FIN-COMPLETE-001`, `GV-FIN-NOREOPEN-001`, `GV-RET-AUTO-001` | manual-finalization/non-auto-close boundary remains Product/invariant-derived | `INVARIANT_ACCEPTANCE` | Product fixture and independent arithmetic; no observational value required |
+
+These existing requirements gain
+`empiricalFixtureBasis=AVAILABLE_WITH_LIMITATIONS` or
+`productBoundaryBasis=AVAILABLE`. Publication state remains `SPECIFIED`; no
+parameter dependency is cleared and no output is asserted.

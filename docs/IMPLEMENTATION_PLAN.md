@@ -2817,3 +2817,26 @@ finance/control/development panels, manager event causes, official/licensed
 player-at-risk transfer data, native disclosed fee semantics, local salary/
 contract/renewal cohorts and private Interest/Offer/negotiation identification.
 No later phase starts automatically.
+
+### Cierre G3D-4E — P1 Reputation, Social, Retirement & Finalization evidence
+
+**Resultado:** `GO_FOR_G3D_4F_WITH_REPUTATION_RETIREMENT_LIMITATIONS`.
+
+G3D-4E acquires dated public-platform/search semantics, follower and engagement
+distribution/tail references, censored professional career-duration and
+retirement-context summaries, and verified competitive comeback routes. Five
+existing DatasetDefinitions advance only to `NORMALIZED_WITH_LIMITATIONS`; no
+parameter, Product Target, scoring value, golden output or Data V1 is published.
+
+#### Reconciled sequence after G3D-4E
+
+| Phase | Inputs | Authorized output | Gate | Explicit boundary |
+|---|---|---|---|---|
+| `G3D-4F` — Integrated P1 Evidence Audit & Calibration Readiness | all G3D-4A..4E evidence/index/license/hash/report artifacts plus P0 candidates and 77 Product Targets | cross-domain source/conflict/license/identifiability/dependency matrix and ordered calibration plan | all direct, joint, weak, synthetic and unresolved families explicit | no ParameterSet values, Data V1 publication, gameplay or scoring implementation; not started here |
+| `G3D-5` — Initial ParameterSet Candidate Calibration | explicit G3D-4F `GO`, audited evidence and frozen Product Targets | versioned candidate values, rationale, sensitivity and acceptance reports | upstream calibration order, source lineage, Monte Carlo/golden gates and separate authorization | cannot start automatically from G3D-4E or without G3D-4F `GO` |
+
+G3D-4F must reconcile the complete P1 blocker set: player/geography/licensing
+gaps, Health definition/censoring, Club/Market private observability, National/
+Award field denominators, social platform/era measurement, strict CM/ST
+retirement coverage, representative comeback denominator, and every Product
+Defined or weakly identified family. G3D-4F is not started by this closure.

@@ -355,3 +355,26 @@ Raw provider/match-event datasets remain outside the repository; dynamic
 official pages require snapshots before freeze. No empirical frequency becomes
 a parameter or Product Target. Result:
 `GO_FOR_G3D_4E_WITH_NATIONAL_AWARD_LIMITATIONS`; G3D-4E is not started.
+
+## 19. G3D-4E P1 Reputation/Social/Retirement evidence result
+
+Scope was limited to public Reputation/Attention/Social observations and
+professional sporting-retirement/comeback/finalization-boundary evidence. It
+adds 50 atomic records from 29 source routes; no private audience, raw scrape,
+private health/motivation observation or player-level external dataset is
+committed.
+
+| Research area | Evidence state | Coverage | Residual research gap |
+|---|---|---|---|
+| Reputation/Awareness | `OBSERVATIONAL_EVIDENCE_ACQUIRED_WITH_LIMITATIONS` | sport/club/public associations, typed events and normalized search contract | latent construct separation, persistence and Argentina/Spain player panel |
+| Public Attention | `READY_WITH_LIMITATIONS` | baseline/peak/decay event references and query reproducibility | repeated footballer events, attribution and freeze-quality snapshots |
+| Followers/Engagement | `OBSERVATIONAL_SUMMARY_AVAILABLE_WITH_LIMITATIONS` | heavy-tail public-account summaries, extreme growth, official gain/loss and interaction semantics | representative male longitudinal panel, organic churn and compatible denominators |
+| Regional/Viral | `OBSERVATIONAL_EVIDENCE_ACQUIRED_WITH_LIMITATIONS` | national-account outside-home proxy and official extreme event cases | player geography, duplicate audiences and representative episode denominator |
+| Retirement/Longevity | `READY_WITH_LIMITATIONS` | censored multi-cohort duration/age and public context chronology | Argentina/Spain cohort and strict CM/ST survival estimates |
+| Comeback | `OBSERVATIONAL_EVIDENCE_ACQUIRED_WITH_LIMITATIONS` | verified contracts, competitive appearances, meaningful roles and gaps | retired-player denominator, multiple cycles and no-return cohort |
+| Finalization | `PRODUCT_DEFINED` | real-world non-observability boundary documented | frozen Product Targets and future harness/invariant acceptance |
+
+All social metrics retain platform/date/definition, active careers are
+right-censored, and no anecdotal comeback becomes a frequency. No parameter,
+Product Target, PBR/PRL/scoring rule, golden output or Data V1 changes. Result:
+`GO_FOR_G3D_4F_WITH_REPUTATION_RETIREMENT_LIMITATIONS`; G3D-4F is not started.

@@ -835,3 +835,32 @@ changes. Only evidence/dataset/identifiability metadata is attached.
 catalog component. No roster ratio becomes a call-up intercept, transition rate
 becomes incumbency persistence, result rate becomes team strength, or historical
 winner share becomes an Award probability.
+
+## 24. P1 Reputation/Social/Retirement evidence and identifiability overlay G3D-4E
+
+All **275** templates remain value-free and `UNASSIGNED`. No canonical path,
+alias, classification, sensitivity, domain, monotonicity or publication state
+changes. Only evidence/dataset/identifiability metadata is attached.
+
+| Parameter branch/family | Evidence binding | Identifiability | Observational support | Remaining dependency |
+|---|---|---|---|---|
+| `reputationSocial.sporting.*` | `DS-REPUTATION-REFERENCE`; `EV-P1-REP-*` | `JOINT_CALIBRATION_REQUIRED` | sport/club/public associations and typed event chronology | distinguish latent sporting persistence from attention; upstream Performance/Award/National facts |
+| `reputationSocial.awareness.*` | search/follower/mention proxies | `JOINT_CALIBRATION_REQUIRED` | normalized search, public audience and reach observations | proxy measurement model, regional coverage and platform-era adapters |
+| `reputationSocial.sentiment.*` | engagement definitions only | `WEAKLY_IDENTIFIED` | no comparable sentiment outcome; engagement is not sentiment | product/synthetic constraint or construct-valid longitudinal source |
+| `reputationSocial.attention.*` | `DS-PUBLIC-ATTENTION-REFERENCE`; `EV-P1-REP-003..007` | observation shape `DIRECTLY_ESTIMABLE`; causal profile joint | baseline, event peak and post-event decline | repeated footballer events, query freeze and attribution |
+| `reputationSocial.regionalDiffusion.*`, `reputationSocial.reach.*` | national-account outside-home shares and event context | `WEAKLY_IDENTIFIED` | aggregate regional/global reach proxy | player geography, transfers, duplicate audience and one-step transition panel |
+| `reputationSocial.followers.{reference|acquisition}.*` | `DS-SOCIAL-AUDIENCE-REFERENCE`; `EV-P1-SOC-*` | cross-section `DIRECTLY_ESTIMABLE` reference; dynamics joint | heavy-tail, scale-dependent event growth and low-account mass | representative male Argentina/Spain longitudinal panel |
+| `reputationSocial.followers.churn.*` | official gain/loss semantics | `JOINT_CALIBRATION_REQUIRED` | follower loss is observable and non-monotone | organic/platform-enforcement/inactivity decomposition and at-risk intervals |
+| `reputationSocial.followers.viral.*` | official/published event tails | `JOINT_CALIBRATION_REQUIRED` | multiple orders-of-magnitude magnitude examples | representative episode denominator plus frozen Product Targets |
+| `reputationSocial.engagement.*` | `DS-SOCIAL-ENGAGEMENT-REFERENCE` | distribution component `DIRECTLY_ESTIMABLE`; persistence joint | audience/engagement heterogeneity and exact platform numerators | comparable denominators and longitudinal AR component |
+| `retirementComeback.age.*`, `retirementComeback.history.*` | `DS-CAREER-RETIREMENT-HISTORY`; `EV-P1-RET-*` | observational survival component `DIRECTLY_ESTIMABLE` | censored age/duration shapes, GK/outfield and level differences | harmonized start/end, geography and strict CM/ST adapters |
+| `retirementComeback.retirementHazard.*`, health/role/market adapters | retirement context plus G3D-4A/4B/4C | `JOINT_CALIBRATION_REQUIRED` | age, health, exposure, career-level and contract context | competing-risk likelihood and causal upstream separation |
+| `retirementComeback.motivation.*`, `retirementComeback.fulfillment.*` | selected surveys/public statements | `WEAKLY_IDENTIFIED` | public/multiple context labels only | private state unobserved; product/synthetic sensitivity constraints |
+| `retirementComeback.comebackHazard.*` | `EV-P1-CBK-*` | `WEAKLY_IDENTIFIED` frequency; route/quality indirect | verified competitive returns, gaps, contracts and minutes | representative retired-player denominator and no-return cohort |
+| `retirementComeback.viability.*`, `retirementComeback.postRetirement.*` | elapsed-time and return chronology | `JOINT_CALIBRATION_REQUIRED` | return remains possible after months/year; no hard threshold | censored comeback cohort, market route and Product Target tails |
+| `retirementComeback.finalizationOpportunity.*` | lifecycle/Product contract | `PRODUCT/SYNTHETIC` | no real-world manual-finalization equivalent | frozen G3D-3D targets and Monte Carlo acceptance only |
+
+`DIRECTLY_ESTIMABLE` describes only a future observation likelihood component.
+No event growth becomes an impulse coefficient, follower summary a dynamic
+parameter, retirement mean a hazard intercept, or comeback anecdote a
+probability. Finalization remains Product Defined.

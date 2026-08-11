@@ -714,3 +714,32 @@ Canonical evidence:
 - [National/Awards Evidence Index](G3D_P1_NATIONAL_AWARDS_EVIDENCE_INDEX.md);
 - [National/Awards Source Manifest](G3D_P1_NATIONAL_AWARDS_SOURCE_LICENSE_MANIFEST.md);
 - [National/Awards Observational Hash Manifest](G3D_P1_NATIONAL_AWARDS_OBSERVATIONAL_HASH_MANIFEST.md).
+
+## 22. P1 Reputation/Social/Retirement evidence overlay G3D-4E
+
+G3D-4E retains all 40 canonical `datasetId` values and advances only the five
+existing Reputation/Social/Retirement definitions. Public aggregate metrics and
+career-event facts are committed; raw platform rows, audience identities,
+private reasons and player-level provider histories remain outside the
+repository.
+
+| Dataset ID | G3D-4E state | Acquired/normalized coverage | Limitation / next gate |
+|---|---|---|---|
+| `DS-REPUTATION-REFERENCE` | `NORMALIZED_WITH_LIMITATIONS` | sport/club/public association, typed event chronology and construct boundary | SportingReputation remains latent; persistence/impulse separation and Argentina/Spain player panel are joint |
+| `DS-SOCIAL-AUDIENCE-REFERENCE` | `NORMALIZED_WITH_LIMITATIONS` | dated Instagram cross-section/event tails plus official platform gain/loss semantics | selected/women/platform bias; no representative male longitudinal or duplicate-audience panel |
+| `DS-SOCIAL-ENGAGEMENT-REFERENCE` | `NORMALIZED_WITH_LIMITATIONS` | separate interaction definitions and published audience/engagement heterogeneity | incompatible platform denominators and no longitudinal football persistence panel |
+| `DS-PUBLIC-ATTENTION-REFERENCE` | `NORMALIZED_WITH_LIMITATIONS` | reproducible search-query contract and event baseline/peak/decline references | query/player attribution, repeated events and freeze-quality snapshots |
+| `DS-CAREER-RETIREMENT-HISTORY` | `NORMALIZED_WITH_LIMITATIONS` | censored career-duration/retirement summaries, public chronology and verified competitive returns | no representative Argentina/Spain cohort, strict CM/ST survival or comeback denominator |
+
+Future row-level candidate histories use `AnonymousObservationId`; public
+player identity is retained only for a nominal official retirement/comeback
+fact. None of these datasets is `VALIDATED`, `FROZEN` or part of a published
+`dataVersion`.
+
+Canonical evidence:
+
+- [Reputation/Social Evidence](G3D_P1_REPUTATION_SOCIAL_EVIDENCE.md);
+- [Retirement/Comeback Evidence](G3D_P1_RETIREMENT_COMEBACK_EVIDENCE.md);
+- [Reputation/Retirement Evidence Index](G3D_P1_REPUTATION_RETIREMENT_EVIDENCE_INDEX.md);
+- [Reputation/Retirement Source Manifest](G3D_P1_REPUTATION_RETIREMENT_SOURCE_LICENSE_MANIFEST.md);
+- [Reputation/Retirement Observational Hash Manifest](G3D_P1_REPUTATION_RETIREMENT_OBSERVATIONAL_HASH_MANIFEST.md).
